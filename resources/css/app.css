@@ -1,0 +1,462 @@
+/* Cairo is already loaded via Edu-System custom.css */
+@import './admin-ui.css';
+
+/* ===== Guest auth (login / register / password) ===== */
+.guest-shell {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 70% 55% at 100% 0%, rgba(13, 110, 253, 0.14), transparent 55%),
+        radial-gradient(ellipse 60% 50% at 0% 100%, rgba(30, 41, 59, 0.1), transparent 50%),
+        linear-gradient(165deg, #e8eef8 0%, #f0f2f5 45%, #eef2f7 100%);
+}
+
+.guest-shell-glow {
+    position: absolute;
+    inset: auto;
+    width: 28rem;
+    height: 28rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(13, 110, 253, 0.09), transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: guest-glow-pulse 8s ease-in-out infinite;
+}
+
+.guest-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 1.15rem;
+    box-shadow: none !important;
+    filter: none;
+    animation: guest-card-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.guest-card-body {
+    padding: 2rem 2rem 1.75rem;
+}
+
+@media (min-width: 576px) {
+    .guest-card-body {
+        padding: 2.35rem 2.5rem 2rem;
+    }
+}
+
+.guest-brand-block {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.guest-logo {
+    display: inline-block;
+    max-height: 44px;
+    width: auto;
+    margin-bottom: 1rem;
+    animation: guest-logo-fade 0.7s ease 0.1s both;
+}
+
+.guest-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.01em;
+}
+
+.guest-subtitle {
+    color: #64748b;
+    font-size: 0.925rem;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.guest-dev-login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px dashed rgba(13, 110, 253, 0.35);
+    border-radius: 0.75rem;
+    background: rgba(13, 110, 253, 0.06);
+}
+
+.guest-dev-login-meta {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.guest-dev-login-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.4rem;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.guest-dev-login strong {
+    display: block;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin-bottom: 0.15rem;
+}
+
+.guest-dev-login p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #64748b;
+    direction: ltr;
+    text-align: start;
+    word-break: break-all;
+}
+
+.guest-dev-login .btn {
+    flex-shrink: 0;
+}
+
+.guest-card .form-label {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.guest-card .form-control {
+    min-height: 46px;
+    border-radius: 0.7rem;
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    padding-block: 0.65rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.guest-card .form-control:focus {
+    background: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.guest-card .form-check {
+    margin-bottom: 1.15rem;
+}
+
+.guest-card .form-check-label {
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.guest-card .btn-primary {
+    min-height: 46px;
+    border-radius: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.guest-card .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.guest-card .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.guest-card .d-flex.justify-content-between {
+    margin-top: 1.15rem !important;
+}
+
+@keyframes guest-card-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes guest-logo-fade {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes guest-glow-pulse {
+    0%,
+    100% {
+        opacity: 0.65;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.08);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guest-shell-glow,
+    .guest-card,
+    .guest-logo,
+    .guest-card .btn-primary {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Content breathing room under sticky header and above footer */
+.main-content.app-content > .container-fluid {
+    padding-block: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .main-content.app-content > .container-fluid {
+        padding-block: 1rem;
+    }
+}
+
+/* Delete confirmation modal */
+.admin-delete-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+}
+
+.admin-delete-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    cursor: pointer;
+}
+
+.admin-delete-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    animation: admin-delete-modal-in 0.22s ease;
+}
+
+@keyframes admin-delete-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.admin-delete-modal-content {
+    background: var(--custom-white, #fff);
+    border-radius: 16px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.22);
+    padding: 2.25rem 1.75rem 1.75rem;
+    text-align: center;
+}
+
+.admin-delete-modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    color: #fff;
+    font-size: 2.1rem;
+}
+
+.admin-delete-modal-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--default-text-color, #1e293b);
+}
+
+.admin-delete-modal-message {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-muted, #64748b);
+}
+
+.admin-delete-modal-warning {
+    margin: 0 0 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #e74c3c;
+}
+
+.admin-delete-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.admin-delete-modal-btn {
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.7rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.admin-delete-modal-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.admin-delete-modal-btn-cancel {
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    color: #475569;
+}
+
+.admin-delete-modal-btn-cancel:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.admin-delete-modal-btn-confirm {
+    border: 0;
+    color: #fff;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.admin-delete-modal-btn-confirm:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 107, 107, 0.45);
+}
+
+[data-theme-mode='dark'] .admin-delete-modal-content {
+    background: var(--custom-white, #1e293b);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme-mode='dark'] .admin-delete-modal-btn-cancel {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.14);
+    color: #e2e8f0;
+}
+
+[data-theme-mode='dark'] .admin-delete-modal-btn-cancel:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Permission picker */
+.permission-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.permission-group {
+    border: 1px solid var(--default-border, #e2e8f0);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--custom-white, #fff);
+}
+
+.permission-group-header {
+    padding: 0.85rem 1rem;
+    background: var(--default-background, #f8fafc);
+    border-bottom: 1px solid var(--default-border, #e2e8f0);
+}
+
+.permission-group-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 700;
+    margin: 0;
+    cursor: pointer;
+}
+
+.permission-group-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.35rem 1rem;
+    padding: 1rem;
+}
+
+.permission-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0;
+    cursor: pointer;
+    padding: 0.35rem 0;
+}
+
+.permission-item span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1.35;
+}
+
+.permission-item small {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.75rem;
+    direction: ltr;
+    text-align: start;
+}
+
+.role-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+}
+
+.role-checkboxes label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+}

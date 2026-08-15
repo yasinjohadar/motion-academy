@@ -1,0 +1,163 @@
+import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
+import { Link, useForm } from '@inertiajs/react';
+
+export default function Edit({ user, roles = [] }) {
+    const { data, setData, put, processing, errors } = useForm({
+        name_ar: user.name_ar || '',
+        name_en: user.name_en || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        password: '',
+        password_confirmation: '',
+        roles: user.roles || [],
+    });
+
+    const toggleRole = (roleName) => {
+        setData(
+            'roles',
+            data.roles.includes(roleName)
+                ? data.roles.filter((name) => name !== roleName)
+                : [...data.roles, roleName],
+        );
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        put(route('admin.users.update', user.id));
+    };
+
+    return (
+        <AdminUiPage
+            title="تعديل المستخدم"
+            subtitle={user.name_ar}
+            actions={
+                <Link href={route('admin.users.index')} className="admin-btn admin-btn-ghost">
+                    <i className="ri-arrow-right-line" />
+                    العودة للقائمة
+                </Link>
+            }
+        >
+            <AdminPanel title="بيانات المستخدم" icon="ri-user-settings-line">
+                <form onSubmit={submit} className="row g-3">
+                    <div className="col-md-6">
+                        <label className="form-label">الاسم بالعربي</label>
+                        <input
+                            type="text"
+                            className={`form-control${errors.name_ar ? ' is-invalid' : ''}`}
+                            value={data.name_ar}
+                            onChange={(e) => setData('name_ar', e.target.value)}
+                        />
+                        {errors.name_ar && (
+                            <div className="invalid-feedback">{errors.name_ar}</div>
+                        )}
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">الاسم بالإنكليزي</label>
+                        <input
+                            type="text"
+                            className={`form-control${errors.name_en ? ' is-invalid' : ''}`}
+                            value={data.name_en}
+                            onChange={(e) => setData('name_en', e.target.value)}
+                            dir="ltr"
+                        />
+                        {errors.name_en && (
+                            <div className="invalid-feedback">{errors.name_en}</div>
+                        )}
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">البريد الإلكتروني</label>
+                        <input
+                            type="email"
+                            className={`form-control${errors.email ? ' is-invalid' : ''}`}
+                            value={data.email}
+                            onChange={(e) => setData('email', e.target.value)}
+                            dir="ltr"
+                        />
+                        {errors.email && (
+                            <div className="invalid-feedback">{errors.email}</div>
+                        )}
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">رقم الهاتف</label>
+                        <input
+                            type="text"
+                            className={`form-control${errors.phone ? ' is-invalid' : ''}`}
+                            value={data.phone}
+                            onChange={(e) => setData('phone', e.target.value)}
+                            dir="ltr"
+                        />
+                        {errors.phone && (
+                            <div className="invalid-feedback">{errors.phone}</div>
+                        )}
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">
+                            كلمة المرور الجديدة{' '}
+                            <span className="text-muted">(اختياري)</span>
+                        </label>
+                        <input
+                            type="password"
+                            className={`form-control${errors.password ? ' is-invalid' : ''}`}
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            dir="ltr"
+                        />
+                        {errors.password && (
+                            <div className="invalid-feedback">{errors.password}</div>
+                        )}
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">تأكيد كلمة المرور</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData('password_confirmation', e.target.value)
+                            }
+                            dir="ltr"
+                        />
+                    </div>
+
+                    <div className="col-12">
+                        <label className="form-label">الأدوار</label>
+                        <div className="role-checkboxes">
+                            {roles.map((role) => (
+                                <label key={role.id}>
+                                    <input
+                                        type="checkbox"
+                                        checked={data.roles.includes(role.name)}
+                                        onChange={() => toggleRole(role.name)}
+                                    />
+                                    <span>{role.name}</span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.roles && (
+                            <div className="text-danger mt-1">{errors.roles}</div>
+                        )}
+                    </div>
+
+                    <div className="col-12 d-flex gap-2 mt-3">
+                        <button
+                            type="submit"
+                            className="admin-btn admin-btn-primary"
+                            disabled={processing}
+                        >
+                            <i className="ri-save-line" />
+                            تحديث
+                        </button>
+                        <Link href={route('admin.users.index')} className="admin-btn admin-btn-ghost">
+                            إلغاء
+                        </Link>
+                    </div>
+                </form>
+            </AdminPanel>
+        </AdminUiPage>
+    );
+}

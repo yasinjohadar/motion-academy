@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use App\Models\AiProvider;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class AiProviderProbeRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $driver = (string) $this->input('driver');
+        $needsKey = $driver !== 'ollama';
+        $needsUrl = in_array($driver, ['ollama', 'openai-compatible'], true);
+
+        return [
+            'name' => ['nullable', 'string', 'max:255'],
+            'driver' => ['required', 'string', Rule::in(array_keys(AiProvider::DRIVERS))],
+            'api_key' => [$needsKey ? 'required' : 'nullable', 'string', 'max:2000'],
+            'base_url' => [$needsUrl ? 'required' : 'nullable', 'string', 'max:500'],
+            'default_model' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'اسم المزود',
+            'driver' => 'نوع المزود',
+            'api_key' => 'مفتاح API',
+            'base_url' => 'Base URL',
+            'default_model' => 'النموذج الافتراضي',
+        ];
+    }
+}
