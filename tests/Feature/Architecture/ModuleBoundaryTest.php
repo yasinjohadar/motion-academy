@@ -25,22 +25,20 @@ class ModuleBoundaryTest extends TestCase
      * @var array<string, list<string>>
      */
     private const BASELINE = [
-        // Enums/NotificationChannel.php — inverted: the channel class now comes from
-        // config('notifications.drivers'), so the core no longer names it.
-        // Notifications/BaseNotification.php and Auth/ResetPasswordNotification.php —
-        // inverted: channelOptions() states intent as strings, and the module's channel
-        // translates them into its own vocabulary.
-        // Support/NotificationChannelResolver.php — inverted: channels now answer for
-        // their own readiness through ReportsChannelAvailability.
-        // Services/Otp/OtpService.php — inverted: the transport is named in
-        // config('otp.channel') and implements DeliversOtpCode.
-        'Services/Dashboard/DashboardStats.php' => [
-            'App\Models\EvolutionInstance',
-            'App\Models\WhatsAppMessage',
-        ],
-        'Http/Controllers/Admin/ObservabilityController.php' => [
-            'App\Models\WhatsAppWebhookEvent',
-        ],
+        /*
+         * Empty — and it must stay empty.
+         *
+         * It began at 12 imports across 7 files. Each was inverted rather than moved:
+         *   NotificationChannel        → config('notifications.drivers')
+         *   NotificationChannelResolver → ReportsChannelAvailability
+         *   OtpService                 → config('otp.channel') + DeliversOtpCode
+         *   BaseNotification + reset   → channelOptions(), strings not enums
+         *   DashboardStats             → ContributesToDashboard
+         *   ObservabilityController    → screen moved to the module's controller
+         *
+         * Adding an entry here is allowed only as a deliberate, temporary debt with a
+         * note saying who will remove it.
+         */
     ];
 
     /**
@@ -187,11 +185,31 @@ class ModuleBoundaryTest extends TestCase
         ]));
     }
 
-    public function test_the_scanner_actually_finds_something(): void
+    /**
+     * The vacuity guard.
+     *
+     * Now that the baseline is empty, "no coupling found" is also what a broken scanner
+     * would report. So instead of asserting that coupling exists, prove the scanner can
+     * still see: it must walk real files, and classify module and core classes correctly.
+     */
+    public function test_the_scanner_can_still_detect_coupling(): void
     {
-        // Without this, a broken regex would make both tests above pass vacuously.
-        // The anchor must be a file still in BASELINE — update it as the list shrinks.
-        $this->assertNotEmpty($this->currentCoupling());
-        $this->assertArrayHasKey('Services/Dashboard/DashboardStats.php', $this->currentCoupling());
+        $scanned = 0;
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(app_path()));
+
+        foreach ($files as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php' && ! $this->isModuleFile(
+                str_replace('\\', '/', substr($file->getPathname(), strlen(app_path()) + 1))
+            )) {
+                $scanned++;
+            }
+        }
+
+        $this->assertGreaterThan(50, $scanned, 'The scanner is not walking the core at all.');
+
+        $this->assertTrue($this->isModuleClass('App\Services\WhatsApp\SendWhatsAppMessage'));
+        $this->assertTrue($this->isModuleClass('App\Models\EvolutionInstance'));
+        $this->assertFalse($this->isModuleClass('App\Models\User'));
+        $this->assertFalse($this->isModuleClass('App\Services\Otp\OtpService'));
     }
 }

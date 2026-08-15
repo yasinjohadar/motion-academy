@@ -3,11 +3,10 @@
 namespace App\Services\Dashboard;
 
 use App\Models\AppNotification;
-use App\Models\EvolutionInstance;
 use App\Models\SmtpSetting;
 use App\Models\User;
-use App\Models\WhatsAppMessage;
 use App\Services\Observability\SecurityLogger;
+use App\Support\Dashboard\ContributesToDashboard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
@@ -30,7 +29,7 @@ class DashboardStats
     {
         $health = $this->systemHealth();
 
-        return [
+        $cards = [
             [
                 'key' => 'users',
                 'title' => 'المستخدمون',
@@ -54,18 +53,6 @@ class DashboardStats
                 'route' => 'admin.observability.security',
             ],
             [
-                'key' => 'messages',
-                'title' => 'الرسائل',
-                'value' => $this->count(fn () => WhatsAppMessage::query()
-                    ->where('direction', WhatsAppMessage::DIRECTION_INBOUND)
-                    ->where('created_at', '>=', now()->startOfMonth())
-                    ->count()),
-                'subtext' => 'رسائل واردة هذا الشهر',
-                'theme' => 'blue',
-                'icon' => 'ri-mail-line',
-                'route' => 'admin.whatsapp-messages.index',
-            ],
-            [
                 'key' => 'health',
                 'title' => 'حالة النظام',
                 'value' => $health['score'],
@@ -75,6 +62,10 @@ class DashboardStats
                 'route' => 'admin.observability.index',
             ],
         ];
+
+        // Module cards come after the core's own, so removing a module only
+        // shortens the row rather than reshuffling it.
+        return [...$cards, ...$this->contribute('statCards')];
     }
 
     /**
@@ -106,14 +97,11 @@ class DashboardStats
                 'passed' => $this->count(fn () => SmtpSetting::query()->where('is_active', true)->count()) > 0,
                 'failure' => 'لا يوجد إعداد SMTP نشِط',
             ],
-            [
-                'label' => 'أرقام واتساب متصلة',
-                // Only meaningful once at least one instance has been added.
-                'passed' => $this->count(fn () => EvolutionInstance::query()->count()) === 0
-                    || $this->count(fn () => EvolutionInstance::query()->connected()->count()) > 0,
-                'failure' => 'جميع أرقام واتساب مقطوعة',
-            ],
         ];
+
+        // Module checks join the same score, so an unreachable WhatsApp number
+        // lowers system health exactly like a failed job does.
+        $checks = [...$checks, ...$this->contribute('healthChecks')];
 
         $failed = array_values(array_filter($checks, fn (array $check): bool => ! $check['passed']));
         $score = (int) round(((count($checks) - count($failed)) / count($checks)) * 100);
@@ -135,21 +123,12 @@ class DashboardStats
      */
     public function todaySummary(User $user): array
     {
-        return [
+        $metrics = [
             [
                 'label' => 'تسجيلات اليوم',
                 'value' => $this->count(fn () => User::query()->whereDate('created_at', today())->count()),
                 'icon' => 'ri-user-add-line',
                 'color' => 'green',
-            ],
-            [
-                'label' => 'رسائل واردة',
-                'value' => $this->count(fn () => WhatsAppMessage::query()
-                    ->where('direction', WhatsAppMessage::DIRECTION_INBOUND)
-                    ->whereDate('created_at', today())
-                    ->count()),
-                'icon' => 'ri-mail-open-line',
-                'color' => 'blue',
             ],
             [
                 'label' => 'مهام معلقة',
@@ -165,6 +144,8 @@ class DashboardStats
                 'color' => 'purple',
             ],
         ];
+
+        return [...$metrics, ...$this->contribute('todayMetrics')];
     }
 
     /**
@@ -224,6 +205,41 @@ class DashboardStats
     public function lastLoginAt(User $user): ?Carbon
     {
         return $user->last_login_at;
+    }
+
+    /**
+     * Collect one kind of contribution from every registered module.
+     *
+     * A contributor that is missing, does not implement the contract, or throws is
+     * skipped: the dashboard is the landing page, and a removed or half-configured
+     * module must not be able to take it down.
+     *
+     * @param  'statCards'|'healthChecks'|'todayMetrics'  $kind
+     * @return array<int, array<string, mixed>>
+     */
+    protected function contribute(string $kind): array
+    {
+        $collected = [];
+
+        foreach ((array) config('dashboard.contributors', []) as $class) {
+            try {
+                if (! is_string($class) || ! class_exists($class)) {
+                    continue;
+                }
+
+                $contributor = app($class);
+
+                if (! $contributor instanceof ContributesToDashboard) {
+                    continue;
+                }
+
+                $collected = [...$collected, ...$contributor->{$kind}()];
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+
+        return $collected;
     }
 
     /**

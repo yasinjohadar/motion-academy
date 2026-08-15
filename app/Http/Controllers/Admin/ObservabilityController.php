@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\WhatsAppWebhookEvent;
 use App\Services\Observability\ActivityLogViewer;
 use App\Services\Observability\DatabaseInspector;
 use App\Services\Observability\FailedJobInspector;
@@ -37,7 +36,7 @@ class ObservabilityController extends Controller implements HasMiddleware
             (new Middleware('permission:admin.observability.security'))
                 ->only(['security', 'sessions', 'revokeSession']),
             (new Middleware('permission:admin.observability.jobs'))
-                ->only(['failedJobs', 'retryJob', 'retryAllJobs', 'forgetJob', 'flushJobs', 'webhooks']),
+                ->only(['failedJobs', 'retryJob', 'retryAllJobs', 'forgetJob', 'flushJobs']),
             (new Middleware('permission:admin.observability.database'))
                 ->only(['database', 'databaseTable']),
         ];
@@ -172,32 +171,6 @@ class ObservabilityController extends Controller implements HasMiddleware
 
         return redirect()->route('admin.observability.failed-jobs')
             ->with('success', "تم حذف {$count} مهمة فاشلة.");
-    }
-
-    /**
-     * Inbound webhook events. Previously a write-only table with no UI at all.
-     */
-    public function webhooks(Request $request): Response
-    {
-        $state = $request->string('state')->toString() ?: null;
-        $type = $request->string('event_type')->toString() ?: null;
-
-        $items = WhatsAppWebhookEvent::query()
-            ->when($type, fn ($q) => $q->where('event_type', $type))
-            ->when($state === 'unprocessed', fn ($q) => $q->whereNull('processed_at'))
-            ->when($state === 'processed', fn ($q) => $q->whereNotNull('processed_at'))
-            ->latest('id')
-            ->paginate((int) config('observability.per_page', 25))
-            ->withQueryString()
-            ->through(fn (WhatsAppWebhookEvent $event): array => $event->toAdminArray());
-
-        return Inertia::render('Admin/Observability/WebhookEvents', [
-            'items' => $items,
-            'filters' => ['state' => $state, 'event_type' => $type],
-            'types' => WhatsAppWebhookEvent::query()
-                ->distinct()->orderBy('event_type')->pluck('event_type')->filter()->values()->all(),
-            'flash' => $this->flash($request),
-        ]);
     }
 
     /**

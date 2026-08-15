@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ObservabilityController;
+use App\Http\Controllers\Admin\WhatsAppWebhookEventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SitePageController;
@@ -63,7 +64,7 @@ Route::middleware(['auth', 'verified'])
             Route::delete('sessions/{session}', [ObservabilityController::class, 'revokeSession'])
                 ->name('sessions.revoke');
 
-            Route::get('webhooks', [ObservabilityController::class, 'webhooks'])->name('webhooks');
+            Route::get('webhooks', [WhatsAppWebhookEventController::class, 'index'])->name('webhooks');
 
             Route::get('database', [ObservabilityController::class, 'database'])->name('database');
             // Table names are validated against the real table list inside the
