@@ -5,7 +5,6 @@ namespace App\Notifications\Auth;
 use App\Enums\NotificationCategory;
 use App\Enums\NotificationChannel;
 use App\Enums\NotificationLevel;
-use App\Enums\WhatsAppPurpose;
 use App\Notifications\BaseNotification;
 use Illuminate\Notifications\Messages\MailMessage;
 
@@ -92,19 +91,21 @@ class ResetPasswordNotification extends BaseNotification
     }
 
     /**
-     * Meta templates take the URL's tail as the button/body parameter, not the whole
-     * link — the domain is fixed in the approved template.
+     * Instructions for the WhatsApp channel, expressed as strings so this core
+     * notification does not have to import the module's enum.
      *
-     * @return array<int, string>
+     * `purpose` selects the approved template once the 24-hour window has closed —
+     * which it always has for someone asking to reset a password. Meta templates take
+     * the URL's tail as the parameter, not the whole link: the domain is fixed inside
+     * the approved template.
+     *
+     * @return array<string, mixed>
      */
-    public function whatsAppTemplateParameters(object $notifiable): array
+    public function channelOptions(string $channel, object $notifiable): array
     {
-        return [$this->token];
-    }
-
-    public function whatsAppPurpose(): WhatsAppPurpose
-    {
-        return WhatsAppPurpose::PasswordReset;
+        return $channel === 'whatsapp'
+            ? ['purpose' => 'password_reset', 'template_parameters' => [$this->token]]
+            : [];
     }
 
     /**

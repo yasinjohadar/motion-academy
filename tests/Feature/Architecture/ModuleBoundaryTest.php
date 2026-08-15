@@ -27,12 +27,9 @@ class ModuleBoundaryTest extends TestCase
     private const BASELINE = [
         // Enums/NotificationChannel.php — inverted: the channel class now comes from
         // config('notifications.drivers'), so the core no longer names it.
-        'Notifications/BaseNotification.php' => [
-            'App\Enums\WhatsAppPurpose',
-        ],
-        'Notifications/Auth/ResetPasswordNotification.php' => [
-            'App\Enums\WhatsAppPurpose',
-        ],
+        // Notifications/BaseNotification.php and Auth/ResetPasswordNotification.php —
+        // inverted: channelOptions() states intent as strings, and the module's channel
+        // translates them into its own vocabulary.
         // Support/NotificationChannelResolver.php — inverted: channels now answer for
         // their own readiness through ReportsChannelAvailability.
         // Services/Otp/OtpService.php — inverted: the transport is named in

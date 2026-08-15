@@ -5,7 +5,6 @@ namespace App\Notifications;
 use App\Enums\NotificationCategory;
 use App\Enums\NotificationChannel;
 use App\Enums\NotificationLevel;
-use App\Enums\WhatsAppPurpose;
 use App\Support\NotificationChannelResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -93,20 +92,19 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Which routing purpose the WhatsApp channel sends this under — it decides the
-     * provider and, on Meta, the approved template used outside the 24-hour window.
-     */
-    public function whatsAppPurpose(): WhatsAppPurpose
-    {
-        return WhatsAppPurpose::SystemNotification;
-    }
-
-    /**
-     * Values for the {{1}}, {{2}} … placeholders of that template, in order.
+     * Extra instructions for one delivery channel, keyed by channel value.
      *
-     * @return array<int, string>
+     * This replaced a pair of WhatsApp-typed methods on this class. A base class every
+     * notification extends must not carry one module's vocabulary — it made the whole
+     * notification system undeliverable without that module.
+     *
+     * Keys are plain strings on purpose: a core notification states its intent, and the
+     * module that owns the channel decides what that intent means. The WhatsApp channel,
+     * for instance, reads `purpose` and `template_parameters`.
+     *
+     * @return array<string, mixed>
      */
-    public function whatsAppTemplateParameters(object $notifiable): array
+    public function channelOptions(string $channel, object $notifiable): array
     {
         return [];
     }

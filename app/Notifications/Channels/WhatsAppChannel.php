@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Channels;
 
+use App\Enums\WhatsAppPurpose;
 use App\Models\EvolutionInstance;
 use App\Notifications\BaseNotification;
 use App\Services\WhatsApp\ProviderCapabilities;
@@ -77,12 +78,19 @@ class WhatsAppChannel implements ReportsChannelAvailability
             return;
         }
 
+        // The notification states its intent as plain strings; translating those into
+        // this module's vocabulary is this class's job, not the core's.
+        $options = $notification->channelOptions('whatsapp', $notifiable);
+
+        $purpose = WhatsAppPurpose::tryFrom((string) ($options['purpose'] ?? ''))
+            ?? WhatsAppPurpose::SystemNotification;
+
         try {
             $this->sendService->sendText(
                 (string) $to,
                 $notification->toWhatsApp($notifiable),
-                purpose: $notification->whatsAppPurpose(),
-                templateParameters: $notification->whatsAppTemplateParameters($notifiable),
+                purpose: $purpose,
+                templateParameters: array_values((array) ($options['template_parameters'] ?? [])),
             );
         } catch (\Throwable $e) {
             // A dead WhatsApp instance must not fail the whole notification — the
