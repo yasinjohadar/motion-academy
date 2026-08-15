@@ -72,6 +72,12 @@ class NotificationChannelResolver
      */
     public function isAvailable(NotificationChannel $channel, object $notifiable): bool
     {
+        // A channel whose class is not registered belongs to a module that is not
+        // installed. Queueing for it would only produce a container error later.
+        if (! $channel->isRegistered()) {
+            return false;
+        }
+
         return match ($channel) {
             NotificationChannel::Database => true,
 

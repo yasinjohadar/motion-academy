@@ -2,9 +2,6 @@
 
 namespace App\Enums;
 
-use App\Notifications\Channels\WhatsAppChannel;
-use NotificationChannels\WebPush\WebPushChannel;
-
 /**
  * Delivery channels a notification may use.
  *
@@ -22,6 +19,11 @@ enum NotificationChannel: string
 
     /**
      * The driver name or channel class Laravel should resolve for this channel.
+     *
+     * Built-in drivers answer by name. Anything supplied by a module or a package is
+     * looked up in `config('notifications.drivers')` rather than imported here — the
+     * core must not name a class that lives in an optional module, or that module
+     * could never be removed.
      */
     public function driver(): string
     {
@@ -29,9 +31,26 @@ enum NotificationChannel: string
             self::Database => 'database',
             self::Broadcast => 'broadcast',
             self::Mail => 'mail',
-            self::WhatsApp => WhatsAppChannel::class,
-            self::WebPush => WebPushChannel::class,
+            default => (string) config("notifications.drivers.{$this->value}", ''),
         };
+    }
+
+    /**
+     * Whether a channel class is actually registered for this channel.
+     *
+     * A module that has been removed leaves its channel unregistered, and delivery
+     * must skip it instead of asking the container for a class that no longer exists.
+     */
+    public function isRegistered(): bool
+    {
+        $driver = $this->driver();
+
+        return $driver !== '' && ($this->isBuiltIn() || class_exists($driver));
+    }
+
+    public function isBuiltIn(): bool
+    {
+        return in_array($this, [self::Database, self::Broadcast, self::Mail], true);
     }
 
     public function label(): string

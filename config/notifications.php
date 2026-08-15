@@ -1,5 +1,8 @@
 <?php
 
+use App\Notifications\Channels\WhatsAppChannel;
+use NotificationChannels\WebPush\WebPushChannel;
+
 /**
  * إعدادات نظام الإشعارات المركزي
  *
@@ -18,6 +21,22 @@ return [
     'realtime' => [
         'enabled' => env('NOTIFICATIONS_REALTIME', false),
         'poll_interval' => (int) env('NOTIFICATIONS_POLL_INTERVAL', 30000),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | أصناف القنوات المخصّصة
+    |--------------------------------------------------------------------------
+    | القنوات المدمجة في Laravel (database, broadcast, mail) تُحلّ باسمها، أما
+    | القنوات التي توفّرها وحدة أو حزمة فتُسجَّل هنا.
+    |
+    | هذا هو موضع تسجيل الوحدة لنفسها: حذف وحدة واتساب = حذف سطرها من هنا،
+    | لا تعديل ملف داخل النواة. وقناة غير مسجَّلة تُعتبر غير متاحة، فلا يُصطفّ
+    | إرسال لا يمكن أن ينجح.
+    */
+    'drivers' => [
+        'whatsapp' => WhatsAppChannel::class,
+        'webpush' => WebPushChannel::class,
     ],
 
     /*
