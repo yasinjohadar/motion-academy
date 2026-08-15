@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\ExposesPolicyFlags;
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 class BlogPost extends Model
 {
     use ExposesPolicyFlags, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'title', 'slug', 'excerpt', 'content', 'featured_image', 'featured_image_alt',

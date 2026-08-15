@@ -6,6 +6,7 @@ use App\Enums\NotificationCategory;
 use App\Enums\NotificationLevel;
 use App\Notifications\Channels\AppDatabaseChannel;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\DatabaseNotification;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Notifications\DatabaseNotification;
  */
 class AppNotification extends DatabaseNotification
 {
+    use HasFactory;
+
     protected $table = 'notifications';
 
     /**

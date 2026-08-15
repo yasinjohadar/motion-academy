@@ -4,12 +4,14 @@ namespace App\Models;
 
 use App\Models\Concerns\AuditsChanges;
 use App\Services\WhatsApp\WhatsAppSettingsService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
 class EvolutionInstance extends Model
 {
     use AuditsChanges;
+    use HasFactory;
 
     protected $fillable = [
         'instance_name',

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class BlogTag extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name', 'slug', 'description', 'color',
         'meta_title', 'meta_description', 'canonical_url',
