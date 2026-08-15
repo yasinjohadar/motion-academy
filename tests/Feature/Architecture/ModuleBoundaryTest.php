@@ -35,10 +35,8 @@ class ModuleBoundaryTest extends TestCase
         ],
         // Support/NotificationChannelResolver.php — inverted: channels now answer for
         // their own readiness through ReportsChannelAvailability.
-        'Services/Otp/OtpService.php' => [
-            'App\Enums\WhatsAppPurpose',
-            'App\Services\WhatsApp\SendWhatsAppMessage',
-        ],
+        // Services/Otp/OtpService.php — inverted: the transport is named in
+        // config('otp.channel') and implements DeliversOtpCode.
         'Services/Dashboard/DashboardStats.php' => [
             'App\Models\EvolutionInstance',
             'App\Models\WhatsAppMessage',
@@ -195,7 +193,8 @@ class ModuleBoundaryTest extends TestCase
     public function test_the_scanner_actually_finds_something(): void
     {
         // Without this, a broken regex would make both tests above pass vacuously.
+        // The anchor must be a file still in BASELINE — update it as the list shrinks.
         $this->assertNotEmpty($this->currentCoupling());
-        $this->assertArrayHasKey('Services/Otp/OtpService.php', $this->currentCoupling());
+        $this->assertArrayHasKey('Services/Dashboard/DashboardStats.php', $this->currentCoupling());
     }
 }

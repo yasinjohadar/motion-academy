@@ -3,10 +3,9 @@
 namespace App\Services\Otp;
 
 use App\Enums\OtpPurpose;
-use App\Enums\WhatsAppPurpose;
 use App\Models\OtpCode;
 use App\Services\Observability\SecurityLogger;
-use App\Services\WhatsApp\SendWhatsAppMessage;
+use App\Support\Otp\DeliversOtpCode;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,15 +19,13 @@ use Illuminate\Support\Facades\Hash;
  *  - attempts are capped per code, and issuing is rate limited per identifier
  *  - every issue / success / failure lands on the security timeline
  *
- * Delivery goes through WhatsAppRouter with the Otp purpose, so on Meta a closed
- * customer service window automatically switches to the approved authentication
- * template — which is the only thing Meta will accept for a user who has not written
- * to the business.
+ * Delivery is not this class's business. The transport named in `config('otp.channel')`
+ * carries the code, so issuing and verifying work the same whether codes go out over
+ * WhatsApp, SMS or email — and the core needs no module installed to own the feature.
  */
 class OtpService
 {
     public function __construct(
-        private SendWhatsAppMessage $whatsapp,
         private SecurityLogger $security,
         private RateLimiter $limiter,
     ) {}
@@ -129,12 +126,31 @@ class OtpService
 
     protected function deliver(string $identifier, OtpPurpose $purpose, string $code): void
     {
-        $this->whatsapp->sendText(
-            $identifier,
-            $purpose->message($code, $this->ttlMinutes()),
-            previewUrl: false,
-            purpose: WhatsAppPurpose::Otp,
-            templateParameters: [$code],
+        $this->channel()->deliver($identifier, $purpose, $code, $this->ttlMinutes());
+    }
+
+    /**
+     * The configured transport, resolved from config rather than injected, so the core
+     * never names the module that carries the code.
+     *
+     * @throws OtpDeliveryException when nothing is configured to deliver
+     */
+    protected function channel(): DeliversOtpCode
+    {
+        $class = config('otp.channel');
+
+        if (is_string($class) && class_exists($class)) {
+            $instance = app($class);
+
+            if ($instance instanceof DeliversOtpCode) {
+                return $instance;
+            }
+        }
+
+        // Failing loudly beats recording an issued code that nothing will ever send —
+        // the user would sit waiting for a message that was never dispatched.
+        throw new OtpDeliveryException(
+            'لا توجد قناة توصيل مُهيّأة لرموز التحقق. اضبط otp.channel.'
         );
     }
 
