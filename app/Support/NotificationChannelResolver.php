@@ -3,14 +3,11 @@
 namespace App\Support;
 
 use App\Enums\NotificationChannel;
-use App\Models\EvolutionInstance;
 use App\Models\NotificationPreference;
 use App\Models\SmtpSetting;
 use App\Models\User;
 use App\Notifications\BaseNotification;
-use App\Services\WhatsApp\ProviderCapabilities;
-use App\Services\WhatsApp\WhatsAppProviderFactory;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Support\Notifications\ReportsChannelAvailability;
 
 /**
  * Decides which channels a notification actually goes out on.
@@ -87,11 +84,42 @@ class NotificationChannelResolver
             NotificationChannel::Mail => filled($notifiable->routeNotificationFor('mail'))
                 && $this->hasActiveMailer(),
 
-            NotificationChannel::WhatsApp => filled($notifiable->routeNotificationFor('whatsapp'))
-                && $this->hasUsableWhatsAppProvider(),
-
             NotificationChannel::WebPush => $this->hasPushSubscription($notifiable),
+
+            // Module-supplied channels answer for themselves.
+            default => $this->channelReportsAvailable($channel, $notifiable),
         };
+    }
+
+    /**
+     * Ask the channel class whether it can deliver.
+     *
+     * A channel that does not implement ReportsChannelAvailability has no opinion, so
+     * being registered is enough — the alternative would be the core guessing on
+     * behalf of a module it is not supposed to know about.
+     */
+    protected function channelReportsAvailable(NotificationChannel $channel, object $notifiable): bool
+    {
+        $reporter = $this->availabilityReporter($channel);
+
+        return $reporter === null || $reporter->isAvailableFor($notifiable);
+    }
+
+    protected function availabilityReporter(NotificationChannel $channel): ?ReportsChannelAvailability
+    {
+        try {
+            $driver = $channel->driver();
+
+            if ($channel->isBuiltIn() || ! class_exists($driver)) {
+                return null;
+            }
+
+            $instance = app($driver);
+
+            return $instance instanceof ReportsChannelAvailability ? $instance : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     protected function isEnabledForNotifiable(
@@ -124,33 +152,6 @@ class NotificationChannelResolver
 
         try {
             return SmtpSetting::query()->where('is_active', true)->exists();
-        } catch (\Throwable) {
-            return false;
-        }
-    }
-
-    /**
-     * Can WhatsApp actually deliver right now?
-     *
-     * What counts as "ready" differs per provider: Evolution needs a paired instance
-     * row, the hosted APIs just need credentials. Asking the capability map and the
-     * provider itself keeps this from becoming a growing list of provider names —
-     * it used to check only for an Evolution instance, which silently disabled the
-     * whole channel on any installation not running Evolution.
-     */
-    protected function hasUsableWhatsAppProvider(): bool
-    {
-        try {
-            $settings = app(WhatsAppSettingsService::class);
-            $provider = $settings->getSettings()['whatsapp_provider'];
-            $capabilities = ProviderCapabilities::for($provider);
-
-            if ($capabilities->requiresConnectedInstance) {
-                return EvolutionInstance::query()->connected()->exists();
-            }
-
-            return WhatsAppProviderFactory::create($provider, $settings->getProviderConfig($provider))
-                ->isConfigured();
         } catch (\Throwable) {
             return false;
         }
@@ -200,13 +201,12 @@ class NotificationChannelResolver
                 ? 'لا يوجد بريد إلكتروني لهذا المستخدم.'
                 : 'لا يوجد إعداد SMTP نشِط.',
 
-            NotificationChannel::WhatsApp => blank($notifiable->routeNotificationFor('whatsapp'))
-                ? 'لا يوجد رقم هاتف في ملف المستخدم.'
-                : 'لا يوجد رقم واتساب متصل.',
-
             NotificationChannel::WebPush => 'لم يتم تسجيل هذا المتصفح لاستقبال الإشعارات.',
 
             NotificationChannel::Database => null,
+
+            default => $this->availabilityReporter($channel)?->unavailableReasonFor($notifiable)
+                ?? 'هذه القناة غير مُتاحة حالياً.',
         };
     }
 }

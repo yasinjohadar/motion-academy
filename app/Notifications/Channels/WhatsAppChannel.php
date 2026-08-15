@@ -2,8 +2,13 @@
 
 namespace App\Notifications\Channels;
 
+use App\Models\EvolutionInstance;
 use App\Notifications\BaseNotification;
+use App\Services\WhatsApp\ProviderCapabilities;
 use App\Services\WhatsApp\SendWhatsAppMessage;
+use App\Services\WhatsApp\WhatsAppProviderFactory;
+use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Support\Notifications\ReportsChannelAvailability;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
@@ -16,9 +21,49 @@ use Illuminate\Support\Facades\Log;
  * SendWhatsAppMessageJob. Queueing there is deliberate: a WhatsApp API failure must
  * not take the rest of the notification's channels down with it.
  */
-class WhatsAppChannel
+class WhatsAppChannel implements ReportsChannelAvailability
 {
     public function __construct(private SendWhatsAppMessage $sendService) {}
+
+    /**
+     * Whether WhatsApp can deliver to this notifiable right now.
+     *
+     * This lives here, not in NotificationChannelResolver: what counts as "ready"
+     * differs per provider — Evolution needs a paired instance row, the hosted APIs
+     * only need credentials — and that is knowledge belonging to the WhatsApp module.
+     * The core resolver used to import four classes from here to answer it.
+     */
+    public function isAvailableFor(object $notifiable): bool
+    {
+        if (blank($notifiable->routeNotificationFor('whatsapp'))) {
+            return false;
+        }
+
+        try {
+            $settings = app(WhatsAppSettingsService::class);
+            $provider = $settings->getSettings()['whatsapp_provider'];
+
+            if (ProviderCapabilities::for($provider)->requiresConnectedInstance) {
+                return EvolutionInstance::query()->connected()->exists();
+            }
+
+            return WhatsAppProviderFactory::create($provider, $settings->getProviderConfig($provider))
+                ->isConfigured();
+        } catch (\Throwable) {
+            // A misconfigured provider is an unavailable channel, never an exception
+            // that takes the preferences screen down with it.
+            return false;
+        }
+    }
+
+    public function unavailableReasonFor(object $notifiable): ?string
+    {
+        if (blank($notifiable->routeNotificationFor('whatsapp'))) {
+            return 'لا يوجد رقم هاتف في ملف المستخدم.';
+        }
+
+        return 'لا يوجد مزوّد واتساب مُهيّأ أو رقم متصل.';
+    }
 
     public function send(object $notifiable, Notification $notification): void
     {

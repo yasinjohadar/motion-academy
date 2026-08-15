@@ -33,12 +33,8 @@ class ModuleBoundaryTest extends TestCase
         'Notifications/Auth/ResetPasswordNotification.php' => [
             'App\Enums\WhatsAppPurpose',
         ],
-        'Support/NotificationChannelResolver.php' => [
-            'App\Models\EvolutionInstance',
-            'App\Services\WhatsApp\ProviderCapabilities',
-            'App\Services\WhatsApp\WhatsAppProviderFactory',
-            'App\Services\WhatsApp\WhatsAppSettingsService',
-        ],
+        // Support/NotificationChannelResolver.php — inverted: channels now answer for
+        // their own readiness through ReportsChannelAvailability.
         'Services/Otp/OtpService.php' => [
             'App\Enums\WhatsAppPurpose',
             'App\Services\WhatsApp\SendWhatsAppMessage',

@@ -5,8 +5,29 @@ namespace Tests\Feature\Notifications;
 use App\Enums\NotificationChannel;
 use App\Models\User;
 use App\Support\NotificationChannelResolver;
+use App\Support\Notifications\ReportsChannelAvailability;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+
+/** Stands in for a module channel that knows it cannot deliver. */
+class UnavailableTestChannel implements ReportsChannelAvailability
+{
+    public function isAvailableFor(object $notifiable): bool
+    {
+        return false;
+    }
+
+    public function unavailableReasonFor(object $notifiable): ?string
+    {
+        return 'قناة الاختبار غير جاهزة.';
+    }
+}
+
+/** Stands in for a module channel that does not implement the contract at all. */
+class SilentTestChannel
+{
+    public function send(object $notifiable, object $notification): void {}
+}
 
 /**
  * Channels supplied by a module are resolved through config, not imported by the core.
@@ -68,6 +89,33 @@ class ChannelRegistrationTest extends TestCase
 
         // Half-removed module: the config line survived but the class did not.
         $this->assertFalse(NotificationChannel::WhatsApp->isRegistered());
+    }
+
+    public function test_a_channel_that_reports_itself_unavailable_is_dropped(): void
+    {
+        config()->set('notifications.drivers.whatsapp', UnavailableTestChannel::class);
+
+        $user = User::factory()->create(['phone' => '966511111111']);
+
+        // The mechanism is generic: any module's channel can veto its own delivery
+        // without the core knowing anything about that module.
+        $this->assertFalse($this->resolver()->isAvailable(NotificationChannel::WhatsApp, $user));
+
+        $this->assertSame(
+            'قناة الاختبار غير جاهزة.',
+            $this->resolver()->availabilityFor($user)['whatsapp']['reason']
+        );
+    }
+
+    public function test_a_channel_with_no_opinion_is_available_once_registered(): void
+    {
+        config()->set('notifications.drivers.whatsapp', SilentTestChannel::class);
+
+        $user = User::factory()->create(['phone' => '966511111111']);
+
+        // Not implementing the contract must not mean "unavailable" — the core would
+        // then be guessing on behalf of a module it does not understand.
+        $this->assertTrue($this->resolver()->isAvailable(NotificationChannel::WhatsApp, $user));
     }
 
     public function test_built_in_channels_stay_available_when_module_config_is_empty(): void
