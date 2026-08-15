@@ -63,6 +63,12 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Present but null, so the model carries the same attribute set as a row
+            // read back from the database. Omitting them means anything reading
+            // `last_login_at` off a factory-made user throws under
+            // Model::preventAccessingMissingAttributes.
+            'last_login_at' => null,
+            'last_login_ip' => null,
         ];
     }
 

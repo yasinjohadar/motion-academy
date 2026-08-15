@@ -26,8 +26,14 @@ class SiteSetting extends Model
 
     public static function current(): self
     {
+        /*
+         * Empty search array, not ['id' => 1]: this is a singleton table, so "the
+         * first row" is the right lookup, and passing `id` mass-assigned a column
+         * that is not fillable — silently discarded before, an exception under
+         * Model::shouldBeStrict.
+         */
         return static::query()->firstOrCreate(
-            ['id' => 1],
+            [],
             [
                 'site_name' => config('app.name', 'لوحة التحكم'),
                 'site_name_en' => config('app.name', 'Admin'),

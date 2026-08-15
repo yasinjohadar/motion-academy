@@ -85,8 +85,13 @@ class UserController extends Controller implements HasMiddleware
             'email' => $data['email'],
             'phone' => $data['phone'],
             'password' => $data['password'],
-            'email_verified_at' => now(),
         ]);
+
+        // Not part of the create() array: `email_verified_at` is deliberately absent
+        // from User's fillable list, so mass assignment silently dropped it and every
+        // admin-created user stayed unverified — locked out by EnsureEmailIsVerified.
+        // An account an admin created in person needs no email round-trip.
+        $user->markEmailAsVerified();
 
         $user->syncRoles($data['roles'] ?? []);
 

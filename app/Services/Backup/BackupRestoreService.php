@@ -181,7 +181,10 @@ class BackupRestoreService
         if (in_array($type, ['database', 'full'], true)) {
             $dbDir = $preDir.'/db';
             mkdir($dbDir, 0755, true);
-            $engineBackup = Backup::query()->make([
+            // A throwaway model that only carries the engine's inputs — never saved.
+            // forceFill, not make(): `id` is not fillable, so mass assignment dropped
+            // it silently and the engine received a model with no id at all.
+            $engineBackup = (new Backup)->forceFill([
                 'id' => 0,
                 'backup_type' => 'database',
             ]);

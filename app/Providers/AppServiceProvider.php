@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\Channels\AppDatabaseChannel;
 use App\Services\Ai\AiProviderConfigApplier;
 use App\Services\Smtp\SmtpConfigApplier;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
@@ -29,6 +30,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
+         * Turns three silent classes of bug into loud ones, outside production:
+         *  - lazy loading a relation (the N+1 that only shows up under real traffic)
+         *  - assigning an attribute that is not fillable (silently dropped writes)
+         *  - reading an attribute that does not exist (typos returning null)
+         *
+         * Production keeps the permissive behaviour: a strictness exception there
+         * would turn a slow page into a broken one.
+         */
+        Model::shouldBeStrict(! $this->app->isProduction());
+
         Vite::prefetch(concurrency: 3);
         SmtpConfigApplier::apply();
         AiProviderConfigApplier::apply();
