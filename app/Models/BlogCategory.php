@@ -81,11 +81,13 @@ class BlogCategory extends Model
         return $this->hasMany(self::class, 'parent_id')->orderBy('order');
     }
 
+    /** @return HasMany<BlogPost, $this> */
     public function posts(): HasMany
     {
         return $this->hasMany(BlogPost::class, 'blog_category_id');
     }
 
+    /** @return HasMany<BlogPost, $this> */
     public function publishedPosts(): HasMany
     {
         return $this->posts()->published();

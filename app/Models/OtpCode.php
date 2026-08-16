@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use App\Enums\OtpPurpose;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property CarbonInterface $expires_at
+ * @property CarbonInterface|null $consumed_at
+ */
 class OtpCode extends Model
 {
     protected $fillable = [

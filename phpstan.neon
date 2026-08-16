@@ -1,0 +1,28 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+
+    # Pinned at the highest level that is currently clean, and raised deliberately.
+    #
+    # Measured on this codebase: level 1 = 0 · level 2 = 50 · level 3 = 56 · level 4 = 105
+    # · level 5 = 127 · level 6 = 347.
+    #
+    # Setting it to 6 today would mean 347 findings that nobody triages, and a tool
+    # everyone learns to ignore is worse than no tool. A gate that passes is a gate
+    # that can fail meaningfully.
+    #
+    # The climb to level 2 is 50 findings, 27 of them `property.notFound` — models not
+    # declaring the columns they expose. Concentrated in Backup, StorageDiskMapping,
+    # BackupSchedule, SitePage and two WhatsApp controllers. Annotate those, then raise
+    # this number and delete this paragraph.
+    level: 1
+
+    # Factories legitimately hand partial attribute arrays to models.
+    excludePaths:
+        - app/Modules/*/Database/Factories/*

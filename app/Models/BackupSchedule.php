@@ -5,10 +5,18 @@ namespace App\Models;
 use App\Models\Concerns\AuditsChanges;
 use App\Models\Concerns\ExposesPolicyFlags;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Datetime casts are invisible to static analysis without this, so every
+ * `->toDateTimeString()` on them reads as a call on a string.
+ *
+ * @property CarbonInterface|null $last_run_at
+ * @property CarbonInterface|null $next_run_at
+ */
 class BackupSchedule extends Model
 {
     use AuditsChanges, ExposesPolicyFlags;

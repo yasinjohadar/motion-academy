@@ -3,8 +3,8 @@ function slugify(value) {
         .trim()
         .toLowerCase()
         .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9\-]/g, '')
-        .replace(/\-+/g, '-');
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-');
 }
 
 export default function SitePageForm({

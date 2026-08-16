@@ -98,16 +98,19 @@ class BlogPost extends Model
         return $slug;
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
     }
 
+    /** @return BelongsTo<BlogCategory, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');
     }
 
+    /** @return BelongsToMany<BlogTag, $this> */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(BlogTag::class, 'blog_post_tag', 'blog_post_id', 'blog_tag_id')

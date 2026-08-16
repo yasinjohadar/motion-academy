@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * `metadata` is a JSON column, so nothing in the schema tells static analysis what
+ * lives inside it. Declaring the shape here is what lets the restore code read
+ * `$backup->metadata['restore']['progress']` and be checked rather than guessed at.
+ *
+ * @property array{restore?: array{status?: string, progress?: int, stage?: string, error?: string|null, started_at?: string, finished_at?: string|null, updated_at?: string}}|null $metadata
+ */
 class Backup extends Model
 {
     use ExposesPolicyFlags, SoftDeletes;
