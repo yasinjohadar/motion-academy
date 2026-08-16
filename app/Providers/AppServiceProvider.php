@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\Channels\AppDatabaseChannel;
 use App\Services\Ai\AiProviderConfigApplier;
 use App\Services\Smtp\SmtpConfigApplier;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Support\Facades\Gate;
@@ -40,6 +41,21 @@ class AppServiceProvider extends ServiceProvider
          * would turn a slow page into a broken one.
          */
         Model::shouldBeStrict(! $this->app->isProduction());
+
+        /*
+         * Factories follow their model. Laravel's default guess derives the factory
+         * namespace from the model's, which sends App\Modules\WhatsApp\Models\X to
+         * Database\Factories\Modules\WhatsApp\Models\XFactory — a path that exists for
+         * no one. A module keeps its factories inside itself so deleting the module
+         * takes them with it; everything else stays in database/factories.
+         */
+        Factory::guessFactoryNamesUsing(function (string $model): string {
+            if (preg_match('/^App\\\\Modules\\\\([^\\\\]+)\\\\Models\\\\(.+)$/', $model, $matches)) {
+                return "App\\Modules\\{$matches[1]}\\Database\\Factories\\{$matches[2]}Factory";
+            }
+
+            return 'Database\\Factories\\'.class_basename($model).'Factory';
+        });
 
         Vite::prefetch(concurrency: 3);
         SmtpConfigApplier::apply();

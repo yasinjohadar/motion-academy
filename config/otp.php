@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\WhatsApp\WhatsAppOtpChannel;
+use App\Modules\WhatsApp\Services\WhatsAppOtpChannel;
 
 /**
  * إعدادات رموز التحقق لمرة واحدة (OTP)

@@ -43,10 +43,28 @@ class PolicyCoverageTest extends TestCase
     /**
      * @return array<int, string>
      */
+    /**
+     * Core models and every module's models.
+     *
+     * The module glob is not optional: when the WhatsApp models moved into
+     * app/Modules this test kept passing while silently covering six fewer models —
+     * exactly the blind spot it exists to prevent.
+     *
+     * @return array<int, string>
+     */
     protected function modelClasses(): array
     {
-        return collect(glob(app_path('Models/*.php')))
-            ->map(fn (string $path): string => 'App\\Models\\'.basename($path, '.php'))
+        $core = collect(glob(app_path('Models/*.php')))
+            ->map(fn (string $path): string => 'App\\Models\\'.basename($path, '.php'));
+
+        $modules = collect(glob(app_path('Modules/*/Models/*.php')))
+            ->map(function (string $path): string {
+                $relative = str_replace([app_path().DIRECTORY_SEPARATOR, '/', '.php'], ['', '\\', ''], $path);
+
+                return 'App\\'.str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+            });
+
+        return $core->merge($modules)
             ->filter(fn (string $class): bool => class_exists($class))
             ->values()
             ->all();
@@ -63,7 +81,10 @@ class PolicyCoverageTest extends TestCase
                 continue;
             }
 
-            if (! class_exists('App\\Policies\\'.$short.'Policy')) {
+            // Ask the Gate rather than guessing a class name. It is what actually
+            // decides authorization at runtime, and it finds a policy whether the model
+            // lives in the core or inside a module — a filename convention does not.
+            if (Gate::getPolicyFor($model) === null) {
                 $missing[] = $short;
             }
         }
@@ -72,8 +93,8 @@ class PolicyCoverageTest extends TestCase
             [],
             $missing,
             "These models have no policy and no documented exemption: \n  ".implode("\n  ", $missing)
-                ."\nAdd App\\Policies\\{Model}Policy extending BasePolicy, or add the model to "
-                .'PolicyCoverageTest::NOT_POLICIED with a reason.'
+                ."\nAdd a {Model}Policy extending BasePolicy next to the model's namespace, "
+                .'or add the model to PolicyCoverageTest::NOT_POLICIED with a reason.'
         );
     }
 
@@ -81,15 +102,14 @@ class PolicyCoverageTest extends TestCase
     {
         foreach ($this->modelClasses() as $model) {
             $short = class_basename($model);
-            $policy = 'App\\Policies\\'.$short.'Policy';
 
-            if (! class_exists($policy)) {
+            if (array_key_exists($short, self::NOT_POLICIED)) {
                 continue;
             }
 
             $this->assertNotNull(
                 Gate::getPolicyFor($model),
-                "Gate could not resolve a policy for [{$model}] even though [{$policy}] exists."
+                "Gate could not resolve a policy for [{$model}]."
             );
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Notifications\Channels\WhatsAppChannel;
+use App\Modules\WhatsApp\Notifications\WhatsAppChannel;
 use NotificationChannels\WebPush\WebPushChannel;
 
 /**

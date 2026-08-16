@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\Notifications;
 
-use App\Events\WhatsAppMessageReceived;
-use App\Listeners\NotifyOnWhatsAppMessageReceived;
 use App\Models\BlogPost;
 use App\Models\User;
-use App\Models\WhatsAppContact;
-use App\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Events\WhatsAppMessageReceived;
+use App\Modules\WhatsApp\Listeners\NotifyOnWhatsAppMessageReceived;
+use App\Modules\WhatsApp\Models\WhatsAppContact;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Notifications\WhatsAppMessageReceivedNotification;
 use App\Notifications\Blog\BlogPostPublished;
 use App\Notifications\Users\UserCreated;
 use App\Notifications\Users\UserRoleChanged;
-use App\Notifications\WhatsApp\WhatsAppMessageReceivedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Support\Facades\Event;

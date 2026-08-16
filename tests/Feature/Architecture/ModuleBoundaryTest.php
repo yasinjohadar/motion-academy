@@ -42,31 +42,17 @@ class ModuleBoundaryTest extends TestCase
     ];
 
     /**
-     * Classes that make up the WhatsApp module, wherever they currently sit.
+     * Everything under app/Modules is module code.
+     *
+     * This used to be a list of twenty scattered prefixes — WhatsApp classes lived in
+     * ten different core directories, so membership had to be spelled out class by
+     * class. Now the directory is the boundary, and any new module is covered by this
+     * one rule without touching the test.
      *
      * @var list<string>
      */
     private const MODULE_PREFIXES = [
-        'App\Services\WhatsApp\\',
-        'App\Models\WhatsApp',
-        'App\Models\EvolutionInstance',
-        'App\Enums\WhatsAppPurpose',
-        'App\DTOs\WhatsApp\\',
-        'App\Policies\WhatsApp',
-        'App\Notifications\WhatsApp\\',
-        'App\Notifications\Channels\WhatsAppChannel',
-        'App\Http\Controllers\Admin\WhatsApp',
-        'App\Http\Controllers\Api\EvolutionWebhookController',
-        'App\Http\Controllers\Api\MetaWebhookController',
-        'App\Support\WhatsAppRecipientNormalizer',
-        'App\Support\WhatsAppSendErrorMessage',
-        'App\Events\WhatsAppMessageReceived',
-        'App\Listeners\NotifyOnWhatsAppMessageReceived',
-        'App\Exceptions\WhatsAppApiException',
-        'App\Jobs\SendWhatsAppMessageJob',
-        'App\Jobs\ProcessWhatsAppWebhookEventJob',
-        'App\Jobs\BroadcastWhatsAppMessageJob',
-        'App\Jobs\PollFlaxxaMessageStatusJob',
+        'App\Modules\\',
     ];
 
     /**
@@ -207,8 +193,8 @@ class ModuleBoundaryTest extends TestCase
 
         $this->assertGreaterThan(50, $scanned, 'The scanner is not walking the core at all.');
 
-        $this->assertTrue($this->isModuleClass('App\Services\WhatsApp\SendWhatsAppMessage'));
-        $this->assertTrue($this->isModuleClass('App\Models\EvolutionInstance'));
+        $this->assertTrue($this->isModuleClass('App\Modules\WhatsApp\Services\SendWhatsAppMessage'));
+        $this->assertTrue($this->isModuleClass('App\Modules\WhatsApp\Models\EvolutionInstance'));
         $this->assertFalse($this->isModuleClass('App\Models\User'));
         $this->assertFalse($this->isModuleClass('App\Services\Otp\OtpService'));
     }

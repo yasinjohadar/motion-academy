@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Jobs\BroadcastWhatsAppMessageJob;
-use App\Models\EvolutionInstance;
 use App\Models\User;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Jobs\BroadcastWhatsAppMessageJob;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;

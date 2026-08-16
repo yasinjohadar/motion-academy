@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Jobs\ProcessWhatsAppWebhookEventJob;
-use App\Models\WhatsAppWebhookEvent;
-use App\Services\WhatsApp\Meta\MetaWebhookParser;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Jobs\ProcessWhatsAppWebhookEventJob;
+use App\Modules\WhatsApp\Models\WhatsAppWebhookEvent;
+use App\Modules\WhatsApp\Services\Meta\MetaWebhookParser;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;

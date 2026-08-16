@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\EvolutionWebhookController;
-use App\Http\Controllers\Api\MetaWebhookController;
+use App\Modules\WhatsApp\Controllers\Api\EvolutionWebhookController;
+use App\Modules\WhatsApp\Controllers\Api\MetaWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/webhooks/evolution/{instance?}', [EvolutionWebhookController::class, 'handle'])

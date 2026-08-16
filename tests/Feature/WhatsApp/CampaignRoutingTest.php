@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Jobs\BroadcastWhatsAppMessageJob;
-use App\Models\EvolutionInstance;
 use App\Models\User;
-use App\Models\WhatsAppBroadcast;
-use App\Models\WhatsAppBroadcastRecipient;
-use App\Models\WhatsAppMessage;
-use App\Services\WhatsApp\BroadcastWhatsAppMessage;
-use App\Services\WhatsApp\SendWhatsAppMessage;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Jobs\BroadcastWhatsAppMessageJob;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
+use App\Modules\WhatsApp\Models\WhatsAppBroadcast;
+use App\Modules\WhatsApp\Models\WhatsAppBroadcastRecipient;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Services\BroadcastWhatsAppMessage;
+use App\Modules\WhatsApp\Services\SendWhatsAppMessage;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;

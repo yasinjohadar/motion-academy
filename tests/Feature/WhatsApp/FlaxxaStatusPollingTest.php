@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Enums\WhatsAppPurpose;
-use App\Jobs\PollFlaxxaMessageStatusJob;
-use App\Models\WhatsAppContact;
-use App\Models\WhatsAppMessage;
-use App\Services\WhatsApp\WhatsAppOutboundSendService;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Enums\WhatsAppPurpose;
+use App\Modules\WhatsApp\Jobs\PollFlaxxaMessageStatusJob;
+use App\Modules\WhatsApp\Models\WhatsAppContact;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Services\WhatsAppOutboundSendService;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;

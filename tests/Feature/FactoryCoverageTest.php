@@ -22,10 +22,28 @@ class FactoryCoverageTest extends TestCase
     /**
      * @return array<int, string>
      */
+    /**
+     * Models covered by a factory, in the core and inside every module.
+     *
+     * The module glob is not optional: when the WhatsApp factories moved into
+     * app/Modules this test kept passing while quietly covering five fewer models.
+     *
+     * @return array<int, string>
+     */
     protected function modelsWithFactories(): array
     {
-        return collect(glob(database_path('factories/*Factory.php')))
-            ->map(fn (string $path): string => 'App\\Models\\'.Str::before(basename($path, '.php'), 'Factory'))
+        $core = collect(glob(database_path('factories/*Factory.php')))
+            ->map(fn (string $path): string => 'App\\Models\\'.Str::before(basename($path, '.php'), 'Factory'));
+
+        $modules = collect(glob(app_path('Modules/*/Database/Factories/*Factory.php')))
+            ->map(function (string $path): string {
+                $module = basename(dirname($path, 3));
+                $model = Str::before(basename($path, '.php'), 'Factory');
+
+                return "App\\Modules\\{$module}\\Models\\{$model}";
+            });
+
+        return $core->merge($modules)
             ->filter(fn (string $class): bool => class_exists($class))
             ->values()
             ->all();

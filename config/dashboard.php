@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\WhatsApp\WhatsAppDashboardContributor;
+use App\Modules\WhatsApp\Services\WhatsAppDashboardContributor;
 
 /**
  * إعدادات لوحة التحكم

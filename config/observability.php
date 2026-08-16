@@ -3,12 +3,12 @@
 use App\Models\AiProvider;
 use App\Models\AppStorageConfig;
 use App\Models\BackupSchedule;
-use App\Models\EvolutionInstance;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
 use App\Models\SmtpSetting;
 use App\Models\StorageDiskMapping;
 use App\Models\User;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
 
 /**
  * إعدادات طبقة المراقبة والسجلات

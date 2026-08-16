@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Exceptions\WhatsAppApiException;
-use App\Services\WhatsApp\Providers\MetaApiProvider;
+use App\Modules\WhatsApp\Exceptions\WhatsAppApiException;
+use App\Modules\WhatsApp\Services\Providers\MetaApiProvider;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;

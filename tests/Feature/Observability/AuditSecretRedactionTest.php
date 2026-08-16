@@ -4,9 +4,9 @@ namespace Tests\Feature\Observability;
 
 use App\Models\AiProvider;
 use App\Models\AppStorageConfig;
-use App\Models\EvolutionInstance;
 use App\Models\SmtpSetting;
 use App\Models\User;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;

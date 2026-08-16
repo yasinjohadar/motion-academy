@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Observability;
 
-use App\Models\WhatsAppWebhookEvent;
+use App\Modules\WhatsApp\Models\WhatsAppWebhookEvent;
 use App\Services\Observability\SecurityLogger;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;

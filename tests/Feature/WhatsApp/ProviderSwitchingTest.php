@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Services\WhatsApp\Evolution\EvolutionRotatingSendService;
-use App\Services\WhatsApp\Providers\EvolutionApiProvider;
-use App\Services\WhatsApp\Providers\MetaApiProvider;
-use App\Services\WhatsApp\WhatsAppProviderFactory;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Services\Evolution\EvolutionRotatingSendService;
+use App\Modules\WhatsApp\Services\Providers\EvolutionApiProvider;
+use App\Modules\WhatsApp\Services\Providers\MetaApiProvider;
+use App\Modules\WhatsApp\Services\WhatsAppProviderFactory;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

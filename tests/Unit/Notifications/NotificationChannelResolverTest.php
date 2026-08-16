@@ -4,12 +4,12 @@ namespace Tests\Unit\Notifications;
 
 use App\Enums\NotificationCategory;
 use App\Enums\NotificationChannel;
-use App\Models\EvolutionInstance;
 use App\Models\NotificationPreference;
 use App\Models\SmtpSetting;
 use App\Models\User;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
+use App\Modules\WhatsApp\Notifications\WhatsAppChannel;
 use App\Notifications\BaseNotification;
-use App\Notifications\Channels\WhatsAppChannel;
 use App\Support\NotificationChannelResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

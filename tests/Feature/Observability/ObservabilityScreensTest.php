@@ -4,7 +4,7 @@ namespace Tests\Feature\Observability;
 
 use App\Models\SmtpSetting;
 use App\Models\User;
-use App\Models\WhatsAppWebhookEvent;
+use App\Modules\WhatsApp\Models\WhatsAppWebhookEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;

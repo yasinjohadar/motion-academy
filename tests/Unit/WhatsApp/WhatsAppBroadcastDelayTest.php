@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\WhatsApp;
 
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

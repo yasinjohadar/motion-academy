@@ -3,13 +3,13 @@
 namespace Tests\Feature\Otp;
 
 use App\Enums\OtpPurpose;
-use App\Jobs\SendWhatsAppMessageJob;
 use App\Models\OtpCode;
-use App\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Jobs\SendWhatsAppMessageJob;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use App\Services\Observability\SecurityLogger;
 use App\Services\Otp\OtpService;
 use App\Services\Otp\OtpThrottledException;
-use App\Services\WhatsApp\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;

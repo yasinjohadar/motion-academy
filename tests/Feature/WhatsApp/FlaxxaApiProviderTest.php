@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Exceptions\WhatsAppApiException;
-use App\Services\WhatsApp\Providers\FlaxxaApiProvider;
-use App\Services\WhatsApp\WhatsAppProviderFactory;
+use App\Modules\WhatsApp\Exceptions\WhatsAppApiException;
+use App\Modules\WhatsApp\Services\Providers\FlaxxaApiProvider;
+use App\Modules\WhatsApp\Services\WhatsAppProviderFactory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;

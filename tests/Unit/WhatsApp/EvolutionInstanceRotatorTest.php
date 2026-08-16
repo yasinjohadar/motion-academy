@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\WhatsApp;
 
-use App\Models\EvolutionInstance;
-use App\Services\WhatsApp\Evolution\EvolutionInstanceRotator;
-use App\Services\WhatsApp\Evolution\EvolutionService;
+use App\Modules\WhatsApp\Models\EvolutionInstance;
+use App\Modules\WhatsApp\Services\Evolution\EvolutionInstanceRotator;
+use App\Modules\WhatsApp\Services\Evolution\EvolutionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;

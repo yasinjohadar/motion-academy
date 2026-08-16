@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Enums\WhatsAppPurpose;
 use App\Models\User;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Enums\WhatsAppPurpose;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;

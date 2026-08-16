@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Enums\WhatsAppPurpose;
-use App\Exceptions\WhatsAppApiException;
-use App\Models\WhatsAppContact;
-use App\Services\WhatsApp\ProviderCapabilities;
-use App\Services\WhatsApp\WhatsAppRouter;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Enums\WhatsAppPurpose;
+use App\Modules\WhatsApp\Exceptions\WhatsAppApiException;
+use App\Modules\WhatsApp\Models\WhatsAppContact;
+use App\Modules\WhatsApp\Services\ProviderCapabilities;
+use App\Modules\WhatsApp\Services\WhatsAppRouter;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

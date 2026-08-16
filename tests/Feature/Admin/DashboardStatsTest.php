@@ -4,8 +4,8 @@ namespace Tests\Feature\Admin;
 
 use App\Models\SmtpSetting;
 use App\Models\User;
-use App\Models\WhatsAppContact;
-use App\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Models\WhatsAppContact;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
 use App\Services\Dashboard\DashboardStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;

@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\WhatsApp;
 
-use App\Enums\WhatsAppPurpose;
-use App\Exceptions\WhatsAppApiException;
-use App\Models\WhatsAppContact;
-use App\Models\WhatsAppMessage;
-use App\Services\WhatsApp\CustomerServiceWindow;
-use App\Services\WhatsApp\WhatsAppOutboundSendService;
-use App\Services\WhatsApp\WhatsAppRouter;
-use App\Services\WhatsApp\WhatsAppSettingsService;
+use App\Modules\WhatsApp\Enums\WhatsAppPurpose;
+use App\Modules\WhatsApp\Exceptions\WhatsAppApiException;
+use App\Modules\WhatsApp\Models\WhatsAppContact;
+use App\Modules\WhatsApp\Models\WhatsAppMessage;
+use App\Modules\WhatsApp\Services\CustomerServiceWindow;
+use App\Modules\WhatsApp\Services\WhatsAppOutboundSendService;
+use App\Modules\WhatsApp\Services\WhatsAppRouter;
+use App\Modules\WhatsApp\Services\WhatsAppSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
