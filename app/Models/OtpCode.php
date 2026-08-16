@@ -26,7 +26,7 @@ class OtpCode extends Model
     /**
      * The hash is never exposed — not in JSON, not in an audit payload.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $hidden = ['code_hash'];
 

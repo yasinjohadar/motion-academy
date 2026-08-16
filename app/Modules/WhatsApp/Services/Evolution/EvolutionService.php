@@ -241,7 +241,13 @@ class EvolutionService
 
     public function providerForInstance(string $instanceName, ?array $settings = null): EvolutionApiProvider
     {
-        return WhatsAppProviderFactory::create('evolution', $this->providerConfigForInstance($instanceName, $settings));
+        $provider = WhatsAppProviderFactory::create('evolution', $this->providerConfigForInstance($instanceName, $settings));
+
+        // The factory is typed to the interface; this method promises the concrete
+        // Evolution provider because rotation needs its instance-specific methods.
+        assert($provider instanceof EvolutionApiProvider);
+
+        return $provider;
     }
 
     /**

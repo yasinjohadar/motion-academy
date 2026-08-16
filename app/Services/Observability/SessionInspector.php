@@ -4,6 +4,7 @@ namespace App\Services\Observability;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -39,7 +40,21 @@ class SessionInspector
 
         $currentId = session()->getId();
 
-        return $paginator->through(fn (object $row): array => [
+        // Extracted so the mapper's declared return type is what the paginator
+        // carries. Inline, PHPStan infers the exact array shape, which is narrower
+        // than the method promises — and LengthAwarePaginator's value type is
+        // invariant, so a narrower shape is not accepted as a wider one.
+        return $paginator->through(fn (object $row): array => $this->toAdminRow($row, $users, $currentId));
+    }
+
+    /**
+     * @param  Collection<int|string, User>  $users
+     * @return array<string, mixed>
+     */
+    protected function toAdminRow(object $row, $users, string $currentId): array
+    {
+        return [
+
             'id' => $row->id,
             'is_current' => $row->id === $currentId,
             'user' => $row->user_id && $users->has($row->user_id) ? [
@@ -56,7 +71,7 @@ class SessionInspector
             'last_activity_human' => $row->last_activity
                 ? now()->setTimestamp((int) $row->last_activity)->diffForHumans()
                 : null,
-        ]);
+        ];
     }
 
     /**

@@ -7,7 +7,7 @@ use App\Models\SmtpSetting;
 use App\Models\User;
 use App\Services\Observability\SecurityLogger;
 use App\Support\Dashboard\ContributesToDashboard;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
 
@@ -194,15 +194,19 @@ class DashboardStats
                 'log_name' => $activity->log_name,
                 'description' => $activity->description,
                 'subject_label' => $activity->subject_type ? class_basename($activity->subject_type) : null,
-                'causer_name' => $activity->causer?->name,
-                'causer_email' => $activity->causer?->email,
+                // A morphTo causer is not guaranteed to be a User; see ActivityLogViewer.
+                'causer_name' => $activity->causer instanceof User ? $activity->causer->name : null,
+                'causer_email' => $activity->causer instanceof User ? $activity->causer->email : null,
                 'created_at' => $activity->created_at?->format('Y-m-d H:i'),
                 'created_at_human' => $activity->created_at?->diffForHumans(),
             ])
             ->all(), []);
     }
 
-    public function lastLoginAt(User $user): ?Carbon
+    // CarbonInterface, not Illuminate\Support\Carbon: the model guarantees the
+    // interface, and promising the concrete class here would be a narrower contract
+    // than the data actually supports.
+    public function lastLoginAt(User $user): ?CarbonInterface
     {
         return $user->last_login_at;
     }

@@ -52,11 +52,13 @@ class Media extends Model
         });
     }
 
+    /** @return HasMany<MediaVariant, $this> */
     public function variants(): HasMany
     {
         return $this->hasMany(MediaVariant::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');

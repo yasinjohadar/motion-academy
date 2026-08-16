@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * `$backup->metadata['restore']['progress']` and be checked rather than guessed at.
  *
  * @property array{restore?: array{status?: string, progress?: int, stage?: string, error?: string|null, started_at?: string, finished_at?: string|null, updated_at?: string}}|null $metadata
+ * @property CarbonInterface|null $started_at
+ * @property CarbonInterface|null $completed_at
+ * @property CarbonInterface|null $expires_at
  */
 class Backup extends Model
 {
@@ -58,21 +61,25 @@ class Backup extends Model
         ];
     }
 
+    /** @return BelongsTo<AppStorageConfig, $this> */
     public function storageConfig(): BelongsTo
     {
         return $this->belongsTo(AppStorageConfig::class, 'storage_config_id');
     }
 
+    /** @return BelongsTo<BackupSchedule, $this> */
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(BackupSchedule::class, 'schedule_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** @return HasMany<BackupLog, $this> */
     public function logs(): HasMany
     {
         return $this->hasMany(BackupLog::class)->latest('id');

@@ -48,16 +48,19 @@ class BackupSchedule extends Model
         ];
     }
 
+    /** @return BelongsTo<AppStorageConfig, $this> */
     public function storageConfig(): BelongsTo
     {
         return $this->belongsTo(AppStorageConfig::class, 'storage_config_id');
     }
 
+    /** @return HasMany<Backup, $this> */
     public function backups(): HasMany
     {
         return $this->hasMany(Backup::class, 'schedule_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

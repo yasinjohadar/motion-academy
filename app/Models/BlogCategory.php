@@ -71,11 +71,13 @@ class BlogCategory extends Model
         return $slug;
     }
 
+    /** @return BelongsTo<self, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
 
+    /** @return HasMany<self, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->orderBy('order');

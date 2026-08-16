@@ -60,6 +60,7 @@ class WhatsAppMessage extends Model
 
     public const TYPE_VIDEO = 'video';
 
+    /** @return BelongsTo<WhatsAppContact, $this> */
     public function contact(): BelongsTo
     {
         return $this->belongsTo(WhatsAppContact::class, 'contact_id');

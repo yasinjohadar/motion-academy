@@ -13,6 +13,7 @@ class BackupLog extends Model
         'message',
     ];
 
+    /** @return BelongsTo<Backup, $this> */
     public function backup(): BelongsTo
     {
         return $this->belongsTo(Backup::class);

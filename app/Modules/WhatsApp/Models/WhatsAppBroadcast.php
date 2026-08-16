@@ -48,11 +48,13 @@ class WhatsAppBroadcast extends Model
 
     public const TYPE_TEXT = 'text';
 
+    /** @return BelongsTo<User, $this> */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** @return HasMany<WhatsAppBroadcastRecipient, $this> */
     public function recipients(): HasMany
     {
         return $this->hasMany(WhatsAppBroadcastRecipient::class, 'broadcast_id');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\AuditsChanges;
 use App\Notifications\Auth\ResetPasswordNotification;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -17,6 +18,13 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Casts are invisible to static analysis, so every Carbon call on these reads
+ * as a method call on a string.
+ *
+ * @property CarbonInterface|null $email_verified_at
+ * @property CarbonInterface|null $last_login_at
+ */
 #[Fillable(['name', 'name_ar', 'name_en', 'email', 'phone', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference
@@ -60,9 +68,7 @@ class User extends Authenticatable implements HasLocalePreference
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    /**
-     * @return HasMany<NotificationPreference, $this>
-     */
+    /** @return HasMany<NotificationPreference, $this> */
     public function notificationPreferences(): HasMany
     {
         return $this->hasMany(NotificationPreference::class);

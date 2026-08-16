@@ -2,6 +2,7 @@
 
 namespace App\Services\Observability;
 
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -97,7 +98,10 @@ class ActivityLogViewer
             'subject_type' => $activity->subject_type,
             'subject_label' => $activity->subject_type ? class_basename($activity->subject_type) : null,
             'subject_id' => $activity->subject_id,
-            'causer' => $activity->causer ? [
+            // `causer` is a morphTo, so it is not necessarily a User — a job or another
+            // model can cause activity too. Reading ->name and ->email off whatever
+            // happens to be there works only for as long as User is the only causer.
+            'causer' => $activity->causer instanceof User ? [
                 'id' => $activity->causer->id,
                 'name' => $activity->causer->name,
                 'email' => $activity->causer->email,

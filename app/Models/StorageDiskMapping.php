@@ -27,6 +27,7 @@ class StorageDiskMapping extends Model
         ];
     }
 
+    /** @return BelongsTo<AppStorageConfig, $this> */
     public function primaryStorage(): BelongsTo
     {
         return $this->belongsTo(AppStorageConfig::class, 'primary_storage_id');

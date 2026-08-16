@@ -33,11 +33,13 @@ class AppStorageConfig extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** @return HasMany<StorageDiskMapping, $this> */
     public function diskMappings(): HasMany
     {
         return $this->hasMany(StorageDiskMapping::class, 'primary_storage_id');

@@ -26,6 +26,7 @@ class MediaVariant extends Model
         ];
     }
 
+    /** @return BelongsTo<Media, $this> */
     public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);

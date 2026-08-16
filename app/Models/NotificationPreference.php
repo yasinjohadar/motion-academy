@@ -24,6 +24,7 @@ class NotificationPreference extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -107,7 +108,7 @@ class NotificationPreference extends Model
     }
 
     /**
-     * @return Collection<int, self>
+     * @return Collection<int, static>
      */
     public static function forUser(User $user): Collection
     {

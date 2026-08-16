@@ -35,11 +35,13 @@ class WhatsAppBroadcastRecipient extends Model
 
     public const STATUS_FAILED = 'failed';
 
+    /** @return BelongsTo<WhatsAppBroadcast, $this> */
     public function broadcast(): BelongsTo
     {
         return $this->belongsTo(WhatsAppBroadcast::class, 'broadcast_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

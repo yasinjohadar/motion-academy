@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Contracts\Role as RoleContract;
 
 /**
  * Rules moved out of RoleController::destroy.
@@ -40,7 +41,10 @@ class RolePolicy extends BasePolicy
             return Response::deny('لا يمكن حذف دور المدير الأعلى.');
         }
 
-        if ($model->users()->exists()) {
+        // The role model class is resolved from config at runtime, so the signature can
+        // only promise a Model. Narrowing to Spatie's contract is what makes users()
+        // a method the analyser knows about rather than one it has to take on faith.
+        if ($model instanceof RoleContract && $model->users()->exists()) {
             return Response::deny('لا يمكن حذف دور مرتبط بمستخدمين.');
         }
 
