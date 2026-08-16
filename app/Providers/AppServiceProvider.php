@@ -6,10 +6,13 @@ use App\Models\User;
 use App\Notifications\Channels\AppDatabaseChannel;
 use App\Services\Ai\AiProviderConfigApplier;
 use App\Services\Smtp\SmtpConfigApplier;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -56,6 +59,16 @@ class AppServiceProvider extends ServiceProvider
 
             return 'Database\\Factories\\'.class_basename($model).'Factory';
         });
+
+        /*
+         * The `api` throttle the public routes reference. Laravel does not define it
+         * for you, and a missing limiter is not an error — the middleware simply never
+         * limits anything, which is the worst possible failure mode for a public
+         * endpoint. Keyed by IP because the API is unauthenticated.
+         */
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(
+            (int) config('api.rate_limit', 60)
+        )->by($request->ip()));
 
         Vite::prefetch(concurrency: 3);
         SmtpConfigApplier::apply();

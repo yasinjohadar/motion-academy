@@ -15,7 +15,7 @@ class BlogController extends Controller
     {
         $posts = BlogPost::query()
             ->published()
-            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'category', 'tags'])
             ->latest('published_at')
             ->latest('id')
             ->paginate(9)
@@ -27,7 +27,7 @@ class BlogController extends Controller
             'featured' => BlogPost::query()
                 ->published()
                 ->featured()
-                ->with(['category:id,name,slug'])
+                ->with(['category'])
                 ->latest('published_at')
                 ->limit(3)
                 ->get()
@@ -56,7 +56,7 @@ class BlogController extends Controller
         $posts = BlogPost::query()
             ->published()
             ->when($q !== '', fn ($builder) => $builder->search($q))
-            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'category', 'tags'])
             ->latest('published_at')
             ->paginate(9)
             ->withQueryString()
@@ -82,7 +82,7 @@ class BlogController extends Controller
         $posts = BlogPost::query()
             ->published()
             ->where('blog_category_id', $category->id)
-            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'category', 'tags'])
             ->latest('published_at')
             ->paginate(9)
             ->withQueryString()
@@ -106,7 +106,7 @@ class BlogController extends Controller
             ->firstOrFail();
 
         $posts = $tag->publishedPosts()
-            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'category', 'tags'])
             ->latest('published_at')
             ->paginate(9)
             ->withQueryString()
@@ -127,7 +127,7 @@ class BlogController extends Controller
         $post = BlogPost::query()
             ->published()
             ->where('slug', $slug)
-            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
+            ->with(['author:id,name', 'category', 'tags'])
             ->firstOrFail();
 
         $post->incrementViews();
@@ -136,7 +136,7 @@ class BlogController extends Controller
             ->published()
             ->where('id', '!=', $post->id)
             ->when($post->blog_category_id, fn ($q) => $q->where('blog_category_id', $post->blog_category_id))
-            ->with(['category:id,name,slug'])
+            ->with(['category'])
             ->latest('published_at')
             ->limit(3)
             ->get()

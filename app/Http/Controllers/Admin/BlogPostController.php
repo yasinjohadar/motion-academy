@@ -131,7 +131,7 @@ class BlogPostController extends Controller implements HasMiddleware
     {
         $this->authorize('update', $blog_post);
 
-        $blog_post->load(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug']);
+        $blog_post->load(['author:id,name', 'category', 'tags']);
 
         return Inertia::render('Admin/Blog/Posts/Edit', [
             'post' => $blog_post->toAdminArray(),

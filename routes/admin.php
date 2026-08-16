@@ -12,7 +12,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ObservabilityController;
-use App\Modules\WhatsApp\Controllers\Admin\WhatsAppWebhookEventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SitePageController;
@@ -25,6 +24,7 @@ use App\Modules\WhatsApp\Controllers\Admin\WhatsAppInstanceController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppMessageController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppSendController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppSettingsController;
+use App\Modules\WhatsApp\Controllers\Admin\WhatsAppWebhookEventController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])
