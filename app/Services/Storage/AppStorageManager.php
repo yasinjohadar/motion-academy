@@ -8,6 +8,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -228,6 +229,51 @@ class AppStorageManager
             } catch (\Throwable) {
                 return null;
             }
+        }
+    }
+
+    /**
+     * A URL that expires, for a file that must not be permanently public.
+     *
+     * `url()` always hands back a permanent address, which is right for a blog image
+     * and wrong for anything private — a backup archive, an uploaded identity
+     * document. There was previously no way to serve those at all.
+     *
+     * Two paths, because the drivers differ:
+     *  - S3 and friends sign the object URL themselves, so the file never touches
+     *    this server.
+     *  - Local disks have nothing to sign, so we hand out a signed route that streams
+     *    the file after Laravel has validated the signature and its expiry.
+     */
+    public function temporaryUrl(string $logicalDisk, ?string $path, ?int $minutes = null): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        $minutes ??= (int) config('storage.temporary_url_minutes', 15);
+        $expiry = now()->addMinutes($minutes);
+
+        try {
+            $disk = $this->getDisk($logicalDisk);
+
+            return $disk->temporaryUrl($path, $expiry);
+        } catch (\Throwable) {
+            // Local/driver has no native signing — fall through to the signed route.
+        }
+
+        try {
+            return URL::temporarySignedRoute('files.private', $expiry, [
+                'disk' => $logicalDisk,
+                'path' => $path,
+            ]);
+        } catch (\Throwable $e) {
+            Log::channel('integrations')->warning('Temporary url generation failed', [
+                'disk' => $logicalDisk,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
         }
     }
 
