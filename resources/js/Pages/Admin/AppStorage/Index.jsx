@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import useCan from '@/hooks/useCan';
@@ -64,11 +65,9 @@ export default function Index({ configs, flash }) {
                             </thead>
                             <tbody>
                                 {configs.length === 0 && (
-                                    <tr>
-                                        <td colSpan="6" className="dashboard-table-empty">
-                                            لا توجد إعدادات تخزين بعد
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={6}>
+                                        لا توجد إعدادات تخزين بعد
+                                    </TableEmptyRow>
                                 )}
                                 {configs.map((config, index) => (
                                     <tr key={config.id}>

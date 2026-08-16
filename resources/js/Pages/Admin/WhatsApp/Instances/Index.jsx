@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import WhatsAppPage, { WaPanel } from '@/Components/Admin/WhatsAppPage';
 import useCan from '@/hooks/useCan';
@@ -135,11 +136,9 @@ export default function Index({ instances, settings, rotationPoolCount, flash })
                         </thead>
                         <tbody>
                             {instances.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} className="text-center text-muted py-4">
-                                        لا توجد أرقام بعد.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={6}>
+                                    لا توجد أرقام بعد.
+                                </TableEmptyRow>
                             )}
                             {instances.map((row) => (
                                 <tr key={row.id}>

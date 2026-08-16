@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import { Link, router } from '@inertiajs/react';
@@ -61,11 +62,9 @@ export default function Index({ roles, flash }) {
                             </thead>
                             <tbody>
                                 {roles.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="dashboard-table-empty">
-                                            لا توجد أدوار
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={5}>
+                                        لا توجد أدوار
+                                    </TableEmptyRow>
                                 )}
                                 {roles.map((role, index) => (
                                     <tr key={role.id}>

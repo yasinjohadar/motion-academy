@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import Pagination from '@/Components/Admin/Pagination';
@@ -124,11 +125,9 @@ export default function Sessions({ items, driver, flash }) {
                                     </tr>
                                 ))}
                                 {rows.length === 0 && (
-                                    <tr>
-                                        <td colSpan={5} className="text-center text-muted py-4">
-                                            لا توجد جلسات نشطة.
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={5}>
+                                        لا توجد جلسات نشطة.
+                                    </TableEmptyRow>
                                 )}
                             </tbody>
                         </table>

@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -255,11 +256,9 @@ export default function Index({ items, filters, categories = [], levels = [], fl
                                 </tr>
                             ))}
                             {rows.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="text-center text-muted py-4">
-                                        لا توجد إشعارات.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={5}>
+                                    لا توجد إشعارات.
+                                </TableEmptyRow>
                             )}
                         </tbody>
                     </table>

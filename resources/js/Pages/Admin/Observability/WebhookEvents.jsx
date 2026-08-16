@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import Pagination from '@/Components/Admin/Pagination';
 import { Link, router } from '@inertiajs/react';
@@ -138,11 +139,9 @@ export default function WebhookEvents({ items, filters, types = [], flash }) {
                                 </Fragment>
                             ))}
                             {rows.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="text-center text-muted py-4">
-                                        لا توجد أحداث.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={5}>
+                                    لا توجد أحداث.
+                                </TableEmptyRow>
                             )}
                         </tbody>
                     </table>

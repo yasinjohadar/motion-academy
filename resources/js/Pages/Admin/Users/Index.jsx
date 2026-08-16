@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import useCan from '@/hooks/useCan';
@@ -19,11 +20,11 @@ export default function Index({ users, filters, flash }) {
         }
 
         const timer = setTimeout(() => {
-            router.get(
-                route('admin.users.index'),
-                query ? { query } : {},
-                { preserveState: true, replace: true, preserveScroll: true },
-            );
+            router.get(route('admin.users.index'), query ? { query } : {}, {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            });
         }, 350);
 
         return () => clearTimeout(timer);
@@ -78,9 +79,7 @@ export default function Index({ users, filters, flash }) {
             <DeleteConfirmModal
                 show={Boolean(userToDelete)}
                 message={
-                    userToDelete
-                        ? `هل أنت متأكد من رغبتك في حذف المستخدم «${userToDelete.name_ar}»؟`
-                        : ''
+                    userToDelete ? `هل أنت متأكد من رغبتك في حذف المستخدم «${userToDelete.name_ar}»؟` : ''
                 }
                 processing={deleting}
                 onConfirm={confirmDelete}
@@ -130,12 +129,9 @@ export default function Index({ users, filters, flash }) {
                             </thead>
                             <tbody>
                                 {users.data.length === 0 && (
-                                    <tr>
-                                        <td colSpan="8" className="dashboard-table-empty">
-                                            <i className="ri-user-search-line" />
-                                            لا توجد نتائج
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={8} icon="ri-user-search-line">
+                                        لا توجد نتائج
+                                    </TableEmptyRow>
                                 )}
 
                                 {users.data.map((user, index) => (
@@ -160,10 +156,7 @@ export default function Index({ users, filters, flash }) {
                                         </td>
                                         <td>
                                             <div className="admin-email-cell">
-                                                <a
-                                                    href={`mailto:${user.email}`}
-                                                    className="admin-email-link"
-                                                >
+                                                <a href={`mailto:${user.email}`} className="admin-email-link">
                                                     {user.email}
                                                 </a>
                                                 <button
@@ -203,10 +196,7 @@ export default function Index({ users, filters, flash }) {
                                         <td>
                                             {user.roles?.length ? (
                                                 user.roles.map((role) => (
-                                                    <span
-                                                        key={role}
-                                                        className="admin-badge admin-badge-role"
-                                                    >
+                                                    <span key={role} className="admin-badge admin-badge-role">
                                                         {role}
                                                     </span>
                                                 ))
@@ -228,8 +218,7 @@ export default function Index({ users, filters, flash }) {
                                                         <i className="ri-edit-line" />
                                                     </Link>
                                                 )}
-                                                {can('admin.users.delete') &&
-                                                    auth.user.id !== user.id && (
+                                                {can('admin.users.delete') && auth.user.id !== user.id && (
                                                     <button
                                                         type="button"
                                                         className="admin-action-btn admin-action-delete"

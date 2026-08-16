@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import WhatsAppPage, { WaPanel } from '@/Components/Admin/WhatsAppPage';
 import useCan from '@/hooks/useCan';
 import { Link } from '@inertiajs/react';
@@ -65,11 +66,9 @@ export default function Index({ campaigns, flash }) {
                                 </tr>
                             ))}
                             {rows.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className="text-center text-muted py-4">
-                                        لا توجد حملات.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={7}>
+                                    لا توجد حملات.
+                                </TableEmptyRow>
                             )}
                         </tbody>
                     </table>

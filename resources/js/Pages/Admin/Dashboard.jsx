@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage from '@/Components/Admin/AdminUiPage';
 import { eventLabel, eventTone } from '@/Components/Admin/ActivityTable';
 import useCan from '@/hooks/useCan';
@@ -332,11 +333,9 @@ export default function Dashboard({
                                             </tr>
                                         ))}
                                         {recentActivity.length === 0 && (
-                                            <tr>
-                                                <td colSpan={4} className="text-center text-muted py-4">
-                                                    لا توجد نشاطات مسجّلة بعد.
-                                                </td>
-                                            </tr>
+                                            <TableEmptyRow colSpan={4}>
+                                                لا توجد نشاطات مسجّلة بعد.
+                                            </TableEmptyRow>
                                         )}
                                     </tbody>
                                 </table>

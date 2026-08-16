@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import useCan from '@/hooks/useCan';
@@ -87,11 +88,9 @@ export default function Index({ backups, flash }) {
                             </thead>
                             <tbody>
                                 {rows.length === 0 && (
-                                    <tr>
-                                        <td colSpan="8" className="dashboard-table-empty">
-                                            لا توجد نسخ احتياطية بعد
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={8}>
+                                        لا توجد نسخ احتياطية بعد
+                                    </TableEmptyRow>
                                 )}
                                 {rows.map((backup, index) => (
                                     <tr key={backup.id}>

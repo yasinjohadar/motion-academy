@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import useCan from '@/hooks/useCan';
@@ -67,11 +68,9 @@ export default function Index({ mappings, flash }) {
                             </thead>
                             <tbody>
                                 {mappings.length === 0 && (
-                                    <tr>
-                                        <td colSpan="6" className="dashboard-table-empty">
-                                            لا توجد روابط أقراص بعد
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={6}>
+                                        لا توجد روابط أقراص بعد
+                                    </TableEmptyRow>
                                 )}
                                 {mappings.map((mapping, index) => (
                                     <tr key={mapping.id}>

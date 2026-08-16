@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import WhatsAppPage, { WaPanel } from '@/Components/Admin/WhatsAppPage';
 
 export default function Index({ messages, flash }) {
@@ -47,11 +48,9 @@ export default function Index({ messages, flash }) {
                                 </tr>
                             ))}
                             {rows.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className="text-center text-muted py-4">
-                                        لا رسائل بعد.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={7}>
+                                    لا رسائل بعد.
+                                </TableEmptyRow>
                             )}
                         </tbody>
                     </table>

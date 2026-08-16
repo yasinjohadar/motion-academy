@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import useCan from '@/hooks/useCan';
@@ -173,11 +174,9 @@ export default function Index({ pages, filters, flash }) {
                                     </tr>
                                 ))}
                                 {(pages.data || []).length === 0 && (
-                                    <tr>
-                                        <td colSpan={6} className="text-center text-muted py-4">
-                                            لا توجد صفحات.
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={6}>
+                                        لا توجد صفحات.
+                                    </TableEmptyRow>
                                 )}
                             </tbody>
                         </table>

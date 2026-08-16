@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import { Link } from '@inertiajs/react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -414,11 +415,9 @@ export default function Database({ connection, tables = [], totals, notes = [], 
                                 </Fragment>
                             ))}
                             {rows.length === 0 && (
-                                <tr>
-                                    <td colSpan={5} className="text-center text-muted py-4">
-                                        لا توجد جداول مطابقة.
-                                    </td>
-                                </tr>
+                                <TableEmptyRow colSpan={5}>
+                                    لا توجد جداول مطابقة.
+                                </TableEmptyRow>
                             )}
                         </tbody>
                     </table>

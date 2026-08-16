@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import useCan from '@/hooks/useCan';
@@ -183,11 +184,9 @@ export default function Index({ categories, filters, flash }) {
                                         </tr>
                                     ))}
                                     {(categories.data || []).length === 0 && (
-                                        <tr>
-                                            <td colSpan={7} className="text-center text-muted py-4">
-                                                لا توجد تصنيفات.
-                                            </td>
-                                        </tr>
+                                        <TableEmptyRow colSpan={7}>
+                                            لا توجد تصنيفات.
+                                        </TableEmptyRow>
                                     )}
                                 </tbody>
                             </table>

@@ -1,3 +1,4 @@
+import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import useCan from '@/hooks/useCan';
@@ -82,11 +83,9 @@ export default function Index({ settings, flash }) {
                             </thead>
                             <tbody>
                                 {settings.length === 0 && (
-                                    <tr>
-                                        <td colSpan="6" className="dashboard-table-empty">
-                                            لا توجد إعدادات SMTP بعد
-                                        </td>
-                                    </tr>
+                                    <TableEmptyRow colSpan={6}>
+                                        لا توجد إعدادات SMTP بعد
+                                    </TableEmptyRow>
                                 )}
 
                                 {settings.map((setting, index) => (
