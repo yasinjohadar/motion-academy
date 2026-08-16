@@ -128,9 +128,25 @@ class WebPushTest extends TestCase
         $this->assertSame(NotificationCategory::Backups->value, $message['tag']);
     }
 
-    public function test_vapid_keys_are_configured(): void
+    /**
+     * Guards a deployment mistake — push notifications configured but no keys — rather
+     * than asserting a fact about the machine running the suite.
+     *
+     * As written before, this asserted that whoever ran the tests had generated VAPID
+     * keys into their own .env. It passed on one developer's machine and failed for
+     * every new clone and every CI run, which makes it a report about the environment
+     * rather than about the application.
+     */
+    public function test_vapid_keys_are_complete_when_web_push_is_configured(): void
     {
-        $this->assertNotEmpty(config('webpush.vapid.public_key'));
+        $public = config('webpush.vapid.public_key');
+
+        if (blank($public)) {
+            $this->markTestSkipped('VAPID keys are not configured; run `php artisan webpush:vapid`.');
+        }
+
+        // A half-configured pair is the dangerous state: subscriptions are accepted and
+        // every send then fails.
         $this->assertNotEmpty(config('webpush.vapid.private_key'));
         $this->assertNotEmpty(config('webpush.vapid.subject'));
     }

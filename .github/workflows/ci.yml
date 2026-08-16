@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+# A second push to the same branch cancels the first: the older run's result is
+# already obsolete and only costs queue time.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, analyse and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------- frontend
+      #
+      # The frontend is built BEFORE the PHP tests, and the order is not cosmetic.
+      # Inertia page tests request real routes, which render app.blade.php, which
+      # calls @vite — without a build manifest every one of those tests fails with a
+      # 500 that says nothing about the actual change.
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Lint JavaScript
+        run: npm run lint
+
+      - name: Build assets
+        run: npm run build
+
+      # ---------------------------------------------------------------- php
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          # sqlite drives the test database (in memory, so no service container);
+          # zip is used by the backup archiver and gd by the image processor.
+          extensions: mbstring, pdo_sqlite, sqlite3, zip, gd, intl
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare the environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Separate steps rather than one `composer check`, so a red run names which
+      # gate failed without anyone opening the log.
+
+      - name: Check formatting
+        run: vendor/bin/pint --test
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=1G
+
+      - name: Run tests
+        run: php artisan test

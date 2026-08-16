@@ -1,0 +1,9 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "resources/assets",
+        "public",
+        "storage",
+        "bootstrap/cache"
+    ]
+}
