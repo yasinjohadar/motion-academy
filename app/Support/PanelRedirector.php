@@ -5,6 +5,10 @@ namespace App\Support;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Where an account lands after signing in: admins in the control panel,
+ * students in their dashboard on the public site (see AccountType).
+ */
 class PanelRedirector
 {
     /**
@@ -18,22 +22,16 @@ class PanelRedirector
             return 'login';
         }
 
-        if ($user->hasRole('admin') || $user->can('admin.dashboard.view')) {
-            return self::panelHome('admin') ?? 'admin.dashboard';
+        if (AccountType::isAdmin($user)) {
+            // A custom admin role without the dashboard still has a page of its own.
+            return $user->hasRole(AccountType::ADMIN) || $user->can('admin.dashboard.view')
+                ? (self::panelHome('admin') ?? 'admin.dashboard')
+                : 'admin.profile.edit';
         }
 
-        if (self::userHasPanelAccess($user, 'admin')) {
-            return 'admin.profile.edit';
-        }
+        $studentHome = self::panelHome('student');
 
-        if ($user->hasRole('teacher') || self::userHasPanelAccess($user, 'teacher')) {
-            $teacherHome = self::panelHome('teacher');
-            if ($teacherHome && Route::has($teacherHome)) {
-                return $teacherHome;
-            }
-        }
-
-        return 'admin.profile.edit';
+        return $studentHome && Route::has($studentHome) ? $studentHome : 'student.dashboard';
     }
 
     public static function url(?User $user = null): string
@@ -46,15 +44,5 @@ class PanelRedirector
         $home = config("permissions.panels.{$panel}.home_route");
 
         return is_string($home) && $home !== '' ? $home : null;
-    }
-
-    protected static function userHasPanelAccess(User $user, string $panel): bool
-    {
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        return $user->getAllPermissions()
-            ->contains(fn ($permission) => str_starts_with($permission->name, "{$panel}."));
     }
 }

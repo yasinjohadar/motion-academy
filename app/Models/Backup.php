@@ -101,7 +101,8 @@ class Backup extends Model
     {
         $data = [
             'id' => $this->id,
-            'can' => $this->policyFlags(['update', 'delete', 'restore']),
+            // Backups are never edited; restore has its own permission (admin.backups.restore).
+            'can' => $this->policyFlags(['delete']),
             'name' => $this->name,
             'type' => $this->type,
             'backup_type' => $this->backup_type,

@@ -1,0 +1,502 @@
+/*
+ * Motion Academy brand layer — loaded after style.css.
+ *
+ * Colours are sampled from the logo (green → teal → blue) with the navy of the
+ * brand's social designs for text. Light mode is the default look: an airy white
+ * page with soft green/blue waves, gradient accents and glass play-shapes.
+ */
+:root {
+  --brand-green: #02ad8f;
+  --brand-green-light: #06b59c;
+  --brand-teal: #45bec4;
+  --brand-blue: #33a4da;
+  --brand-blue-deep: #1a83c1;
+  --brand-navy: #0f2a4a;
+  --brand-gradient: linear-gradient(135deg, #02ad8f 0%, #22b3b6 45%, #33a4da 75%, #1a83c1 100%);
+  --brand-gradient-soft: linear-gradient(135deg, rgba(2, 173, 143, 0.12), rgba(51, 164, 218, 0.12));
+  --brand-shadow: 0 10px 28px rgba(26, 131, 193, 0.22), 0 4px 10px rgba(2, 173, 143, 0.18);
+
+  --text-primary: var(--brand-navy);
+  --accent-color: var(--brand-green);
+  --accent-hover: #018a72;
+  --page-bg: #f7fbfe;
+}
+
+/* ---------- Page background: soft brand waves (light mode) ---------- */
+html[data-theme="light"] body,
+html:not([data-theme]) body {
+  background-color: #f7fbfe;
+  background-image:
+    radial-gradient(60rem 28rem at 105% -5%, rgba(51, 164, 218, 0.16), transparent 60%),
+    radial-gradient(45rem 24rem at 100% 30%, rgba(2, 173, 143, 0.12), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 85%, rgba(2, 173, 143, 0.14), transparent 60%),
+    radial-gradient(40rem 26rem at -5% 40%, rgba(26, 131, 193, 0.10), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* ---------- Brand mark in the navbar: stacked like the logo ---------- */
+.site-brand {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-block: 4px;
+  direction: ltr;
+  text-align: center;
+  line-height: 1;
+}
+
+.site-brand-logo {
+  width: 46px;
+  height: auto;
+  margin-bottom: 2px;
+  transition: transform 0.35s ease;
+}
+
+.site-brand:hover .site-brand-logo {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.site-brand .site-brand-name {
+  font-family: 'Poppins', 'Alexandria', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--brand-navy) !important;
+  white-space: nowrap;
+}
+
+.site-brand-tagline {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--brand-navy);
+  white-space: nowrap;
+}
+
+html[data-theme="dark"] .site-brand .site-brand-name,
+html[data-theme="dark"] .site-brand-tagline {
+  color: #eaf6fb !important;
+}
+
+@media (max-width: 575.98px) {
+  .site-brand-logo { width: 38px; }
+  .site-brand .site-brand-name { font-size: 0.72rem; }
+  .site-brand-tagline { display: none; }
+}
+
+/* ---------- Footer logo (the footer is navy in both themes) ---------- */
+.footer-logo-img {
+  width: 120px;
+  height: auto;
+}
+
+/* ---------- Gradient buttons: every filled button shares the logo gradient ---------- */
+:is(
+  .btn-accent, .btn-auth, .btn-primary, .btn-success, .btn-hero-primary,
+  .site-nav-cta, .site-search-submit,
+  .categories-view-all, .courses-view-all, .blog-view-all, .blog-featured-cta,
+  .about-btn-primary, .team-page-cta-btn, .footer-cta-btn-primary,
+  .course-purchase-btn-primary, .course-card-preview-btn, .course-card-cart,
+  .newsletter-submit, .footer-newsletter-form button, .blog-detail-sidebar-search button,
+  .blog-detail-submit-btn, .cart-empty-btn, .checkout-submit-btn, .checkout-success-btn,
+  .sidebar-toggle-btn,
+  .blog-filter-chip.active, .categories-level-chip.active, .blog-page-btn.is-active,
+  .courses-view-btn.active, .page-item.active .page-link
+) {
+  background: var(--brand-gradient) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: var(--brand-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+:is(
+  .btn-accent, .btn-auth, .btn-primary, .btn-success, .btn-hero-primary,
+  .site-nav-cta, .site-search-submit,
+  .categories-view-all, .courses-view-all, .blog-view-all, .blog-featured-cta,
+  .about-btn-primary, .team-page-cta-btn, .footer-cta-btn-primary,
+  .course-purchase-btn-primary, .course-card-preview-btn, .course-card-cart,
+  .newsletter-submit, .footer-newsletter-form button, .blog-detail-sidebar-search button,
+  .blog-detail-submit-btn, .cart-empty-btn, .checkout-submit-btn, .checkout-success-btn,
+  .sidebar-toggle-btn
+):not(:disabled):hover {
+  transform: translateY(-2px);
+  filter: saturate(1.1) brightness(1.04);
+  box-shadow: 0 14px 34px rgba(26, 131, 193, 0.3), 0 6px 14px rgba(2, 173, 143, 0.22);
+}
+
+:is(.btn-primary, .btn-success, .course-purchase-btn-primary, .checkout-submit-btn):disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Small toggles/chips: the gradient without the heavy lift shadow. */
+:is(.blog-filter-chip.active, .categories-level-chip.active, .blog-page-btn.is-active,
+    .courses-view-btn.active, .page-item.active .page-link) {
+  box-shadow: 0 4px 12px rgba(26, 131, 193, 0.22);
+}
+
+/* ---------- Eyebrows: small gradient labels above section titles ---------- */
+[class$="-eyebrow"],
+[class*="-eyebrow "] {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  font-weight: 700;
+}
+
+[class$="-eyebrow"] i,
+[class*="-eyebrow "] i {
+  color: var(--brand-green);
+  -webkit-text-fill-color: var(--brand-green);
+}
+
+/* ---------- Section titles: navy with the brand divider (line ▸▸▸ line) ---------- */
+html[data-theme="light"] .categories-title,
+html[data-theme="light"] .courses-title,
+html[data-theme="light"] .features-title,
+html[data-theme="light"] .blog-section-title,
+html[data-theme="light"] [class$="-page-hero-title"] {
+  color: var(--brand-navy);
+}
+
+.categories-title::after,
+.courses-title::after,
+.features-title::after,
+.blog-section-title::after,
+[class$="-page-hero-title"]::after {
+  content: '';
+  display: block;
+  width: 140px;
+  height: 10px;
+  margin-top: 0.7rem;
+  background:
+    linear-gradient(90deg, var(--brand-green), var(--brand-green)) left center / 52px 3px no-repeat,
+    linear-gradient(90deg, var(--brand-blue), var(--brand-blue-deep)) right center / 52px 3px no-repeat,
+    conic-gradient(from 60deg at 0 50%, var(--brand-teal) 0 60deg, transparent 0) 58px 0 / 8px 10px no-repeat,
+    conic-gradient(from 60deg at 0 50%, var(--brand-teal) 0 60deg, transparent 0) 66px 0 / 8px 10px no-repeat,
+    conic-gradient(from 60deg at 0 50%, var(--brand-blue) 0 60deg, transparent 0) 74px 0 / 8px 10px no-repeat;
+}
+
+.text-center > [class$="-title"]::after,
+[class$="-page-hero-inner"] [class$="-page-hero-title"]::after {
+  margin-inline: auto;
+}
+
+/* ---------- Cards: white glass with a soft brand edge ---------- */
+html[data-theme="light"] .course-card,
+html[data-theme="light"] .course-list-card,
+html[data-theme="light"] .blog-card,
+html[data-theme="light"] .category-item,
+html[data-theme="light"] .category-page-card,
+html[data-theme="light"] .feature-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(51, 164, 218, 0.14);
+  box-shadow: 0 6px 22px rgba(15, 42, 74, 0.06);
+}
+
+html[data-theme="light"] .course-card:hover,
+html[data-theme="light"] .course-list-card:hover,
+html[data-theme="light"] .blog-card:hover,
+html[data-theme="light"] .category-item:hover,
+html[data-theme="light"] .category-page-card:hover,
+html[data-theme="light"] .feature-card:hover {
+  border-color: rgba(2, 173, 143, 0.35);
+  box-shadow: 0 16px 36px rgba(26, 131, 193, 0.14), 0 4px 12px rgba(2, 173, 143, 0.1);
+}
+
+.course-card-badge {
+  background: var(--brand-gradient) !important;
+  color: #fff !important;
+}
+
+.course-card-price,
+.course-purchase-price {
+  color: var(--brand-green-light) !important;
+}
+
+/* ---------- Navbar on light: frosted white ---------- */
+html[data-theme="light"] .site-navbar {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(51, 164, 218, 0.12);
+}
+
+/* ---------- Focus states in brand colour ---------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+ * Dark mode — the same logo palette on a deep navy (the logo's deep blue,
+ * darkened), with the green/blue waves glowing instead of tinting.
+ * ===================================================================== */
+html[data-theme="dark"] {
+  --text-primary: #eaf6fb;
+  --text-secondary: rgba(199, 228, 245, 0.72);
+  --page-bg: #061427;
+  --glass-bg: rgba(11, 33, 64, 0.72);
+  --glass-border: rgba(69, 190, 196, 0.22);
+  --glass-hover-bg: rgba(15, 42, 74, 0.85);
+  --glass-hover-border: rgba(6, 181, 156, 0.5);
+}
+
+html[data-theme="dark"] body {
+  background-color: #061427;
+  background-image:
+    radial-gradient(60rem 28rem at 105% -5%, rgba(51, 164, 218, 0.22), transparent 60%),
+    radial-gradient(45rem 24rem at 100% 30%, rgba(2, 173, 143, 0.14), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 85%, rgba(2, 173, 143, 0.18), transparent 60%),
+    radial-gradient(40rem 26rem at -5% 40%, rgba(26, 131, 193, 0.16), transparent 60%),
+    linear-gradient(160deg, #061427 0%, #08192f 45%, #0b2140 100%);
+  background-attachment: fixed;
+}
+
+html[data-theme="dark"] .site-navbar {
+  background: rgba(6, 20, 39, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(69, 190, 196, 0.16);
+}
+
+html[data-theme="dark"] .categories-title,
+html[data-theme="dark"] .courses-title,
+html[data-theme="dark"] .features-title,
+html[data-theme="dark"] .blog-section-title,
+html[data-theme="dark"] [class$="-page-hero-title"] {
+  color: #eaf6fb;
+}
+
+html[data-theme="dark"] .course-card,
+html[data-theme="dark"] .course-list-card,
+html[data-theme="dark"] .blog-card,
+html[data-theme="dark"] .category-item,
+html[data-theme="dark"] .category-page-card,
+html[data-theme="dark"] .feature-card {
+  background: rgba(11, 33, 64, 0.72);
+  border: 1px solid rgba(69, 190, 196, 0.16);
+  box-shadow: 0 8px 26px rgba(6, 20, 39, 0.45);
+}
+
+html[data-theme="dark"] .course-card:hover,
+html[data-theme="dark"] .course-list-card:hover,
+html[data-theme="dark"] .blog-card:hover,
+html[data-theme="dark"] .category-item:hover,
+html[data-theme="dark"] .category-page-card:hover,
+html[data-theme="dark"] .feature-card:hover {
+  border-color: rgba(6, 181, 156, 0.5);
+  box-shadow: 0 18px 40px rgba(6, 20, 39, 0.55), 0 0 0 1px rgba(51, 164, 218, 0.2);
+}
+
+html[data-theme="dark"] .course-card-price,
+html[data-theme="dark"] .course-purchase-price {
+  color: #45bec4 !important;
+}
+
+/* The footer shares the navy family in both themes. */
+.footer-main {
+  background:
+    radial-gradient(40rem 18rem at 100% 0%, rgba(51, 164, 218, 0.18), transparent 60%),
+    radial-gradient(36rem 18rem at 0% 100%, rgba(2, 173, 143, 0.16), transparent 60%),
+    #0b2346 !important;
+}
+
+/* ---------- Without the top bar the navbar sits at the very top ---------- */
+body:not(:has(.top-bar)) .main-nav {
+  top: 0;
+}
+
+@media (min-width: 768px) {
+  body:not(:has(.top-bar)) {
+    padding-top: 85px;
+  }
+}
+
+/* ---------- Footer bottom strip: solid deep navy in both themes ---------- */
+.footer-bottom,
+html[data-theme="light"] .footer-bottom,
+html[data-theme="dark"] .footer-bottom {
+  background: #061427;
+  border-top: 1px solid rgba(69, 190, 196, 0.14);
+}
+
+.footer-copyright strong {
+  color: #45bec4;
+}
+
+.footer-legal a {
+  color: rgba(234, 246, 251, 0.65);
+}
+
+.footer-legal a:hover {
+  color: #45bec4;
+}
+
+/* The page background must not show below the footer. */
+.site-footer {
+  margin-bottom: 0;
+}
+
+/* =====================================================================
+ * Page headers (blog, courses, categories, about, team, cart, checkout):
+ * the logo gradient, with glass play-shapes floating over it.
+ * ===================================================================== */
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(30rem 16rem at 90% 10%, rgba(255, 255, 255, 0.16), transparent 60%),
+    radial-gradient(26rem 14rem at 5% 95%, rgba(6, 20, 39, 0.18), transparent 60%),
+    var(--brand-gradient) !important;
+  color: #fff;
+}
+
+html[data-theme="dark"] :is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) {
+  background:
+    radial-gradient(30rem 16rem at 90% 10%, rgba(255, 255, 255, 0.08), transparent 60%),
+    linear-gradient(135deg, #018a72 0%, #1b8f9a 45%, #1a6fa6 75%, #123b6e 100%) !important;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::before,
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  clip-path: polygon(15% 0, 100% 50%, 15% 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(6px);
+  animation: brand-float 7s ease-in-out infinite;
+  z-index: 0;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::before {
+  width: 90px;
+  height: 90px;
+  top: 16%;
+  inset-inline-start: 6%;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::after {
+  width: 58px;
+  height: 58px;
+  bottom: 14%;
+  inset-inline-end: 8%;
+  animation-delay: -3.5s;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes brand-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(-6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::before,
+  :is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero)::after {
+    animation: none;
+  }
+}
+
+/* On the gradient, labels and the title divider are white. */
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) [class*="-eyebrow"] {
+  background: rgba(255, 255, 255, 0.16) !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) [class*="-eyebrow"] i {
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) [class*="-title"] {
+  color: #fff !important;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) [class*="-title"]::after {
+  margin-inline: auto;
+  background:
+    linear-gradient(90deg, #fff, #fff) left center / 52px 3px no-repeat,
+    linear-gradient(90deg, #fff, #fff) right center / 52px 3px no-repeat,
+    conic-gradient(from 60deg at 0 50%, #fff 0 60deg, transparent 0) 58px 0 / 8px 10px no-repeat,
+    conic-gradient(from 60deg at 0 50%, #fff 0 60deg, transparent 0) 66px 0 / 8px 10px no-repeat,
+    conic-gradient(from 60deg at 0 50%, #fff 0 60deg, transparent 0) 74px 0 / 8px 10px no-repeat;
+  opacity: 0.85;
+}
+
+:is(.page-hero, .blog-page-hero, .blog-detail-hero, .courses-page-hero, .categories-page-hero, .about-page-hero, .who-we-are-hero, .cart-page-hero, .checkout-page-hero) :is([class*="-stat"], [class*="-hero-stat"]) {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* The strip between the hero and the next section was hard-coded white,
+   which showed as a white band in dark mode. Let the page background through. */
+.home-hero-bridge {
+  background: transparent !important;
+}
+
+/* =====================================================================
+ * Page scrolling
+ * The theme set `overflow-x: hidden` on both html and body, which makes body
+ * its own scroll container: the window scrollbar stops responding properly and
+ * position: sticky breaks. `clip` hides sideways overflow without that.
+ * ===================================================================== */
+html,
+body {
+  overflow-x: clip !important;
+  overflow-y: visible;
+}
+
+html {
+  scrollbar-width: auto;
+  scrollbar-color: #33a4da #e8f3f8;
+}
+
+html[data-theme="dark"] {
+  scrollbar-color: #45bec4 #061427;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e8f3f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #02ad8f, #33a4da 55%, #1a83c1);
+  border-radius: 10px;
+  border: 3px solid #e8f3f8;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #06b59c, #45bec4 55%, #33a4da);
+  border-width: 2px;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #1a83c1;
+  border-width: 2px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #061427;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  border-color: #061427;
+}

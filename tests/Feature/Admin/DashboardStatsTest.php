@@ -189,7 +189,7 @@ class DashboardStatsTest extends TestCase
 
     public function test_the_dashboard_requires_its_permission(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs($this->panelUserWithoutPermissions())
             ->get(route('admin.dashboard'))
             ->assertForbidden();
     }

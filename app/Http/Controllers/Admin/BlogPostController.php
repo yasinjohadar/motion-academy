@@ -44,7 +44,7 @@ class BlogPostController extends Controller implements HasMiddleware
         $categoryId = $request->integer('blog_category_id') ?: null;
 
         $posts = BlogPost::query()
-            ->with(['author:id,name', 'category:id,name', 'tags:id,name'])
+            ->with(['author:id,name', 'category:id,name,slug', 'tags:id,name,slug'])
             ->when($query !== '', fn ($builder) => $builder->search($query))
             ->when($status !== '', fn ($builder) => $builder->where('status', $status))
             ->when($categoryId, fn ($builder) => $builder->where('blog_category_id', $categoryId))

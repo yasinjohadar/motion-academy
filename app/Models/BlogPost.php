@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ExposesPolicyFlags;
 use App\Services\Storage\AppStorageManager;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
+/**
+ * Datetime casts are invisible to static analysis without these.
+ *
+ * @property CarbonInterface|null $published_at
+ * @property CarbonInterface|null $scheduled_at
+ * @property CarbonInterface|null $schema_published_time
+ * @property CarbonInterface|null $schema_modified_time
+ */
 class BlogPost extends Model
 {
     use ExposesPolicyFlags, SoftDeletes;

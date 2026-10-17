@@ -3,14 +3,17 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 export default function UpdateProfileInformationForm({
     mustVerifyEmail,
     status,
+    phone = { country_code: '963', phone: '', verified: false },
+    countries = [],
 }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name: user.name,
+        email: user.email,
+        country_code: phone.country_code,
+        phone: phone.phone,
+    });
 
     const submit = (e) => {
         e.preventDefault();
@@ -31,9 +34,7 @@ export default function UpdateProfileInformationForm({
                     required
                     autoComplete="name"
                 />
-                {errors.name && (
-                    <div className="invalid-feedback">{errors.name}</div>
-                )}
+                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
 
             <div className="mb-3">
@@ -49,9 +50,54 @@ export default function UpdateProfileInformationForm({
                     required
                     autoComplete="username"
                 />
-                {errors.email && (
-                    <div className="invalid-feedback">{errors.email}</div>
-                )}
+                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+            </div>
+
+            <div className="mb-3">
+                <label htmlFor="phone" className="form-label d-flex align-items-center gap-2">
+                    رقم الهاتف (واتساب)
+                    {phone.phone &&
+                        (phone.verified ? (
+                            <span className="admin-badge admin-badge-success">مؤكد</span>
+                        ) : (
+                            <span className="admin-badge admin-badge-muted">غير مؤكد</span>
+                        ))}
+                </label>
+                <div className="input-group" dir="ltr">
+                    <select
+                        className="form-select"
+                        style={{ maxWidth: 150 }}
+                        value={data.country_code}
+                        onChange={(e) => setData('country_code', e.target.value)}
+                        aria-label="مفتاح الدولة"
+                    >
+                        {countries.map((country) => (
+                            <option key={country.code + country.iso} value={country.code}>
+                                {country.flag} +{country.code}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        id="phone"
+                        type="tel"
+                        inputMode="numeric"
+                        className={`form-control${errors.phone ? ' is-invalid' : ''}`}
+                        value={data.phone}
+                        placeholder="991234567"
+                        onChange={(e) =>
+                            setData('phone', e.target.value.replace(/\D+/g, '').replace(/^0+/, ''))
+                        }
+                        autoComplete="tel-national"
+                    />
+                    {errors.phone && (
+                        <div className="invalid-feedback" dir="rtl">
+                            {errors.phone}
+                        </div>
+                    )}
+                </div>
+                <div className="form-text">
+                    يُستخدم للدخول برمز واتساب ولاستعادة كلمة المرور. يتأكد تلقائياً عند أول دخول برمز.
+                </div>
             </div>
 
             {mustVerifyEmail && user.email_verified_at === null && (
@@ -76,16 +122,10 @@ export default function UpdateProfileInformationForm({
             )}
 
             <div className="d-flex align-items-center gap-3">
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={processing}
-                >
+                <button type="submit" className="btn btn-primary" disabled={processing}>
                     حفظ
                 </button>
-                {recentlySuccessful && (
-                    <span className="small text-success">تم الحفظ.</span>
-                )}
+                {recentlySuccessful && <span className="small text-success">تم الحفظ.</span>}
             </div>
         </form>
     );

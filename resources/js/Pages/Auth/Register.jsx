@@ -1,10 +1,15 @@
+import AuthField from '@/Components/Auth/AuthField';
+import PasswordStrength from '@/Components/Auth/PasswordStrength';
+import PhoneField from '@/Components/Auth/PhoneField';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Register() {
+export default function Register({ countries = [], defaultCountry = '963' }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
+        country_code: defaultCountry,
+        phone: '',
         password: '',
         password_confirmation: '',
     });
@@ -16,110 +21,109 @@ export default function Register() {
         });
     };
 
+    const mismatch = data.password_confirmation !== '' && data.password !== data.password_confirmation;
+
     return (
         <GuestLayout
-            title="إنشاء حساب"
-            subtitle="سجّل حساباً جديداً للوصول إلى لوحة التحكم"
+            title="أنشئ حسابك"
+            subtitle="انضم إلى الأكاديمية وابدأ بدرس مجاني من أي دورة"
+            icon="ri-user-add-line"
+            aside={{
+                heading: 'ابدأ مشهدك الأول اليوم',
+                text: 'حساب واحد يفتح لك الدورات والدروس المجانية للمعاينة ومقالات المدونة.',
+            }}
         >
             <Head title="إنشاء حساب" />
 
-            <form onSubmit={submit}>
-                <div className="mb-3">
-                    <label htmlFor="name" className="form-label">
-                        الاسم
-                    </label>
-                    <input
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className={`form-control${errors.name ? ' is-invalid' : ''}`}
-                        autoComplete="name"
-                        autoFocus
-                        required
-                        onChange={(e) => setData('name', e.target.value)}
-                    />
-                    {errors.name && (
-                        <div className="invalid-feedback">{errors.name}</div>
-                    )}
-                </div>
+            <form onSubmit={submit} className="auth-form" noValidate>
+                <AuthField
+                    label="الاسم الكامل"
+                    icon="ri-user-line"
+                    name="name"
+                    value={data.name}
+                    onChange={(value) => setData('name', value)}
+                    error={errors.name}
+                    autoComplete="name"
+                    placeholder="اسمك كما تحب أن يظهر"
+                    autoFocus
+                    required
+                />
 
-                <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                        البريد الإلكتروني
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className={`form-control${errors.email ? ' is-invalid' : ''}`}
-                        autoComplete="username"
-                        required
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-                    {errors.email && (
-                        <div className="invalid-feedback">{errors.email}</div>
-                    )}
-                </div>
+                <AuthField
+                    label="البريد الإلكتروني"
+                    icon="ri-mail-line"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    onChange={(value) => setData('email', value)}
+                    error={errors.email}
+                    autoComplete="username"
+                    placeholder="name@example.com"
+                    dir="ltr"
+                    required
+                />
 
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                        كلمة المرور
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className={`form-control${errors.password ? ' is-invalid' : ''}`}
-                        autoComplete="new-password"
-                        required
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-                    {errors.password && (
-                        <div className="invalid-feedback">{errors.password}</div>
-                    )}
-                </div>
+                <PhoneField
+                    countries={countries}
+                    countryCode={data.country_code}
+                    phone={data.phone}
+                    onCountryChange={(code) => setData('country_code', code)}
+                    onPhoneChange={(value) => setData('phone', value)}
+                    error={errors.phone || errors.country_code}
+                    hint="رقم عليه واتساب — تستخدمه للدخول برمز ولاستعادة كلمة المرور."
+                />
 
-                <div className="mb-3">
-                    <label htmlFor="password_confirmation" className="form-label">
-                        تأكيد كلمة المرور
-                    </label>
-                    <input
-                        id="password_confirmation"
+                <div className="auth-row">
+                    <div>
+                        <AuthField
+                            label="كلمة المرور"
+                            icon="ri-lock-2-line"
+                            type="password"
+                            name="password"
+                            value={data.password}
+                            onChange={(value) => setData('password', value)}
+                            error={errors.password}
+                            autoComplete="new-password"
+                            placeholder="8 أحرف على الأقل"
+                            required
+                        />
+                        <PasswordStrength password={data.password} />
+                    </div>
+
+                    <AuthField
+                        label="تأكيد كلمة المرور"
+                        icon="ri-shield-check-line"
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className={`form-control${errors.password_confirmation ? ' is-invalid' : ''}`}
-                        autoComplete="new-password"
-                        required
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                        onChange={(value) => setData('password_confirmation', value)}
+                        error={
+                            errors.password_confirmation ||
+                            (mismatch ? 'كلمتا المرور غير متطابقتين.' : undefined)
                         }
+                        autoComplete="new-password"
+                        placeholder="أعد كتابتها"
+                        required
                     />
-                    {errors.password_confirmation && (
-                        <div className="invalid-feedback">
-                            {errors.password_confirmation}
-                        </div>
+                </div>
+
+                <button type="submit" className="auth-submit" disabled={processing}>
+                    {processing ? (
+                        <span className="auth-spinner" aria-hidden="true" />
+                    ) : (
+                        <i className="ri-rocket-2-line" />
                     )}
-                </div>
-
-                <div className="d-grid gap-2">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={processing}
-                    >
-                        تسجيل
-                    </button>
-                </div>
-
-                <div className="text-center mt-3 small">
-                    <Link href={route('login')} className="link-secondary">
-                        لديك حساب؟ سجّل الدخول
-                    </Link>
-                </div>
+                    {processing ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب'}
+                </button>
             </form>
+
+            <div className="auth-divider">
+                <span>لديك حساب بالفعل؟</span>
+            </div>
+
+            <Link href={route('login')} className="auth-secondary">
+                <i className="ri-login-circle-line" /> سجّل الدخول
+            </Link>
         </GuestLayout>
     );
 }

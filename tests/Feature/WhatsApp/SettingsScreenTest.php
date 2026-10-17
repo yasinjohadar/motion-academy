@@ -369,7 +369,7 @@ class SettingsScreenTest extends TestCase
 
     public function test_a_user_without_the_edit_permission_cannot_save(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs($this->panelUserWithoutPermissions())
             ->put(route('admin.whatsapp-settings.update'), $this->payload())
             ->assertForbidden();
     }

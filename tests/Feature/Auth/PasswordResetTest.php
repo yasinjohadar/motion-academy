@@ -5,7 +5,9 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use App\Notifications\Auth\ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -69,5 +71,43 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_unknown_email_gets_the_same_answer_as_a_registered_one(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $known = $this->from('/forgot-password')->post('/forgot-password', ['email' => $user->email]);
+        $unknown = $this->from('/forgot-password')->post('/forgot-password', ['email' => 'nobody@example.com']);
+
+        $known->assertSessionHasNoErrors()->assertRedirect('/forgot-password');
+        $unknown->assertSessionHasNoErrors()->assertRedirect('/forgot-password');
+        $this->assertSame(session('status'), __(Password::RESET_LINK_SENT));
+
+        Notification::assertSentTimes(ResetPasswordNotification::class, 1);
+    }
+
+    public function test_a_used_token_cannot_reset_the_password_again(): void
+    {
+        $user = User::factory()->create();
+        $token = Password::broker()->createToken($user);
+
+        $this->post('/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'first-new-pass',
+            'password_confirmation' => 'first-new-pass',
+        ])->assertSessionHasNoErrors();
+
+        $this->post('/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'second-new-pass',
+            'password_confirmation' => 'second-new-pass',
+        ])->assertSessionHasErrors('email');
+
+        $this->assertTrue(Hash::check('first-new-pass', $user->fresh()->password));
     }
 }

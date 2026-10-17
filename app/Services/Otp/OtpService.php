@@ -28,6 +28,7 @@ class OtpService
     public function __construct(
         private SecurityLogger $security,
         private RateLimiter $limiter,
+        private OtpSettings $settings,
     ) {}
 
     public function length(): int
@@ -35,14 +36,17 @@ class OtpService
         return (int) config('otp.length', 6);
     }
 
+    /**
+     * Admin setting (Control panel → OTP), falling back to config/otp.php.
+     */
     public function ttlMinutes(): int
     {
-        return (int) config('otp.ttl_minutes', 10);
+        return $this->settings->ttlMinutes();
     }
 
     public function maxAttempts(): int
     {
-        return (int) config('otp.max_attempts', 5);
+        return $this->settings->maxAttempts();
     }
 
     /**

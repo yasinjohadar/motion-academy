@@ -128,7 +128,9 @@ class AppStorageManager
             }
         }
 
-        return Storage::disk(config('storage.fallback_disk', 'public'));
+        return Storage::disk(
+            config("storage.private_fallbacks.{$logicalDisk}") ?? config('storage.fallback_disk', 'public')
+        );
     }
 
     public function storeUploadedFile(string $logicalDisk, UploadedFile $file, string $directory = ''): string|false

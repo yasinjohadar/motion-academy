@@ -1,9 +1,11 @@
 import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
+import EnrollStudentModal from '@/Components/Admin/EnrollStudentModal';
+import ImpersonationLinkModal from '@/Components/Admin/ImpersonationLinkModal';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
 import useCan from '@/hooks/useCan';
 import { Link, router, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Index({ users, filters, flash }) {
     const { auth } = usePage().props;
@@ -12,6 +14,10 @@ export default function Index({ users, filters, flash }) {
     const [copiedEmail, setCopiedEmail] = useState(null);
     const [userToDelete, setUserToDelete] = useState(null);
     const [deleting, setDeleting] = useState(false);
+    const [userToOpen, setUserToOpen] = useState(null);
+    const closeImpersonation = useCallback(() => setUserToOpen(null), []);
+    const [userToEnroll, setUserToEnroll] = useState(null);
+    const closeEnroll = useCallback(() => setUserToEnroll(null), []);
 
     useEffect(() => {
         const current = filters.query || '';
@@ -76,6 +82,18 @@ export default function Index({ users, filters, flash }) {
                 ) : null
             }
         >
+            <EnrollStudentModal
+                key={`enroll-${userToEnroll?.id ?? 'closed'}`}
+                user={userToEnroll}
+                onClose={closeEnroll}
+            />
+
+            <ImpersonationLinkModal
+                key={userToOpen?.id ?? 'closed'}
+                user={userToOpen}
+                onClose={closeImpersonation}
+            />
+
             <DeleteConfirmModal
                 show={Boolean(userToDelete)}
                 message={
@@ -122,7 +140,7 @@ export default function Index({ users, filters, flash }) {
                                     <th>الاسم بالإنكليزي</th>
                                     <th>البريد</th>
                                     <th>الهاتف</th>
-                                    <th>الأدوار</th>
+                                    <th>نوع الحساب</th>
                                     <th>تاريخ الإنشاء</th>
                                     <th>العمليات</th>
                                 </tr>
@@ -140,14 +158,18 @@ export default function Index({ users, filters, flash }) {
                                             {(users.from || 0) + index}
                                         </th>
                                         <td>
-                                            <div className="dashboard-student-cell">
+                                            <Link
+                                                href={route('admin.users.show', user.id)}
+                                                className="dashboard-student-cell ud-name-link"
+                                                title="عرض تفاصيل المستخدم"
+                                            >
                                                 <span className="dashboard-row-avatar">
                                                     {(user.name_ar || '?').charAt(0)}
                                                 </span>
                                                 <div>
                                                     <h6>{user.name_ar}</h6>
                                                 </div>
-                                            </div>
+                                            </Link>
                                         </td>
                                         <td>
                                             <strong className="admin-user-link d-block">
@@ -194,14 +216,14 @@ export default function Index({ users, filters, flash }) {
                                             )}
                                         </td>
                                         <td>
-                                            {user.roles?.length ? (
-                                                user.roles.map((role) => (
-                                                    <span key={role} className="admin-badge admin-badge-role">
-                                                        {role}
-                                                    </span>
-                                                ))
+                                            {user.account_type === 'admin' ? (
+                                                <span className="admin-badge admin-badge-accent">
+                                                    <i className="ri-shield-user-line" /> أدمن
+                                                </span>
                                             ) : (
-                                                <span className="text-muted">—</span>
+                                                <span className="admin-badge admin-badge-muted">
+                                                    <i className="ri-graduation-cap-line" /> طالب
+                                                </span>
                                             )}
                                         </td>
                                         <td>
@@ -209,6 +231,28 @@ export default function Index({ users, filters, flash }) {
                                         </td>
                                         <td>
                                             <div className="admin-action-group">
+                                                {can('admin.enrollments.create') &&
+                                                    user.account_type === 'student' && (
+                                                        <button
+                                                            type="button"
+                                                            className="admin-action-btn admin-action-add"
+                                                            title="إضافة إلى دورة"
+                                                            onClick={() => setUserToEnroll(user)}
+                                                        >
+                                                            <i className="ri-user-add-line" />
+                                                        </button>
+                                                    )}
+                                                {can('admin.users.impersonate') &&
+                                                    user.account_type === 'student' && (
+                                                        <button
+                                                            type="button"
+                                                            className="admin-action-btn admin-action-login"
+                                                            title="الدخول إلى حساب الطالب"
+                                                            onClick={() => setUserToOpen(user)}
+                                                        >
+                                                            <i className="ri-login-circle-line" />
+                                                        </button>
+                                                    )}
                                                 {can('admin.users.edit') && (
                                                     <Link
                                                         href={route('admin.users.edit', user.id)}

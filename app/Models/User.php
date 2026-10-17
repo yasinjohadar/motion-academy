@@ -24,8 +24,9 @@ use Spatie\Permission\Traits\HasRoles;
  *
  * @property CarbonInterface|null $email_verified_at
  * @property CarbonInterface|null $last_login_at
+ * @property CarbonInterface|null $phone_verified_at
  */
-#[Fillable(['name', 'name_ar', 'name_en', 'email', 'phone', 'password'])]
+#[Fillable(['name', 'name_ar', 'name_en', 'email', 'phone', 'phone_e164', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasLocalePreference
 {
@@ -37,6 +38,7 @@ class User extends Authenticatable implements HasLocalePreference
         return [
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -55,7 +57,9 @@ class User extends Authenticatable implements HasLocalePreference
      */
     public function routeNotificationForWhatsapp(?Notification $notification = null): ?string
     {
-        return filled($this->phone) ? (string) $this->phone : null;
+        // The canonical number is what WhatsApp can actually deliver to; the free-form
+        // `phone` is only a fallback for accounts that have not been normalised.
+        return $this->phone_e164 ?: (filled($this->phone) ? (string) $this->phone : null);
     }
 
     /**
@@ -69,6 +73,18 @@ class User extends Authenticatable implements HasLocalePreference
     }
 
     /** @return HasMany<NotificationPreference, $this> */
+    /** @return HasMany<CourseEnrollment, $this> */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+    /** @return HasMany<LessonProgress, $this> */
+    public function lessonProgress(): HasMany
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+
     public function notificationPreferences(): HasMany
     {
         return $this->hasMany(NotificationPreference::class);

@@ -17,10 +17,7 @@ export default function Index({ configs, flash }) {
             flash={flash}
             actions={
                 can('admin.app-storage.create') && (
-                    <Link
-                        href={route('admin.app-storage.create')}
-                        className="admin-btn admin-btn-primary"
-                    >
+                    <Link href={route('admin.app-storage.create')} className="admin-btn admin-btn-primary">
                         <i className="ri-cloud-line" />
                         إعداد جديد
                     </Link>
@@ -29,11 +26,7 @@ export default function Index({ configs, flash }) {
         >
             <DeleteConfirmModal
                 show={Boolean(itemToDelete)}
-                message={
-                    itemToDelete
-                        ? `هل أنت متأكد من حذف إعداد التخزين «${itemToDelete.name}»؟`
-                        : ''
-                }
+                message={itemToDelete ? `هل أنت متأكد من حذف إعداد التخزين «${itemToDelete.name}»؟` : ''}
                 processing={deleting}
                 onConfirm={() => {
                     if (!itemToDelete || deleting) return;
@@ -65,9 +58,7 @@ export default function Index({ configs, flash }) {
                             </thead>
                             <tbody>
                                 {configs.length === 0 && (
-                                    <TableEmptyRow colSpan={6}>
-                                        لا توجد إعدادات تخزين بعد
-                                    </TableEmptyRow>
+                                    <TableEmptyRow colSpan={6}>لا توجد إعدادات تخزين بعد</TableEmptyRow>
                                 )}
                                 {configs.map((config, index) => (
                                     <tr key={config.id}>
@@ -75,9 +66,7 @@ export default function Index({ configs, flash }) {
                                         <td>
                                             <strong>{config.name}</strong>
                                             {config.cdn_url && (
-                                                <div className="text-muted small">
-                                                    {config.cdn_url}
-                                                </div>
+                                                <div className="text-muted small">{config.cdn_url}</div>
                                             )}
                                         </td>
                                         <td>{config.driver_label}</td>
@@ -97,10 +86,7 @@ export default function Index({ configs, flash }) {
                                                         className="admin-btn admin-btn-sm admin-btn-ghost"
                                                         onClick={() =>
                                                             router.post(
-                                                                route(
-                                                                    'admin.app-storage.test',
-                                                                    config.id,
-                                                                ),
+                                                                route('admin.app-storage.test', config.id),
                                                                 {},
                                                                 { preserveScroll: true },
                                                             )
@@ -109,24 +95,19 @@ export default function Index({ configs, flash }) {
                                                         اختبار
                                                     </button>
                                                 )}
-                                                {can('admin.app-storage.edit') && (
+                                                {config.can?.update && (
                                                     <Link
-                                                        href={route(
-                                                            'admin.app-storage.edit',
-                                                            config.id,
-                                                        )}
+                                                        href={route('admin.app-storage.edit', config.id)}
                                                         className="admin-btn admin-btn-sm admin-btn-ghost"
                                                     >
                                                         تعديل
                                                     </Link>
                                                 )}
-                                                {can('admin.app-storage.delete') && (
+                                                {config.can?.delete && (
                                                     <button
                                                         type="button"
                                                         className="admin-btn admin-btn-sm admin-btn-danger"
-                                                        onClick={() =>
-                                                            setItemToDelete(config)
-                                                        }
+                                                        onClick={() => setItemToDelete(config)}
                                                     >
                                                         حذف
                                                     </button>

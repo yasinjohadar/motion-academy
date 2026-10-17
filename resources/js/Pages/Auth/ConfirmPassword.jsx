@@ -1,3 +1,4 @@
+import AuthField from '@/Components/Auth/AuthField';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -15,40 +16,34 @@ export default function ConfirmPassword() {
 
     return (
         <GuestLayout
-            title="تأكيد كلمة المرور"
-            subtitle="هذه منطقة محمية. يرجى تأكيد كلمة المرور للمتابعة"
+            title="تأكيد هويتك"
+            subtitle="هذه منطقة محمية. أدخل كلمة المرور للمتابعة"
+            icon="ri-shield-keyhole-line"
         >
             <Head title="تأكيد كلمة المرور" />
 
-            <form onSubmit={submit}>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                        كلمة المرور
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className={`form-control${errors.password ? ' is-invalid' : ''}`}
-                        autoComplete="current-password"
-                        autoFocus
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-                    {errors.password && (
-                        <div className="invalid-feedback">{errors.password}</div>
-                    )}
-                </div>
+            <form onSubmit={submit} className="auth-form" noValidate>
+                <AuthField
+                    label="كلمة المرور"
+                    icon="ri-lock-2-line"
+                    type="password"
+                    name="password"
+                    value={data.password}
+                    onChange={(value) => setData('password', value)}
+                    error={errors.password}
+                    autoComplete="current-password"
+                    autoFocus
+                    required
+                />
 
-                <div className="d-grid">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={processing}
-                    >
-                        تأكيد
-                    </button>
-                </div>
+                <button type="submit" className="auth-submit" disabled={processing}>
+                    {processing ? (
+                        <span className="auth-spinner" aria-hidden="true" />
+                    ) : (
+                        <i className="ri-shield-check-line" />
+                    )}
+                    {processing ? 'جارٍ التأكيد...' : 'تأكيد'}
+                </button>
             </form>
         </GuestLayout>
     );

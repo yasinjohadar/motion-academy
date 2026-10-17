@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Services\Otp\OtpSettings;
+
 enum OtpPurpose: string
 {
     case Login = 'login';
@@ -20,11 +22,12 @@ enum OtpPurpose: string
     }
 
     /**
-     * How the code is worded when delivered as free text.
+     * How the code is worded when delivered as free text — the template the admin
+     * set under Control panel → OTP, with {code}, {minutes}, {purpose}, {site}.
      */
     public function message(string $code, int $minutes): string
     {
-        return "رمز {$this->label()}: {$code}\nصالح لمدة {$minutes} دقيقة. لا تشاركه مع أحد.";
+        return app(OtpSettings::class)->message($this, $code, $minutes);
     }
 
     /**

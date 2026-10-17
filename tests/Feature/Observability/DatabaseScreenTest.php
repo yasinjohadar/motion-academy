@@ -22,7 +22,7 @@ class DatabaseScreenTest extends TestCase
 
     protected function userWith(array $permissions): User
     {
-        $user = User::factory()->create();
+        $user = User::factory()->staff()->create();
         $user->givePermissionTo($permissions);
 
         return $user;
@@ -37,7 +37,7 @@ class DatabaseScreenTest extends TestCase
 
     public function test_the_screen_requires_its_own_permission(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs($this->panelUserWithoutPermissions())
             ->get(route('admin.observability.database'))
             ->assertForbidden();
     }

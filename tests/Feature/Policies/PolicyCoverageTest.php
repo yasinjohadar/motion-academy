@@ -29,6 +29,8 @@ class PolicyCoverageTest extends TestCase
     protected const NOT_POLICIED = [
         'AppNotification' => 'own notifications, scoped by owner in NotificationCenter',
         'NotificationPreference' => 'own preferences, never listed for other users',
+        'CourseLessonAttachment' => 'child rows of a lesson, governed by CoursePolicy through the lesson form',
+        'LessonProgress' => 'own learning progress, written and read only by LearningProgress for the signed-in student',
         'BackupLog' => 'read-only child rows rendered inside the backup screen',
         'MediaVariant' => 'child rows of Media, governed by MediaPolicy',
         'WhatsAppBroadcastRecipient' => 'child rows of WhatsAppBroadcast',

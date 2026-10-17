@@ -66,7 +66,7 @@ class NotificationTriggersTest extends TestCase
             'phone' => '966500000001',
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
-            'roles' => [],
+            'account_type' => 'student',
         ])->assertRedirect(route('admin.users.index'));
 
         Notification::assertSentTo($admin, UserCreated::class);
@@ -84,7 +84,7 @@ class NotificationTriggersTest extends TestCase
             'name_en' => $target->name_en ?? 'User',
             'email' => $target->email,
             'phone' => $target->phone,
-            'roles' => ['admin'],
+            'account_type' => 'admin',
         ])->assertRedirect(route('admin.users.index'));
 
         Notification::assertSentTo($target, UserRoleChanged::class);
@@ -96,13 +96,14 @@ class NotificationTriggersTest extends TestCase
 
         $admin = $this->adminUser();
         $target = User::factory()->create();
+        $target->assignRole(Role::findOrCreate('student', 'web'));
 
         $this->actingAs($admin)->put(route('admin.users.update', $target->id), [
             'name_ar' => 'اسم محدّث',
             'name_en' => 'Updated Name',
             'email' => $target->email,
             'phone' => $target->phone,
-            'roles' => [],
+            'account_type' => 'student',
         ]);
 
         Notification::assertNothingSentTo($target);

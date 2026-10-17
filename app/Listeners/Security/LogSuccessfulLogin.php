@@ -17,7 +17,9 @@ class LogSuccessfulLogin
     {
         $user = $event->user;
 
-        if (! $user instanceof User) {
+        // An admin opening a student's account (StudentImpersonation) is logged as
+        // such, and must not look like the student signing in.
+        if (! $user instanceof User || request()->attributes->get('impersonation')) {
             return;
         }
 

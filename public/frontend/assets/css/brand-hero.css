@@ -1,0 +1,642 @@
+/*
+ * Home hero — Motion Academy slider (resources/views/frontend/partials/home-hero.blade.php).
+ * Loaded after brand.css; uses its --brand-* tokens. Light and dark themes,
+ * and every animation stops for visitors who prefer reduced motion.
+ */
+.ma-hero {
+  --ma-surface: rgba(255, 255, 255, 0.78);
+  --ma-surface-border: rgba(51, 164, 218, 0.18);
+  --ma-ink: var(--brand-navy);
+  --ma-ink-muted: rgba(15, 42, 74, 0.7);
+  background: transparent !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+html[data-theme="dark"] .ma-hero {
+  --ma-surface: rgba(11, 33, 64, 0.72);
+  --ma-surface-border: rgba(69, 190, 196, 0.22);
+  --ma-ink: #eaf6fb;
+  --ma-ink-muted: rgba(199, 228, 245, 0.75);
+}
+
+.ma-hero .hero-slide {
+  background: transparent !important;
+}
+
+/* ---------- Flowing waves and glass play-triangles behind the slides ---------- */
+.ma-hero-waves {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ma-wave {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: ma-drift 18s ease-in-out infinite;
+}
+
+.ma-wave-1 {
+  width: 62vw;
+  height: 62vw;
+  max-width: 900px;
+  max-height: 900px;
+  top: -40%;
+  inset-inline-start: -18%;
+  background: radial-gradient(circle at 60% 60%, rgba(51, 164, 218, 0.28), transparent 62%);
+}
+
+.ma-wave-2 {
+  width: 50vw;
+  height: 50vw;
+  max-width: 760px;
+  max-height: 760px;
+  bottom: -45%;
+  inset-inline-end: -12%;
+  background: radial-gradient(circle at 40% 40%, rgba(2, 173, 143, 0.28), transparent 62%);
+  animation-delay: -6s;
+}
+
+.ma-wave-3 {
+  width: 30vw;
+  height: 30vw;
+  max-width: 420px;
+  max-height: 420px;
+  top: 20%;
+  inset-inline-end: 30%;
+  background: radial-gradient(circle, rgba(69, 190, 196, 0.2), transparent 65%);
+  animation-delay: -12s;
+}
+
+.ma-tri {
+  position: absolute;
+  clip-path: polygon(18% 0, 100% 50%, 18% 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(51, 164, 218, 0.35));
+  animation: brand-float 8s ease-in-out infinite;
+}
+
+html[data-theme="dark"] .ma-tri {
+  background: linear-gradient(135deg, rgba(143, 217, 224, 0.4), rgba(26, 131, 193, 0.2));
+}
+
+.ma-tri-1 { width: 70px; height: 70px; top: 14%; inset-inline-end: 46%; }
+.ma-tri-2 { width: 46px; height: 46px; bottom: 22%; inset-inline-start: 4%; animation-delay: -3s; }
+.ma-tri-3 { width: 34px; height: 34px; top: 30%; inset-inline-start: 44%; animation-delay: -5s; opacity: 0.8; }
+
+@keyframes ma-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(3%, 4%) scale(1.06); }
+}
+
+/* ---------- Copy ---------- */
+.ma-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-surface-border);
+  color: var(--ma-ink);
+  font-weight: 700;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  margin-bottom: 1.25rem;
+}
+
+.ma-hero-badge i {
+  width: 24px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-size: 0.65rem;
+}
+
+.ma-hero-title {
+  font-family: 'Alexandria', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+  line-height: 1.35;
+  color: var(--ma-ink);
+  margin-bottom: 1.1rem;
+}
+
+.ma-gradient-text {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ma-hero-desc {
+  font-size: 1.12rem;
+  line-height: 1.9;
+  color: var(--ma-ink-muted);
+  max-width: 34rem;
+  margin: 0 auto 1.75rem;
+}
+
+@media (min-width: 992px) {
+  .ma-hero-desc { margin-inline: 0; }
+}
+
+.ma-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 14px 26px;
+  border-radius: 14px;
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-surface-border);
+  color: var(--ma-ink) !important;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.ma-btn-ghost i { color: var(--brand-green); }
+
+.ma-btn-ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-teal);
+}
+
+.ma-hero-stats {
+  display: flex;
+  gap: 1.75rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+@media (min-width: 992px) {
+  .ma-hero-stats { justify-content: flex-start; }
+}
+
+.ma-hero-stats div { display: flex; flex-direction: column; }
+
+.ma-hero-stats strong {
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ma-hero-stats span { color: var(--ma-ink-muted); font-size: 0.85rem; }
+
+.hero-visual { position: relative; }
+
+/* ---------- Slide 1: motion editor mock-up ---------- */
+.ma-editor {
+  position: relative;
+  margin-inline: auto;
+  max-width: 540px;
+  border-radius: 22px;
+  background: #0b2346;
+  box-shadow: 0 30px 70px rgba(15, 42, 74, 0.28), 0 0 0 1px rgba(69, 190, 196, 0.25);
+  overflow: hidden;
+  transform: perspective(1200px) rotateY(-8deg) rotateX(4deg);
+  animation: ma-tilt 9s ease-in-out infinite;
+}
+
+.ma-editor-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #08192f;
+}
+
+.ma-editor-top span { width: 10px; height: 10px; border-radius: 50%; background: #45bec4; }
+.ma-editor-top span:nth-child(2) { background: #33a4da; }
+.ma-editor-top span:nth-child(3) { background: #02ad8f; }
+
+.ma-editor-top em {
+  margin-inline-start: auto;
+  color: rgba(234, 246, 251, 0.6);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-family: 'Poppins', sans-serif;
+}
+
+.ma-editor-body { display: flex; gap: 12px; padding: 14px; }
+
+.ma-editor-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(234, 246, 251, 0.6);
+  font-size: 0.9rem;
+}
+
+.ma-editor-tools i:first-child { color: #45bec4; }
+
+.ma-editor-stage {
+  position: relative;
+  flex: 1;
+  height: 220px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 30% 30%, rgba(51, 164, 218, 0.35), transparent 55%), #0f2a4a;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.ma-stage-shape {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--brand-gradient);
+  box-shadow: 0 0 30px rgba(69, 190, 196, 0.6);
+  animation: ma-stage-move 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.ma-stage-play {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-size: 1.5rem;
+  box-shadow: 0 0 0 10px rgba(69, 190, 196, 0.15), 0 12px 30px rgba(2, 173, 143, 0.5);
+  pointer-events: none;
+}
+
+.ma-stage-play i { margin-inline-start: 4px; }
+
+.ma-timeline {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 14px 14px 18px;
+  background: #08192f;
+}
+
+.ma-track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ma-track i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: var(--s);
+  width: var(--w);
+  border-radius: 6px;
+  background: linear-gradient(90deg, #02ad8f, #06b59c);
+}
+
+.ma-track-blue i { background: linear-gradient(90deg, #33a4da, #1a83c1); }
+
+.ma-playhead {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  inset-inline-start: 14px;
+  animation: ma-playhead 4.5s linear infinite;
+}
+
+.ma-float-logo {
+  position: absolute;
+  width: 92px;
+  top: -14px;
+  inset-inline-end: 4%;
+  filter: drop-shadow(0 14px 24px rgba(26, 131, 193, 0.35));
+  animation: brand-float 6s ease-in-out infinite;
+}
+
+@keyframes ma-tilt {
+  0%, 100% { transform: perspective(1200px) rotateY(-8deg) rotateX(4deg); }
+  50% { transform: perspective(1200px) rotateY(-3deg) rotateX(1deg) translateY(-8px); }
+}
+
+@keyframes ma-stage-move {
+  0% { transform: translate(-130px, 60px) rotate(0deg); }
+  50% { transform: translate(130px, -60px) rotate(180deg); border-radius: 50%; }
+  100% { transform: translate(-130px, 60px) rotate(360deg); }
+}
+
+@keyframes ma-playhead {
+  from { inset-inline-start: 14px; }
+  to { inset-inline-start: calc(100% - 16px); }
+}
+
+/* ---------- Slide 2: bezier curve with keyframes ---------- */
+.ma-curve {
+  position: relative;
+  max-width: 540px;
+  margin-inline: auto;
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-surface-border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 60px rgba(15, 42, 74, 0.12);
+}
+
+.ma-curve-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.ma-curve-guide {
+  fill: none;
+  stroke: rgba(51, 164, 218, 0.15);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.ma-curve-path {
+  fill: none;
+  stroke: url(#maCurveGrad);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation: ma-draw 3.2s ease infinite alternate;
+}
+
+.ma-handle { stroke: rgba(26, 131, 193, 0.5); stroke-width: 2; stroke-dasharray: 4 4; }
+.ma-handle-dot { fill: #fff; stroke: #1a83c1; stroke-width: 2.5; }
+.ma-key { fill: #02ad8f; stroke: #fff; stroke-width: 2; }
+
+.ma-curve-ball {
+  position: absolute;
+  inset: 24px;
+  pointer-events: none;
+}
+
+.ma-curve-ball::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  box-shadow: 0 0 0 6px rgba(69, 190, 196, 0.25), 0 8px 20px rgba(2, 173, 143, 0.5);
+  animation: ma-along 3.2s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+
+/* The ball follows the curve's key points (as % of the 520x320 drawing). */
+@keyframes ma-along {
+  0% { left: 7.7%; top: 78%; }
+  25% { left: 30%; top: 50%; }
+  50% { left: 50%; top: 22%; }
+  75% { left: 70%; top: 52%; }
+  100% { left: 92.3%; top: 28%; }
+}
+
+.ma-curve-label {
+  position: absolute;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: #0b2346;
+}
+
+.ma-curve-label-1 { bottom: 12%; inset-inline-end: 10%; }
+.ma-curve-label-2 { top: 10%; inset-inline-start: 8%; background: var(--brand-gradient); }
+
+@keyframes ma-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---------- Slide 3: stacked real course cards ---------- */
+.ma-stack {
+  position: relative;
+  height: 380px;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+.ma-stack-card {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 20px;
+  background: var(--ma-surface);
+  border: 1px solid var(--ma-surface-border);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 50px rgba(15, 42, 74, 0.14);
+  color: var(--ma-ink);
+  text-decoration: none;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.ma-stack-card-1 { top: 0; transform: translateX(-6%) rotate(-3deg); z-index: 3; }
+.ma-stack-card-2 { top: 125px; transform: translateX(6%) rotate(2deg); z-index: 2; }
+.ma-stack-card-3 { top: 250px; transform: translateX(-2%) rotate(-1deg); z-index: 1; }
+
+.ma-stack-card:hover {
+  transform: translateX(0) rotate(0) scale(1.03);
+  z-index: 4;
+  color: var(--ma-ink);
+  box-shadow: 0 26px 60px rgba(26, 131, 193, 0.22);
+}
+
+.ma-stack-thumb {
+  flex-shrink: 0;
+  width: 120px;
+  height: 84px;
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--card-color, #02ad8f), #1a83c1);
+  color: #fff;
+  font-size: 1.8rem;
+}
+
+.ma-stack-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.ma-stack-body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.ma-stack-body small { color: var(--brand-green); font-weight: 700; }
+
+.ma-stack-body strong {
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ma-stack-meta { display: flex; gap: 1rem; color: var(--ma-ink-muted); font-size: 0.82rem; }
+.ma-stack-price { font-weight: 800; color: var(--brand-blue-deep); }
+html[data-theme="dark"] .ma-stack-price { color: var(--brand-teal); }
+
+/* ---------- Slide 4: phone with the lesson list ---------- */
+.ma-phone {
+  width: 290px;
+  margin-inline: auto;
+  padding: 12px;
+  border-radius: 38px;
+  background: #0b2346;
+  box-shadow: 0 30px 70px rgba(15, 42, 74, 0.3), 0 0 0 1px rgba(69, 190, 196, 0.3);
+  animation: ma-phone-float 7s ease-in-out infinite;
+}
+
+@keyframes ma-phone-float {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(-2deg) translateY(-12px); }
+}
+
+.ma-phone-screen {
+  border-radius: 28px;
+  overflow: hidden;
+  background: #f7fbfe;
+}
+
+html[data-theme="dark"] .ma-phone-screen { background: #0f2a4a; }
+
+.ma-phone-video {
+  height: 160px;
+  display: grid;
+  place-items: center;
+  background: var(--brand-gradient);
+}
+
+.ma-pulse {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: var(--brand-green);
+  font-size: 1.3rem;
+}
+
+.ma-pulse i { margin-inline-start: 4px; }
+
+.ma-pulse::before,
+.ma-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  animation: ma-pulse 2.4s ease-out infinite;
+}
+
+.ma-pulse::after { animation-delay: 1.2s; }
+
+@keyframes ma-pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(2); opacity: 0; }
+}
+
+.ma-phone-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.ma-phone-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(51, 164, 218, 0.08);
+  color: var(--ma-ink);
+  font-size: 0.82rem;
+}
+
+.ma-phone-list li i { color: var(--ma-ink-muted); font-size: 0.75rem; }
+.ma-phone-list li.is-free { background: rgba(2, 173, 143, 0.12); }
+.ma-phone-list li.is-free i { color: var(--brand-green); }
+
+.ma-phone-list li em {
+  margin-inline-start: auto;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: #fff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--brand-gradient);
+}
+
+/* ---------- Slider chrome in brand colours ---------- */
+.ma-hero .hero-nav-btn {
+  background: var(--ma-surface) !important;
+  border: 1px solid var(--ma-surface-border) !important;
+  color: var(--ma-ink) !important;
+  backdrop-filter: blur(10px);
+}
+
+.ma-hero .hero-nav-btn:hover {
+  background: var(--brand-gradient) !important;
+  color: #fff !important;
+}
+
+.ma-hero .hero-progress-fill,
+.ma-hero .swiper-pagination-bullet-active .hero-bullet-inner {
+  background: var(--brand-gradient) !important;
+}
+
+/* ---------- Entrance: copy and visual rise in on each slide change ---------- */
+.ma-hero .swiper-slide-active .hero-content > * {
+  animation: ma-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ma-hero .swiper-slide-active .hero-content > *:nth-child(2) { animation-delay: 0.08s; }
+.ma-hero .swiper-slide-active .hero-content > *:nth-child(3) { animation-delay: 0.16s; }
+.ma-hero .swiper-slide-active .hero-content > *:nth-child(4) { animation-delay: 0.24s; }
+.ma-hero .swiper-slide-active .hero-content > *:nth-child(5) { animation-delay: 0.32s; }
+
+.ma-hero .swiper-slide-active .hero-visual {
+  animation: ma-pop 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both 0.1s;
+}
+
+@keyframes ma-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ma-pop {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ma-hero *,
+  .ma-hero *::before,
+  .ma-hero *::after {
+    animation: none !important;
+  }
+
+  .ma-curve-path { stroke-dashoffset: 0; }
+}

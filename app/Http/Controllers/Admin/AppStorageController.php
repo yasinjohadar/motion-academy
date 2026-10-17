@@ -83,6 +83,8 @@ class AppStorageController extends Controller implements HasMiddleware
 
     public function edit(Request $request, AppStorageConfig $app_storage): Response
     {
+        $this->authorize('update', $app_storage);
+
         return Inertia::render('Admin/AppStorage/Edit', [
             'config' => $app_storage->toAdminArray(),
             'drivers' => config('storage.drivers', []),
@@ -95,6 +97,8 @@ class AppStorageController extends Controller implements HasMiddleware
 
     public function update(AppStorageUpdateRequest $request, AppStorageConfig $app_storage): RedirectResponse
     {
+        $this->authorize('update', $app_storage);
+
         $data = $request->validated();
         $mergedConfig = $app_storage->mergeConfigKeepingSecrets($data['config'] ?? []);
 
@@ -114,6 +118,8 @@ class AppStorageController extends Controller implements HasMiddleware
 
     public function destroy(AppStorageConfig $app_storage): RedirectResponse
     {
+        $this->authorize('delete', $app_storage);
+
         if ($app_storage->diskMappings()->exists()) {
             return redirect()
                 ->route('admin.app-storage.index')

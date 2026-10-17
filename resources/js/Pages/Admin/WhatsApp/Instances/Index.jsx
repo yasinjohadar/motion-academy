@@ -136,9 +136,7 @@ export default function Index({ instances, settings, rotationPoolCount, flash })
                         </thead>
                         <tbody>
                             {instances.length === 0 && (
-                                <TableEmptyRow colSpan={6}>
-                                    لا توجد أرقام بعد.
-                                </TableEmptyRow>
+                                <TableEmptyRow colSpan={6}>لا توجد أرقام بعد.</TableEmptyRow>
                             )}
                             {instances.map((row) => (
                                 <tr key={row.id}>
@@ -165,15 +163,17 @@ export default function Index({ instances, settings, rotationPoolCount, flash })
                                     <td dir="ltr">{row.last_used_at || '—'}</td>
                                     <td>
                                         <div className="d-flex flex-wrap gap-1">
-                                            <Link
-                                                href={route(
-                                                    'admin.whatsapp-instances.connect',
-                                                    row.instance_name,
-                                                )}
-                                                className="wa-btn wa-btn-ghost wa-btn-sm"
-                                            >
-                                                QR
-                                            </Link>
+                                            {can('admin.whatsapp-instances.edit') && (
+                                                <Link
+                                                    href={route(
+                                                        'admin.whatsapp-instances.connect',
+                                                        row.instance_name,
+                                                    )}
+                                                    className="wa-btn wa-btn-ghost wa-btn-sm"
+                                                >
+                                                    QR
+                                                </Link>
+                                            )}
                                             {can('admin.whatsapp-instances.edit') && (
                                                 <>
                                                     <button

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -103,6 +104,11 @@ class MediaService
 
         return [
             'id' => $media->id,
+            // Ownership-aware (edit-any / delete-any), for the buttons on each item.
+            'can' => [
+                'update' => Gate::allows('update', $media),
+                'delete' => Gate::allows('delete', $media),
+            ],
             'uuid' => $media->uuid,
             'filename' => $media->filename,
             'mime' => $media->mime,

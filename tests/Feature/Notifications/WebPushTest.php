@@ -18,7 +18,7 @@ class WebPushTest extends TestCase
 
     protected function subscribedUser(): User
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $user->updatePushSubscription(
             'https://fcm.googleapis.com/fcm/send/test-endpoint',
@@ -32,7 +32,7 @@ class WebPushTest extends TestCase
 
     public function test_a_user_can_register_a_push_subscription(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->postJson(route('admin.notifications.push.subscribe'), [
@@ -53,7 +53,7 @@ class WebPushTest extends TestCase
     {
         // Must be real 422 JSON, not the HTML redirect that $request->validate() would
         // produce here — bootstrap/app.php only renders JSON exceptions for `api/*`.
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->admin()->create())
             ->postJson(route('admin.notifications.push.subscribe'), ['endpoint' => ''])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['endpoint', 'keys.p256dh', 'keys.auth']);
@@ -90,7 +90,7 @@ class WebPushTest extends TestCase
     public function test_webpush_channel_is_unavailable_without_a_subscription(): void
     {
         $available = app(NotificationChannelResolver::class)
-            ->isAvailable(NotificationChannel::WebPush, User::factory()->create());
+            ->isAvailable(NotificationChannel::WebPush, User::factory()->admin()->create());
 
         $this->assertFalse($available);
     }

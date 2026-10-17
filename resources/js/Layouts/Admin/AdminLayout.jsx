@@ -3,16 +3,14 @@ import { useEffect } from 'react';
 import Footer from './Footer';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import {
-    bindOverlayClose,
-    initThemeAttributes,
-} from './themeControls';
+import { bindOverlayClose, bindSwitcherControls, initThemeAttributes } from './themeControls';
 
 export default function AdminLayout({ children }) {
     useEffect(() => {
         document.body.classList.add('admin-portal');
         initThemeAttributes();
         bindOverlayClose();
+        bindSwitcherControls();
 
         const loader = document.getElementById('loader');
         if (loader) {

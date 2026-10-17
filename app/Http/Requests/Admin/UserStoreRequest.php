@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Support\AccountType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -21,8 +22,7 @@ class UserStoreRequest extends FormRequest
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['required', 'string', 'max:30'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', Rule::exists('roles', 'name')],
+            'account_type' => ['required', Rule::in(array_keys(AccountType::LABELS))],
         ];
     }
 
@@ -34,7 +34,7 @@ class UserStoreRequest extends FormRequest
             'email' => 'البريد الإلكتروني',
             'phone' => 'الهاتف',
             'password' => 'كلمة المرور',
-            'roles' => 'الأدوار',
+            'account_type' => 'نوع الحساب',
         ];
     }
 }

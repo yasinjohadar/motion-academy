@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProfileUpdateRequest;
+use App\Support\PhoneInput;
+use App\Support\PhoneNumber;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +21,11 @@ class ProfileController extends Controller
         return Inertia::render('Admin/Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'phone' => [
+                ...PhoneInput::split($request->user()->phone_e164),
+                'verified' => $request->user()->phone_verified_at !== null,
+            ],
+            'countries' => config('phone.countries'),
         ]);
     }
 
@@ -35,6 +42,18 @@ class ProfileController extends Controller
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
+        }
+
+        if ($request->filled('phone')) {
+            $canonical = PhoneInput::canonical($request->input('country_code'), $request->input('phone'), $user->id);
+
+            if ($canonical !== $user->phone_e164) {
+                $user->forceFill([
+                    'phone' => PhoneNumber::format($canonical),
+                    'phone_e164' => $canonical,
+                    'phone_verified_at' => null,
+                ]);
+            }
         }
 
         $user->save();

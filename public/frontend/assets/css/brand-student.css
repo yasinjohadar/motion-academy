@@ -1,0 +1,141 @@
+/* =====================================================================
+ * Student side — enrollment box (partials/enrollment-box). The dashboard and
+ * lesson player live in brand-learn.css.
+ * ===================================================================== */
+:root {
+  --st-ink: #0f2a4a;
+  --st-muted: rgba(15, 42, 74, 0.64);
+  --st-card: #ffffff;
+  --st-soft: #f2f8fc;
+  --st-line: rgba(51, 164, 218, 0.16);
+  --st-grad: linear-gradient(135deg, #02ad8f 0%, #45bec4 45%, #33a4da 75%, #1a83c1 100%);
+}
+
+html[data-theme="dark"] {
+  --st-ink: #eaf6fb;
+  --st-muted: rgba(199, 228, 245, 0.7);
+  --st-card: rgba(11, 33, 64, 0.82);
+  --st-soft: rgba(15, 42, 74, 0.75);
+  --st-line: rgba(69, 190, 196, 0.18);
+}
+
+/* ---------- Enrollment box ---------- */
+.enr-box { display: grid; gap: 10px; scroll-margin-top: 120px; }
+
+.enr-box .cd-btn-primary { text-decoration: none; cursor: pointer; }
+
+.enr-flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.7;
+  color: #018a72;
+  background: rgba(2, 173, 143, 0.1);
+  border: 1px solid rgba(2, 173, 143, 0.25);
+}
+
+.enr-flash i { margin-top: 4px; }
+
+.enr-flash.is-error {
+  color: #b42318;
+  background: rgba(220, 38, 38, 0.07);
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
+.enr-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--st-line);
+  background: var(--st-soft);
+}
+
+.enr-state strong { display: block; color: var(--st-ink); font-size: 0.95rem; }
+.enr-state small { display: block; margin-top: 2px; color: var(--st-muted); font-size: 0.8rem; line-height: 1.6; }
+
+.enr-state-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--st-grad);
+}
+
+.enr-state.is-approved { border-color: rgba(2, 173, 143, 0.35); background: rgba(2, 173, 143, 0.08); }
+.enr-state.is-pending .enr-state-icon { background: linear-gradient(135deg, #45bec4, #1a83c1); animation: enr-pulse 2s ease-in-out infinite; }
+.enr-state.is-rejected .enr-state-icon,
+.enr-state.is-full .enr-state-icon { background: #5a7089; }
+
+@keyframes enr-pulse {
+  50% { box-shadow: 0 0 0 8px rgba(69, 190, 196, 0.15); }
+}
+
+.enr-cancel {
+  width: 100%;
+  height: 44px;
+  border: 1.5px dashed var(--st-line);
+  border-radius: 12px;
+  font-weight: 700;
+  color: var(--st-muted);
+  background: transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.enr-cancel:hover { color: #b42318; border-color: rgba(220, 38, 38, 0.4); }
+
+.enr-form { display: grid; gap: 10px; margin: 0; }
+
+.enr-note summary {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a83c1;
+  cursor: pointer;
+  list-style: none;
+}
+
+.enr-note summary::-webkit-details-marker { display: none; }
+
+.enr-note textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--st-line);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  resize: vertical;
+  color: var(--st-ink);
+  background: var(--st-soft);
+}
+
+.enr-note textarea:focus { outline: 0; border-color: #33a4da; box-shadow: 0 0 0 4px rgba(69, 190, 196, 0.15); }
+.enr-error { color: #b42318; }
+
+.enr-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  text-align: center;
+  color: var(--st-muted);
+}
+
+.enr-hint i { color: #02ad8f; }
+
+.enr-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--st-ink);
+}
+
+.cd-lesson-open { text-decoration: none; color: inherit; }
+.cd-lesson-open:hover { color: #1a83c1; }

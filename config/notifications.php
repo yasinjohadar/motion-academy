@@ -50,6 +50,8 @@ return [
         'backups' => ['database', 'broadcast', 'mail'],
         'whatsapp' => ['database', 'broadcast'],
         'blog' => ['database', 'broadcast'],
+        // Students learn the outcome of their request by email; admins see requests in the bell.
+        'courses' => ['database', 'broadcast', 'mail'],
         'users' => ['database', 'broadcast'],
         'system' => ['database', 'broadcast', 'mail'],
     ],

@@ -52,6 +52,21 @@ class BlogSystemTest extends TestCase
         return $user;
     }
 
+    public function test_posts_list_renders_posts_with_their_category_and_tags(): void
+    {
+        $category = BlogCategory::factory()->create(['name' => 'أخبار', 'slug' => 'news']);
+        $tag = BlogTag::factory()->create(['name' => 'تحديثات', 'slug' => 'updates']);
+        $post = BlogPost::factory()->published()->create(['blog_category_id' => $category->id]);
+        $post->tags()->attach($tag);
+
+        $this->actingAs($this->adminUser())
+            ->get(route('admin.blog-posts.index'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('posts.data.0.category.slug', 'news')
+                ->where('posts.data.0.tags.0.slug', 'updates'));
+    }
+
     public function test_admin_can_create_category_tag_and_post(): void
     {
         $admin = $this->adminUser();
@@ -109,9 +124,8 @@ class BlogSystemTest extends TestCase
 
         $this->get(route('blog.show', $post->slug))
             ->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('Blog/Show')
-                ->where('post.slug', 'public-post'));
+            ->assertViewIs('frontend.pages.blog-detail')
+            ->assertViewHas('post', fn (BlogPost $viewPost) => $viewPost->slug === 'public-post');
     }
 
     public function test_seo_builder_expands_draft(): void

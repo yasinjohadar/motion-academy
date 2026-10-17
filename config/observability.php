@@ -3,6 +3,7 @@
 use App\Models\AiProvider;
 use App\Models\AppStorageConfig;
 use App\Models\BackupSchedule;
+use App\Models\Course;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
 use App\Models\SmtpSetting;
@@ -61,6 +62,13 @@ return [
                 'fields' => [
                     'site_name', 'site_name_en', 'tagline', 'logo_path', 'favicon_path',
                     'primary_whatsapp', 'email', 'phone', 'address', 'footer_text',
+                ],
+            ],
+            Course::class => [
+                'log_name' => 'content',
+                'fields' => [
+                    'title', 'slug', 'course_category_id', 'instructor_id', 'status', 'published_at',
+                    'is_featured', 'is_free', 'price', 'sale_price', 'sale_ends_at', 'level',
                 ],
             ],
             SitePage::class => [

@@ -28,6 +28,14 @@ class SiteSettingUpdateRequest extends FormRequest
             'favicon_url' => ['nullable', 'string', 'max:1000', 'regex:/^(https?:\/\/|\/).+/i'],
             'remove_logo' => ['nullable', 'boolean'],
             'remove_favicon' => ['nullable', 'boolean'],
+            'seo_title' => ['nullable', 'string', 'max:120'],
+            'seo_description' => ['nullable', 'string', 'max:320'],
+            'seo_keywords' => ['nullable', 'string', 'max:500'],
+            'seo_og_image' => ['nullable', 'string', 'max:1000', 'regex:/^(https?:\/\/|\/).+/i'],
+            'twitter_handle' => ['nullable', 'string', 'regex:/^@?[A-Za-z0-9_]{1,15}$/'],
+            'google_site_verification' => ['nullable', 'string', 'max:500'],
+            'bing_site_verification' => ['nullable', 'string', 'max:500'],
+            'allow_indexing' => ['nullable', 'boolean'],
             'social_links' => ['nullable', 'array'],
             'social_links.*.id' => ['nullable', 'integer'],
             'social_links.*.label' => ['required_with:social_links', 'string', 'max:100'],
@@ -45,6 +53,13 @@ class SiteSettingUpdateRequest extends FormRequest
             'logo_url' => 'رابط اللوغو',
             'favicon_url' => 'رابط الأيقونة',
             'primary_whatsapp' => 'رقم الواتساب',
+            'seo_title' => 'عنوان الصفحة الرئيسية',
+            'seo_description' => 'الوصف الافتراضي',
+            'seo_keywords' => 'الكلمات المفتاحية',
+            'seo_og_image' => 'صورة المشاركة الافتراضية',
+            'twitter_handle' => 'حساب X (تويتر)',
+            'google_site_verification' => 'رمز تحقق Google',
+            'bing_site_verification' => 'رمز تحقق Bing',
             'social_links.*.label' => 'اسم الرابط',
             'social_links.*.url' => 'رابط السوشيال',
             'social_links.*.icon' => 'أيقونة السوشيال',
@@ -56,6 +71,8 @@ class SiteSettingUpdateRequest extends FormRequest
         return [
             'logo_url.regex' => 'صيغة رابط اللوغو غير صحيحة.',
             'favicon_url.regex' => 'صيغة رابط الأيقونة غير صحيحة.',
+            'seo_og_image.regex' => 'صيغة رابط الصورة غير صحيحة.',
+            'twitter_handle.regex' => 'اكتب اسم الحساب فقط، مثل @MotionAcademy.',
         ];
     }
 }

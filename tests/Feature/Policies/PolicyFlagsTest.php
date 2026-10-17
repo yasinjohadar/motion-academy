@@ -23,7 +23,7 @@ class PolicyFlagsTest extends TestCase
             Permission::findOrCreate($permission, 'web');
         }
 
-        $user = User::factory()->create();
+        $user = User::factory()->staff()->create();
         $user->givePermissionTo($permissions);
 
         return $user;

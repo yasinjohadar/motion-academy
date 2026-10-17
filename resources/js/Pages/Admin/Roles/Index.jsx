@@ -1,10 +1,12 @@
 import TableEmptyRow from '@/Components/Admin/TableEmptyRow';
 import DeleteConfirmModal from '@/Components/Admin/DeleteConfirmModal';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
+import useCan from '@/hooks/useCan';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Index({ roles, flash }) {
+    const { can } = useCan();
     const [roleToDelete, setRoleToDelete] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -29,19 +31,17 @@ export default function Index({ roles, flash }) {
             subtitle="إدارة أدوار النظام وتعيين حزم الصلاحيات لكل لوحة"
             flash={flash}
             actions={
-                <Link href={route('admin.roles.create')} className="admin-btn admin-btn-primary">
-                    <i className="ri-shield-user-line" />
-                    إنشاء دور جديد
-                </Link>
+                can('admin.roles.create') ? (
+                    <Link href={route('admin.roles.create')} className="admin-btn admin-btn-primary">
+                        <i className="ri-shield-user-line" />
+                        إنشاء دور جديد
+                    </Link>
+                ) : null
             }
         >
             <DeleteConfirmModal
                 show={Boolean(roleToDelete)}
-                message={
-                    roleToDelete
-                        ? `هل أنت متأكد من رغبتك في حذف الدور «${roleToDelete.name}»؟`
-                        : ''
-                }
+                message={roleToDelete ? `هل أنت متأكد من رغبتك في حذف الدور «${roleToDelete.name}»؟` : ''}
                 processing={deleting}
                 onConfirm={confirmDelete}
                 onCancel={() => !deleting && setRoleToDelete(null)}
@@ -62,9 +62,7 @@ export default function Index({ roles, flash }) {
                             </thead>
                             <tbody>
                                 {roles.length === 0 && (
-                                    <TableEmptyRow colSpan={5}>
-                                        لا توجد أدوار
-                                    </TableEmptyRow>
+                                    <TableEmptyRow colSpan={5}>لا توجد أدوار</TableEmptyRow>
                                 )}
                                 {roles.map((role, index) => (
                                     <tr key={role.id}>
@@ -81,14 +79,16 @@ export default function Index({ roles, flash }) {
                                         <td>{role.users_count}</td>
                                         <td>
                                             <div className="admin-action-group">
-                                                <Link
-                                                    href={route('admin.roles.edit', role.id)}
-                                                    className="admin-action-btn admin-action-edit"
-                                                    title="تعديل"
-                                                >
-                                                    <i className="ri-edit-line" />
-                                                </Link>
-                                                {!role.is_locked && (
+                                                {can('admin.roles.edit') && (
+                                                    <Link
+                                                        href={route('admin.roles.edit', role.id)}
+                                                        className="admin-action-btn admin-action-edit"
+                                                        title="تعديل"
+                                                    >
+                                                        <i className="ri-edit-line" />
+                                                    </Link>
+                                                )}
+                                                {!role.is_locked && can('admin.roles.delete') && (
                                                     <button
                                                         type="button"
                                                         className="admin-action-btn admin-action-delete"

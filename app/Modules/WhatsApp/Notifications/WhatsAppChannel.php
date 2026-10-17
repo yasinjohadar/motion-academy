@@ -86,12 +86,22 @@ class WhatsAppChannel implements ReportsChannelAvailability
             ?? WhatsAppPurpose::SystemNotification;
 
         try {
-            $this->sendService->sendText(
+            $message = $this->sendService->sendText(
                 (string) $to,
                 $notification->toWhatsApp($notifiable),
                 purpose: $purpose,
                 templateParameters: array_values((array) ($options['template_parameters'] ?? [])),
             );
+
+            // Secrets (a password the admin just set) go out in full but are blanked
+            // in the stored copy, so the message log never displays them. The queued
+            // job carries its own copy of the text to send.
+            $secrets = array_filter(array_map('strval', (array) ($options['redact'] ?? [])), 'filled');
+            if ($secrets !== []) {
+                $message->forceFill([
+                    'body' => str_replace($secrets, '••••••', (string) $message->body),
+                ])->save();
+            }
         } catch (\Throwable $e) {
             // A dead WhatsApp instance must not fail the whole notification — the
             // database record has already been written by this point.

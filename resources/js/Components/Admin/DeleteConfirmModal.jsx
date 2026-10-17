@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
 
 export default function DeleteConfirmModal({
@@ -34,8 +35,15 @@ export default function DeleteConfirmModal({
         return null;
     }
 
-    return (
-        <div className="admin-delete-modal" role="dialog" aria-modal="true" aria-labelledby="admin-delete-modal-title">
+    // Rendered into <body>: a fixed overlay inside an animated (transformed)
+    // page container would be positioned against that container, not the screen.
+    return createPortal(
+        <div
+            className="admin-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-delete-modal-title"
+        >
             <button
                 type="button"
                 className="admin-delete-modal-backdrop"
@@ -79,6 +87,7 @@ export default function DeleteConfirmModal({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 }

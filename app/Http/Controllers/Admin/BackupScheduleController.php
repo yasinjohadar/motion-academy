@@ -84,6 +84,8 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
     public function edit(Request $request, BackupSchedule $backup_schedule): Response
     {
+        $this->authorize('update', $backup_schedule);
+
         $backup_schedule->load('storageConfig');
 
         return Inertia::render('Admin/BackupSchedules/Edit', [
@@ -98,6 +100,8 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
     public function update(BackupScheduleUpdateRequest $request, BackupSchedule $backup_schedule): RedirectResponse
     {
+        $this->authorize('update', $backup_schedule);
+
         $data = $request->validated();
 
         $backup_schedule->fill([
@@ -115,6 +119,8 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
     public function destroy(BackupSchedule $backup_schedule): RedirectResponse
     {
+        $this->authorize('delete', $backup_schedule);
+
         $backup_schedule->delete();
 
         return redirect()
@@ -124,6 +130,8 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
     public function toggleActive(BackupSchedule $backup_schedule): RedirectResponse
     {
+        $this->authorize('update', $backup_schedule);
+
         $active = ! $backup_schedule->is_active;
 
         $backup_schedule->update([
@@ -138,6 +146,8 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
     public function execute(BackupSchedule $backup_schedule): RedirectResponse
     {
+        $this->authorize('update', $backup_schedule);
+
         $backup = $this->scheduleService->dispatchSchedule($backup_schedule);
 
         return redirect()

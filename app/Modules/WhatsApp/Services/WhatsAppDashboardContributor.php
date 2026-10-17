@@ -27,6 +27,7 @@ class WhatsAppDashboardContributor implements ContributesToDashboard
             'theme' => 'blue',
             'icon' => 'ri-mail-line',
             'route' => 'admin.whatsapp-messages.index',
+            'permissions' => ['admin.whatsapp-messages.list'],
         ]];
     }
 

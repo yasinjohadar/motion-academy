@@ -29,11 +29,7 @@ export default function Index({ schedules, flash }) {
         >
             <DeleteConfirmModal
                 show={Boolean(itemToDelete)}
-                message={
-                    itemToDelete
-                        ? `هل أنت متأكد من حذف الجدولة «${itemToDelete.name}»؟`
-                        : ''
-                }
+                message={itemToDelete ? `هل أنت متأكد من حذف الجدولة «${itemToDelete.name}»؟` : ''}
                 processing={deleting}
                 onConfirm={() => {
                     if (!itemToDelete || deleting) return;
@@ -67,9 +63,7 @@ export default function Index({ schedules, flash }) {
                             </thead>
                             <tbody>
                                 {schedules.length === 0 && (
-                                    <TableEmptyRow colSpan={8}>
-                                        لا توجد جداول بعد
-                                    </TableEmptyRow>
+                                    <TableEmptyRow colSpan={8}>لا توجد جداول بعد</TableEmptyRow>
                                 )}
                                 {schedules.map((schedule, index) => (
                                     <tr key={schedule.id}>
@@ -82,9 +76,7 @@ export default function Index({ schedules, flash }) {
                                             {schedule.frequency_label} · {schedule.time}
                                         </td>
                                         <td>{schedule.storage_config?.name || '—'}</td>
-                                        <td className="small">
-                                            {schedule.next_run_at || '—'}
-                                        </td>
+                                        <td className="small">{schedule.next_run_at || '—'}</td>
                                         <td>
                                             <span
                                                 className={`admin-badge ${schedule.is_active ? 'admin-badge-success' : 'admin-badge-muted'}`}
@@ -94,7 +86,7 @@ export default function Index({ schedules, flash }) {
                                         </td>
                                         <td>
                                             <div className="d-flex flex-wrap gap-2">
-                                                {can('admin.backup-schedules.edit') && (
+                                                {schedule.can?.update && (
                                                     <>
                                                         <Link
                                                             href={route(
@@ -117,9 +109,7 @@ export default function Index({ schedules, flash }) {
                                                                 )
                                                             }
                                                         >
-                                                            {schedule.is_active
-                                                                ? 'إيقاف'
-                                                                : 'تفعيل'}
+                                                            {schedule.is_active ? 'إيقاف' : 'تفعيل'}
                                                         </button>
                                                         <button
                                                             type="button"
@@ -137,13 +127,11 @@ export default function Index({ schedules, flash }) {
                                                         </button>
                                                     </>
                                                 )}
-                                                {can('admin.backup-schedules.delete') && (
+                                                {schedule.can?.delete && (
                                                     <button
                                                         type="button"
                                                         className="admin-btn admin-btn-sm admin-btn-danger"
-                                                        onClick={() =>
-                                                            setItemToDelete(schedule)
-                                                        }
+                                                        onClick={() => setItemToDelete(schedule)}
                                                     >
                                                         حذف
                                                     </button>

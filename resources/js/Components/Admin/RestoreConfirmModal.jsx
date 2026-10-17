@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 export default function RestoreConfirmModal({
     show,
     backupName = '',
@@ -13,7 +14,9 @@ export default function RestoreConfirmModal({
 
     const canConfirm = confirmText?.trim() === 'استرجاع';
 
-    return (
+    // Rendered into <body>: a fixed overlay inside an animated (transformed)
+    // page container would be positioned against that container, not the screen.
+    return createPortal(
         <div
             className="modal fade show d-block"
             tabIndex="-1"
@@ -43,8 +46,8 @@ export default function RestoreConfirmModal({
                             .
                         </p>
                         <p className="text-muted small mb-3">
-                            تُنشأ لقطة أمان مؤقتة، ويُعرض تقدّم الاسترجاع مباشرة على صفحة التفاصيل.
-                            اكتب كلمة <strong>استرجاع</strong> للمتابعة.
+                            تُنشأ لقطة أمان مؤقتة، ويُعرض تقدّم الاسترجاع مباشرة على صفحة التفاصيل. اكتب كلمة{' '}
+                            <strong>استرجاع</strong> للمتابعة.
                         </p>
                         <input
                             type="text"
@@ -57,12 +60,7 @@ export default function RestoreConfirmModal({
                         />
                     </div>
                     <div className="modal-footer">
-                        <button
-                            type="button"
-                            className="admin-btn"
-                            onClick={onCancel}
-                            disabled={processing}
-                        >
+                        <button type="button" className="admin-btn" onClick={onCancel} disabled={processing}>
                             إلغاء
                         </button>
                         <button
@@ -76,6 +74,7 @@ export default function RestoreConfirmModal({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 }

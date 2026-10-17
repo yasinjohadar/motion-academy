@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends Factory<User>
@@ -59,7 +60,12 @@ class UserFactory extends Factory
             'name_ar' => $nameAr,
             'name_en' => $nameEn,
             'email' => fake()->unique()->safeEmail(),
-            'phone' => '05'.fake()->numerify('########'),
+            'phone' => '+963 9'.fake()->unique()->numerify('########'),
+            // Follows whatever phone a test sets, so ['phone' => null] really means "no number".
+            'phone_e164' => fn (array $attributes): ?string => filled($attributes['phone'] ?? null)
+                ? preg_replace('/\D+/', '', (string) $attributes['phone'])
+                : null,
+            'phone_verified_at' => null,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
@@ -77,5 +83,30 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * An admin account: the only kind allowed into the control panel (/admin).
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::findOrCreate('admin', 'web')));
+    }
+
+    /**
+     * A staff account with a custom (non-student) role and no permissions of its
+     * own: it reaches the control panel, and a test grants what it may do there.
+     */
+    public function staff(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::findOrCreate('staff', 'web')));
+    }
+
+    /**
+     * A student account, like every public sign-up.
+     */
+    public function student(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::findOrCreate('student', 'web')));
     }
 }

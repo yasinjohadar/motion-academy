@@ -25,6 +25,19 @@ return [
         'backups' => 'أرشيف النسخ الاحتياطية',
         'blog' => 'صور المدونة',
         'media' => 'مكتبة الوسائط',
+        'courses' => 'صور الدورات',
+        'course-videos' => 'فيديوهات ومرفقات الدروس (خاص)',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logical disks that must never fall back to a public disk
+    |--------------------------------------------------------------------------
+    | When one of these has no active mapping it falls back to the Laravel disk named
+    | here instead of `fallback_disk`, so protected files never land under /storage.
+    */
+    'private_fallbacks' => [
+        'course-videos' => 'local',
     ],
 
     /*

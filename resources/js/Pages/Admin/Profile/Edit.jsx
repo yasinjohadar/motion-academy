@@ -3,7 +3,7 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({ mustVerifyEmail, status, phone, countries = [] }) {
     return (
         <AdminUiPage title="الملف الشخصي" subtitle="إدارة معلومات حسابك">
             <div className="row g-3">
@@ -12,6 +12,8 @@ export default function Edit({ mustVerifyEmail, status }) {
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
+                            phone={phone}
+                            countries={countries}
                         />
                     </AdminPanel>
                 </div>

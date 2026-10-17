@@ -261,6 +261,8 @@ class BackupController extends Controller implements HasMiddleware
 
     public function destroy(Backup $backup): RedirectResponse
     {
+        $this->authorize('delete', $backup);
+
         $this->backupService->deleteBackup($backup);
 
         return redirect()

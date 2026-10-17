@@ -39,7 +39,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_view_their_notification_centre_without_any_permission(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->makeNotification($user);
 
         $this->actingAs($user)
@@ -55,7 +55,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_shared_prop_exposes_unread_count_and_recent_items(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->makeNotification($user);
         $this->makeNotification($user, ['read_at' => now()]);
 
@@ -70,8 +70,8 @@ class NotificationCenterTest extends TestCase
 
     public function test_notifications_are_scoped_to_their_owner(): void
     {
-        $owner = User::factory()->create();
-        $intruder = User::factory()->create();
+        $owner = User::factory()->admin()->create();
+        $intruder = User::factory()->admin()->create();
         $notification = $this->makeNotification($owner);
 
         $this->actingAs($intruder)
@@ -90,8 +90,8 @@ class NotificationCenterTest extends TestCase
 
     public function test_another_user_cannot_delete_your_notification(): void
     {
-        $owner = User::factory()->create();
-        $intruder = User::factory()->create();
+        $owner = User::factory()->admin()->create();
+        $intruder = User::factory()->admin()->create();
         $notification = $this->makeNotification($owner);
 
         $this->actingAs($intruder)
@@ -104,7 +104,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_mark_a_notification_as_read(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $notification = $this->makeNotification($user);
 
         $this->actingAs($user)
@@ -117,7 +117,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_mark_all_notifications_as_read(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->makeNotification($user);
         $this->makeNotification($user);
 
@@ -131,8 +131,8 @@ class NotificationCenterTest extends TestCase
 
     public function test_marking_all_read_does_not_touch_other_users(): void
     {
-        $user = User::factory()->create();
-        $other = User::factory()->create();
+        $user = User::factory()->admin()->create();
+        $other = User::factory()->admin()->create();
         $this->makeNotification($user);
         $otherNotification = $this->makeNotification($other);
 
@@ -145,7 +145,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_delete_a_notification(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $notification = $this->makeNotification($user);
 
         $this->actingAs($user)
@@ -158,8 +158,8 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_delete_all_their_notifications_only(): void
     {
-        $user = User::factory()->create();
-        $other = User::factory()->create();
+        $user = User::factory()->admin()->create();
+        $other = User::factory()->admin()->create();
         $this->makeNotification($user);
         $otherNotification = $this->makeNotification($other);
 
@@ -173,7 +173,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_index_can_be_filtered_by_read_state(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->makeNotification($user);
         $this->makeNotification($user, ['read_at' => now()]);
 
@@ -188,7 +188,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_index_can_be_filtered_by_category_and_level(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->makeNotification($user);
         $this->makeNotification($user, [
             'category' => NotificationCategory::Blog->value,
@@ -206,7 +206,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_view_preferences_screen(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->admin()->create())
             ->get(route('admin.notifications.preferences'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
@@ -219,7 +219,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_user_can_save_preferences(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->put(route('admin.notifications.preferences.update'), [
@@ -243,7 +243,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_the_database_channel_preference_is_never_persisted(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)->put(route('admin.notifications.preferences.update'), [
             'preferences' => [
@@ -261,7 +261,7 @@ class NotificationCenterTest extends TestCase
 
     public function test_preference_matrix_marks_the_database_channel_locked(): void
     {
-        $matrix = NotificationPreference::matrixForUser(User::factory()->create());
+        $matrix = NotificationPreference::matrixForUser(User::factory()->admin()->create());
 
         $databaseCell = collect($matrix[0]['channels'])
             ->firstWhere('channel', NotificationChannel::Database->value);

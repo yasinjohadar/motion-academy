@@ -47,29 +47,31 @@ export default function Index({ campaigns, flash }) {
                             {rows.map((c) => (
                                 <tr key={c.id}>
                                     <td>
-                                        <Link
-                                            href={route('admin.whatsapp-campaigns.show', c.id)}
-                                            className="fw-semibold text-decoration-none"
-                                            style={{ color: 'var(--wa-accent)' }}
-                                        >
-                                            {c.id}
-                                        </Link>
+                                        {can('admin.whatsapp-campaigns.show') ? (
+                                            <Link
+                                                href={route('admin.whatsapp-campaigns.show', c.id)}
+                                                className="fw-semibold text-decoration-none"
+                                                style={{ color: 'var(--wa-accent)' }}
+                                            >
+                                                {c.id}
+                                            </Link>
+                                        ) : (
+                                            <span className="fw-semibold">{c.id}</span>
+                                        )}
                                     </td>
                                     <td>{c.message_preview}</td>
                                     <td>{c.total_recipients}</td>
                                     <td>{c.sent_count}</td>
                                     <td>{c.failed_count}</td>
                                     <td>
-                                        <span className={`wa-badge ${statusBadge(c.status)}`}>{c.status}</span>
+                                        <span className={`wa-badge ${statusBadge(c.status)}`}>
+                                            {c.status}
+                                        </span>
                                     </td>
                                     <td dir="ltr">{c.created_at}</td>
                                 </tr>
                             ))}
-                            {rows.length === 0 && (
-                                <TableEmptyRow colSpan={7}>
-                                    لا توجد حملات.
-                                </TableEmptyRow>
-                            )}
+                            {rows.length === 0 && <TableEmptyRow colSpan={7}>لا توجد حملات.</TableEmptyRow>}
                         </tbody>
                     </table>
                 </div>

@@ -85,6 +85,50 @@ class SiteSettingsAndPagesTest extends TestCase
         $this->assertTrue(SocialLink::query()->where('label', 'إنستغرام')->exists());
     }
 
+    public function test_admin_can_set_site_wide_seo(): void
+    {
+        $this->actingAs($this->adminUser())
+            ->put(route('admin.site-settings.update'), [
+                'site_name' => 'Motion Academy',
+                'seo_title' => 'Motion Academy — تعلّم التحريك',
+                'seo_description' => 'دورات تحريك عملية.',
+                'seo_keywords' => 'تحريك, موشن',
+                'seo_og_image' => 'https://cdn.example.com/og.png',
+                'twitter_handle' => 'MotionAcademy',
+                // Pasted as the whole tag, the way Search Console hands it out.
+                'google_site_verification' => '<meta name="google-site-verification" content="abc123XYZ" />',
+                'bing_site_verification' => 'BING-CODE',
+                'allow_indexing' => '0',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('admin.site-settings.edit'));
+
+        $setting = SiteSetting::current();
+        $this->assertSame('Motion Academy — تعلّم التحريك', $setting->seo_title);
+        $this->assertSame('@MotionAcademy', $setting->twitter_handle);
+        $this->assertSame('abc123XYZ', $setting->google_site_verification);
+        $this->assertSame('BING-CODE', $setting->bing_site_verification);
+        $this->assertFalse($setting->allow_indexing);
+
+        $this->actingAs($this->adminUser())
+            ->get(route('admin.site-settings.edit'))
+            ->assertInertia(fn ($page) => $page
+                ->where('setting.seo_description', 'دورات تحريك عملية.')
+                ->where('setting.allow_indexing', false));
+    }
+
+    public function test_seo_settings_are_validated(): void
+    {
+        $this->actingAs($this->adminUser())
+            ->put(route('admin.site-settings.update'), [
+                'site_name' => 'Motion Academy',
+                'twitter_handle' => 'not a handle!',
+                'seo_og_image' => 'javascript:alert(1)',
+                'seo_title' => str_repeat('ع', 121),
+            ])
+            ->assertSessionHasErrors(['twitter_handle', 'seo_og_image', 'seo_title']);
+    }
+
     public function test_admin_can_manage_site_pages(): void
     {
         $admin = $this->adminUser();

@@ -24,6 +24,10 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            // Optional here so older forms keep working; normalised and checked for
+            // uniqueness in ProfileController::update via PhoneInput.
+            'country_code' => ['nullable', 'string', 'regex:/^\+?\d{1,4}$/'],
+            'phone' => ['nullable', 'string', 'max:20'],
         ];
     }
 }

@@ -1,9 +1,11 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import NotificationBell from '@/Components/Admin/NotificationBell';
+import useCan from '@/hooks/useCan';
 import { toggleSidemenu, toggleThemeMode } from './themeControls';
 
 export default function Header() {
     const { auth, site } = usePage().props;
+    const { can } = useCan();
     const user = auth.user;
     const siteName = site?.site_name || 'لوحة التحكم';
     const siteInitial = siteName.trim().charAt(0) || 'ل';
@@ -30,7 +32,9 @@ export default function Header() {
                     <div className="header-element">
                         <div className="horizontal-logo">
                             <Link
-                                href={route('admin.dashboard')}
+                                href={route(
+                                    can('admin.dashboard.view') ? 'admin.dashboard' : 'admin.profile.edit',
+                                )}
                                 className="header-logo admin-brand-text"
                                 title={siteName}
                             >
@@ -89,17 +93,28 @@ export default function Header() {
                         <ul className="main-header-dropdown dropdown-menu dropdown-menu-end Search-element-dropdown">
                             <li>
                                 <div className="input-group w-100 p-2">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Search...."
-                                    />
+                                    <input type="text" className="form-control" placeholder="Search...." />
                                     <div className="btn btn-primary">
                                         <i className="fa fa-search" aria-hidden="true" />
                                     </div>
                                 </div>
                             </li>
                         </ul>
+                    </div>
+
+                    {/* The public site is Blade, not Inertia: a plain link, in a new tab. */}
+                    <div className="header-element">
+                        <a
+                            href={route('home')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="admin-site-link"
+                            title="فتح الواجهة الخارجية للموقع في تبويب جديد"
+                        >
+                            <i className="ri-global-line" aria-hidden="true" />
+                            <span className="admin-site-link__label">الواجهة الخارجية</span>
+                            <i className="ri-external-link-line admin-site-link__arrow" aria-hidden="true" />
+                        </a>
                     </div>
 
                     <div className="header-element header-theme-mode">
@@ -117,59 +132,6 @@ export default function Header() {
                                 <i className="ri-sun-fill" />
                             </span>
                         </a>
-                    </div>
-
-                    <div className="header-element messages-dropdown">
-                        <a
-                            href="javascript:void(0);"
-                            className="header-link dropdown-toggle"
-                            data-bs-auto-close="outside"
-                            data-bs-toggle="dropdown"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="header-link-icon"
-                                height="24px"
-                                viewBox="0 0 24 24"
-                                width="24px"
-                                fill="currentColor"
-                            >
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" />
-                            </svg>
-                            <span className="pulse-danger" />
-                        </a>
-                        <div className="main-header-dropdown dropdown-menu dropdown-menu-end main-header-message">
-                            <div className="menu-header-content bg-primary text-fixed-white">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <h6 className="mb-0 fs-15 fw-semibold text-fixed-white">
-                                        الرسائل
-                                    </h6>
-                                    <span className="badge rounded-pill bg-warning pt-1 text-fixed-black">
-                                        تحديد الكل كمقروء
-                                    </span>
-                                </div>
-                                <p className="dropdown-title-text subtext mb-0 text-fixed-white op-6 pb-0 fs-12">
-                                    لديك 0 رسائل جديدة
-                                </p>
-                            </div>
-                            <div>
-                                <hr className="dropdown-divider" />
-                            </div>
-                            <ul className="list-unstyled mb-0" id="header-cart-items-scroll">
-                                <li className="dropdown-item text-center py-3">
-                                    <p className="text-muted mb-0">لا توجد رسائل جديدة</p>
-                                </li>
-                            </ul>
-                            <div className="text-center dropdown-footer">
-                                <a
-                                    href="javascript:void(0);"
-                                    className="text-primary fs-13"
-                                >
-                                    عرض الكل
-                                </a>
-                            </div>
-                        </div>
                     </div>
 
                     <NotificationBell />
@@ -257,30 +219,19 @@ export default function Header() {
                             <li>
                                 <div className="main-header-profile bg-primary menu-header-content text-fixed-white">
                                     <div className="my-auto">
-                                        <h6 className="mb-0 lh-1 text-fixed-white">
-                                            {user?.name}
-                                        </h6>
-                                        <span className="fs-11 op-7 lh-1">
-                                            {user?.email}
-                                        </span>
+                                        <h6 className="mb-0 lh-1 text-fixed-white">{user?.name}</h6>
+                                        <span className="fs-11 op-7 lh-1">{user?.email}</span>
                                     </div>
                                 </div>
                             </li>
                             <li>
-                                <Link
-                                    className="dropdown-item d-flex"
-                                    href={route('admin.profile.edit')}
-                                >
+                                <Link className="dropdown-item d-flex" href={route('admin.profile.edit')}>
                                     <i className="bx bx-user-circle fs-18 me-2 op-7" />
                                     الملف الشخصي
                                 </Link>
                             </li>
                             <li>
-                                <a
-                                    className="dropdown-item d-flex"
-                                    href="#"
-                                    onClick={logout}
-                                >
+                                <a className="dropdown-item d-flex" href="#" onClick={logout}>
                                     <i className="bx bx-log-out fs-18 me-2 op-7" />
                                     تسجيل الخروج
                                 </a>

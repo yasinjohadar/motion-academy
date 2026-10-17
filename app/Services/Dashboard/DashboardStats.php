@@ -38,6 +38,8 @@ class DashboardStats
                 'theme' => 'purple',
                 'icon' => 'ri-user-line',
                 'route' => 'admin.users.index',
+                // Any of these lets the viewer open the card's page.
+                'permissions' => ['admin.users.list'],
             ],
             [
                 'key' => 'logins',
@@ -51,6 +53,7 @@ class DashboardStats
                 'theme' => 'green',
                 'icon' => 'ri-login-circle-line',
                 'route' => 'admin.observability.security',
+                'permissions' => ['admin.observability.security'],
             ],
             [
                 'key' => 'health',
@@ -60,6 +63,10 @@ class DashboardStats
                 'theme' => $health['score'] === 100 ? 'orange' : 'red',
                 'icon' => $health['score'] === 100 ? 'ri-shield-check-line' : 'ri-shield-flash-line',
                 'route' => 'admin.observability.index',
+                'permissions' => [
+                    'admin.observability.activity', 'admin.observability.security', 'admin.observability.logs',
+                    'admin.observability.jobs', 'admin.observability.database',
+                ],
             ],
         ];
 

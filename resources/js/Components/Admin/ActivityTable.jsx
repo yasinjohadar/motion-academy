@@ -1,4 +1,5 @@
 import Pagination from '@/Components/Admin/Pagination';
+import useCan from '@/hooks/useCan';
 import { Link } from '@inertiajs/react';
 
 /**
@@ -66,6 +67,9 @@ export function logNameLabel(logName) {
  * security screen, where every row is log_name=security anyway.
  */
 export default function ActivityTable({ items, showLogName = true, emptyMessage = 'لا توجد سجلات.' }) {
+    // The details page needs the activity permission, even when this table lists security events.
+    const { can } = useCan();
+    const canOpen = can('admin.observability.activity');
     const rows = items?.data || [];
 
     return (
@@ -114,9 +118,7 @@ export default function ActivityTable({ items, showLogName = true, emptyMessage 
                                         <span className="text-muted">النظام</span>
                                     )}
                                 </td>
-                                <td dir="ltr">
-                                    {row.ip || <span className="text-muted">—</span>}
-                                </td>
+                                <td dir="ltr">{row.ip || <span className="text-muted">—</span>}</td>
                                 <td>
                                     <span className="d-block" dir="ltr">
                                         {row.created_at}
@@ -124,13 +126,15 @@ export default function ActivityTable({ items, showLogName = true, emptyMessage 
                                     <span className="text-muted fs-11">{row.created_at_human}</span>
                                 </td>
                                 <td>
-                                    <Link
-                                        href={route('admin.observability.show', row.id)}
-                                        className="admin-action-btn admin-action-edit"
-                                        title="التفاصيل"
-                                    >
-                                        <i className="ri-eye-line" />
-                                    </Link>
+                                    {canOpen && (
+                                        <Link
+                                            href={route('admin.observability.show', row.id)}
+                                            className="admin-action-btn admin-action-edit"
+                                            title="التفاصيل"
+                                        >
+                                            <i className="ri-eye-line" />
+                                        </Link>
+                                    )}
                                 </td>
                             </tr>
                         ))}

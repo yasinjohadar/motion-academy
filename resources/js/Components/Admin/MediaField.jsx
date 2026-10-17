@@ -1,4 +1,5 @@
 import MediaPicker from '@/Components/Admin/MediaPicker';
+import useCan from '@/hooks/useCan';
 import { useState } from 'react';
 
 /**
@@ -17,21 +18,25 @@ export default function MediaField({
     allowUpload = true,
     disabled = false,
 }) {
+    const { can } = useCan();
+    const canBrowse = can('admin.media.list');
     const [open, setOpen] = useState(false);
 
     return (
         <div className="mb-3">
             {label && <label className="form-label">{label}</label>}
             <div className="d-flex flex-wrap gap-2">
-                <button
-                    type="button"
-                    className="admin-btn admin-btn-primary"
-                    disabled={disabled}
-                    onClick={() => setOpen(true)}
-                >
-                    <i className="ri-gallery-line" />
-                    من المكتبة
-                </button>
+                {canBrowse && (
+                    <button
+                        type="button"
+                        className="admin-btn admin-btn-primary"
+                        disabled={disabled}
+                        onClick={() => setOpen(true)}
+                    >
+                        <i className="ri-gallery-line" />
+                        من المكتبة
+                    </button>
+                )}
                 {allowUpload && (
                     <label className={`admin-btn admin-btn-ghost mb-0${disabled ? ' disabled' : ''}`}>
                         <i className="ri-upload-2-line" />
@@ -66,11 +71,7 @@ export default function MediaField({
             )}
             {error && <div className="invalid-feedback d-block">{error}</div>}
 
-            <MediaPicker
-                open={open}
-                onClose={() => setOpen(false)}
-                onSelect={(item) => onPick?.(item)}
-            />
+            <MediaPicker open={open} onClose={() => setOpen(false)} onSelect={(item) => onPick?.(item)} />
         </div>
     );
 }

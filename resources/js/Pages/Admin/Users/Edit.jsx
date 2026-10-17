@@ -1,7 +1,8 @@
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
+import AccountTypeField from '@/Components/Admin/AccountTypeField';
 import { Link, useForm } from '@inertiajs/react';
 
-export default function Edit({ user, roles = [] }) {
+export default function Edit({ user, accountTypes = {} }) {
     const { data, setData, put, processing, errors } = useForm({
         name_ar: user.name_ar || '',
         name_en: user.name_en || '',
@@ -9,17 +10,8 @@ export default function Edit({ user, roles = [] }) {
         phone: user.phone || '',
         password: '',
         password_confirmation: '',
-        roles: user.roles || [],
+        account_type: user.account_type || 'student',
     });
-
-    const toggleRole = (roleName) => {
-        setData(
-            'roles',
-            data.roles.includes(roleName)
-                ? data.roles.filter((name) => name !== roleName)
-                : [...data.roles, roleName],
-        );
-    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -47,9 +39,7 @@ export default function Edit({ user, roles = [] }) {
                             value={data.name_ar}
                             onChange={(e) => setData('name_ar', e.target.value)}
                         />
-                        {errors.name_ar && (
-                            <div className="invalid-feedback">{errors.name_ar}</div>
-                        )}
+                        {errors.name_ar && <div className="invalid-feedback">{errors.name_ar}</div>}
                     </div>
 
                     <div className="col-md-6">
@@ -61,9 +51,7 @@ export default function Edit({ user, roles = [] }) {
                             onChange={(e) => setData('name_en', e.target.value)}
                             dir="ltr"
                         />
-                        {errors.name_en && (
-                            <div className="invalid-feedback">{errors.name_en}</div>
-                        )}
+                        {errors.name_en && <div className="invalid-feedback">{errors.name_en}</div>}
                     </div>
 
                     <div className="col-md-6">
@@ -75,9 +63,7 @@ export default function Edit({ user, roles = [] }) {
                             onChange={(e) => setData('email', e.target.value)}
                             dir="ltr"
                         />
-                        {errors.email && (
-                            <div className="invalid-feedback">{errors.email}</div>
-                        )}
+                        {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                     </div>
 
                     <div className="col-md-6">
@@ -89,15 +75,12 @@ export default function Edit({ user, roles = [] }) {
                             onChange={(e) => setData('phone', e.target.value)}
                             dir="ltr"
                         />
-                        {errors.phone && (
-                            <div className="invalid-feedback">{errors.phone}</div>
-                        )}
+                        {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                     </div>
 
                     <div className="col-md-6">
                         <label className="form-label">
-                            كلمة المرور الجديدة{' '}
-                            <span className="text-muted">(اختياري)</span>
+                            كلمة المرور الجديدة <span className="text-muted">(اختياري)</span>
                         </label>
                         <input
                             type="password"
@@ -106,9 +89,7 @@ export default function Edit({ user, roles = [] }) {
                             onChange={(e) => setData('password', e.target.value)}
                             dir="ltr"
                         />
-                        {errors.password && (
-                            <div className="invalid-feedback">{errors.password}</div>
-                        )}
+                        {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                     </div>
 
                     <div className="col-md-6">
@@ -117,38 +98,22 @@ export default function Edit({ user, roles = [] }) {
                             type="password"
                             className="form-control"
                             value={data.password_confirmation}
-                            onChange={(e) =>
-                                setData('password_confirmation', e.target.value)
-                            }
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
                             dir="ltr"
                         />
                     </div>
 
                     <div className="col-12">
-                        <label className="form-label">الأدوار</label>
-                        <div className="role-checkboxes">
-                            {roles.map((role) => (
-                                <label key={role.id}>
-                                    <input
-                                        type="checkbox"
-                                        checked={data.roles.includes(role.name)}
-                                        onChange={() => toggleRole(role.name)}
-                                    />
-                                    <span>{role.name}</span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.roles && (
-                            <div className="text-danger mt-1">{errors.roles}</div>
-                        )}
+                        <AccountTypeField
+                            value={data.account_type}
+                            onChange={(value) => setData('account_type', value)}
+                            types={accountTypes}
+                            error={errors.account_type}
+                        />
                     </div>
 
                     <div className="col-12 d-flex gap-2 mt-3">
-                        <button
-                            type="submit"
-                            className="admin-btn admin-btn-primary"
-                            disabled={processing}
-                        >
+                        <button type="submit" className="admin-btn admin-btn-primary" disabled={processing}>
                             <i className="ri-save-line" />
                             تحديث
                         </button>

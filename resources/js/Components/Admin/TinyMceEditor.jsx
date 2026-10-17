@@ -1,15 +1,14 @@
 import MediaPicker from '@/Components/Admin/MediaPicker';
+import useCan from '@/hooks/useCan';
 import { Editor } from '@tinymce/tinymce-react';
 import { useRef, useState } from 'react';
 
-export default function TinyMceEditor({
-    value = '',
-    onChange,
-    height = 480,
-    dir = 'rtl',
-}) {
+export default function TinyMceEditor({ value = '', onChange, height = 480, dir = 'rtl' }) {
     const editorRef = useRef(null);
     const [pickerOpen, setPickerOpen] = useState(false);
+    const { can } = useCan();
+    const canBrowse = can('admin.media.list');
+    const canUpload = can('admin.media.create');
 
     const uploadHandler = (blobInfo, progress) =>
         new Promise((resolve, reject) => {
@@ -63,12 +62,11 @@ export default function TinyMceEditor({
                     branding: false,
                     directionality: dir === 'rtl' ? 'rtl' : 'ltr',
                     language: 'ar',
-                    plugins:
-                        'lists link image media table code codesample fullscreen directionality',
-                    toolbar:
-                        'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image medialibrary media table | code fullscreen',
-                    images_upload_handler: uploadHandler,
-                    automatic_uploads: true,
+                    plugins: 'lists link image media table code codesample fullscreen directionality',
+                    // Library and upload controls appear only with the matching media permission.
+                    toolbar: `undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image${canBrowse ? ' medialibrary' : ''} media table | code fullscreen`,
+                    ...(canUpload ? { images_upload_handler: uploadHandler, automatic_uploads: true } : {}),
+                    image_uploadtab: canUpload,
                     file_picker_types: 'image',
                     setup: (editor) => {
                         editor.ui.registry.addButton('medialibrary', {

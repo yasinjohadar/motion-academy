@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\OtpPurpose;
 use App\Http\Controllers\Controller;
+use App\Services\Otp\OtpSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -19,6 +21,9 @@ class PasswordResetLinkController extends Controller
     {
         return Inertia::render('Auth/ForgotPassword', [
             'status' => session('status'),
+            'whatsappAvailable' => app(OtpSettings::class)->isAvailable(OtpPurpose::PasswordReset),
+            'countries' => config('phone.countries'),
+            'defaultCountry' => (string) config('phone.default_country'),
         ]);
     }
 
@@ -40,8 +45,10 @@ class PasswordResetLinkController extends Controller
             $request->only('email')
         );
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+        // An unknown address gets the same answer as a known one, so this form
+        // cannot be used to find out who has an account (as with the WhatsApp flow).
+        if ($status === Password::RESET_LINK_SENT || $status === Password::INVALID_USER) {
+            return back()->with('status', __(Password::RESET_LINK_SENT));
         }
 
         throw ValidationException::withMessages([

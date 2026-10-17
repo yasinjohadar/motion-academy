@@ -65,12 +65,38 @@ class SiteSettingsService
                 'phone' => $data['phone'] ?? null,
                 'address' => $data['address'] ?? null,
                 'footer_text' => $data['footer_text'] ?? null,
+                'seo_title' => $data['seo_title'] ?? null,
+                'seo_description' => $data['seo_description'] ?? null,
+                'seo_keywords' => $data['seo_keywords'] ?? null,
+                'seo_og_image' => $data['seo_og_image'] ?? null,
+                'twitter_handle' => filled($data['twitter_handle'] ?? null) ? '@'.ltrim($data['twitter_handle'], '@') : null,
+                'google_site_verification' => $this->verificationCode($data['google_site_verification'] ?? null),
+                'bing_site_verification' => $this->verificationCode($data['bing_site_verification'] ?? null),
+                'allow_indexing' => (bool) ($data['allow_indexing'] ?? $setting->allow_indexing ?? true),
             ])->save();
 
             $this->syncSocialLinks($data['social_links'] ?? []);
 
             return $setting->fresh();
         });
+    }
+
+    /**
+     * Search consoles hand out a whole tag (<meta name="…" content="CODE">);
+     * people paste either that or the bare code. Keep only the code.
+     */
+    private function verificationCode(?string $input): ?string
+    {
+        $input = trim((string) $input);
+        if ($input === '') {
+            return null;
+        }
+
+        if (preg_match('/content\s*=\s*["\']([^"\']+)["\']/i', $input, $match)) {
+            return trim($match[1]);
+        }
+
+        return mb_substr(strip_tags($input), 0, 120);
     }
 
     /**

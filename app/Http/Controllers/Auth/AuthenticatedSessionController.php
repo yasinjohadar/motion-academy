@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\OtpPurpose;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\Otp\OtpSettings;
 use App\Support\PanelRedirector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,7 @@ class AuthenticatedSessionController extends Controller
     {
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
+            'otpLoginAvailable' => app(OtpSettings::class)->isAvailable(OtpPurpose::Login),
             'status' => session('status'),
             'devQuickLogin' => app()->environment('local')
                 ? [

@@ -29,7 +29,7 @@ class ObservabilityScreensTest extends TestCase
 
     protected function userWith(array $permissions): User
     {
-        $user = User::factory()->create();
+        $user = User::factory()->staff()->create();
         $user->givePermissionTo($permissions);
 
         return $user;
@@ -79,7 +79,7 @@ class ObservabilityScreensTest extends TestCase
 
     public function test_a_user_without_any_observability_permission_is_forbidden(): void
     {
-        $user = User::factory()->create();
+        $user = $this->panelUserWithoutPermissions();
 
         $this->actingAs($user)->get(route('admin.observability.index'))->assertForbidden();
         $this->actingAs($user)->get(route('admin.observability.activity'))->assertForbidden();

@@ -1,7 +1,8 @@
+import AuthField from '@/Components/Auth/AuthField';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Login({ status, canResetPassword, devQuickLogin }) {
+export default function Login({ status, canResetPassword, devQuickLogin, otpLoginAvailable }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -19,122 +20,122 @@ export default function Login({ status, canResetPassword, devQuickLogin }) {
         if (!devQuickLogin) {
             return;
         }
-
-        setData({
-            ...data,
-            email: devQuickLogin.email,
-            password: devQuickLogin.password,
-            remember: true,
-        });
+        setData({ email: devQuickLogin.email, password: devQuickLogin.password, remember: true });
     };
 
     return (
         <GuestLayout
-            title="تسجيل الدخول"
-            subtitle="أدخل بياناتك للوصول إلى لوحة التحكم"
+            title="مرحباً بعودتك"
+            subtitle="سجّل دخولك لمتابعة رحلتك في الأكاديمية"
+            icon="ri-login-circle-line"
+            aside={{
+                heading: 'أكمل من حيث توقفت',
+                text: 'دوراتك ودروسك بانتظارك — تابع تعلّم التحريك وصناعة المحتوى البصري.',
+            }}
         >
             <Head title="تسجيل الدخول" />
 
             {status && (
-                <div className="alert alert-success" role="alert">
-                    {status}
+                <div className="auth-alert is-success" role="status">
+                    <i className="ri-checkbox-circle-line" />
+                    <span>{status}</span>
                 </div>
             )}
 
             {devQuickLogin && (
-                <div className="guest-dev-login">
-                    <div className="guest-dev-login-meta">
-                        <span className="guest-dev-login-badge">تطوير</span>
-                        <div>
-                            <strong>{devQuickLogin.label}</strong>
-                            <p>
-                                {devQuickLogin.email} / {devQuickLogin.password}
-                            </p>
-                        </div>
+                <div className="auth-dev">
+                    <span className="auth-dev-badge">تطوير</span>
+                    <div className="auth-dev-text">
+                        <strong>{devQuickLogin.label}</strong>
+                        <small dir="ltr">
+                            {devQuickLogin.email} / {devQuickLogin.password}
+                        </small>
                     </div>
-                    <button
-                        type="button"
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={fillAdmin}
-                    >
+                    <button type="button" className="auth-dev-btn" onClick={fillAdmin}>
                         تعبئة
                     </button>
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                        البريد الإلكتروني
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className={`form-control${errors.email ? ' is-invalid' : ''}`}
-                        autoComplete="username"
-                        autoFocus
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-                    {errors.email && (
-                        <div className="invalid-feedback">{errors.email}</div>
-                    )}
-                </div>
+            <form onSubmit={submit} className="auth-form" noValidate>
+                <AuthField
+                    label="البريد الإلكتروني"
+                    icon="ri-mail-line"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    onChange={(value) => setData('email', value)}
+                    error={errors.email}
+                    autoComplete="username"
+                    placeholder="name@example.com"
+                    dir="ltr"
+                    autoFocus
+                    required
+                />
 
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                        كلمة المرور
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className={`form-control${errors.password ? ' is-invalid' : ''}`}
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-                    {errors.password && (
-                        <div className="invalid-feedback">{errors.password}</div>
-                    )}
-                </div>
+                <AuthField
+                    label="كلمة المرور"
+                    icon="ri-lock-2-line"
+                    type="password"
+                    name="password"
+                    value={data.password}
+                    onChange={(value) => setData('password', value)}
+                    error={errors.password}
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    required
+                    trailing={
+                        canResetPassword && (
+                            <Link href={route('password.request')} className="auth-link-sm">
+                                نسيت كلمة المرور؟
+                            </Link>
+                        )
+                    }
+                />
 
-                <div className="mb-3 form-check">
+                <label className="auth-check">
                     <input
-                        id="remember"
                         type="checkbox"
                         name="remember"
-                        className="form-check-input"
                         checked={data.remember}
                         onChange={(e) => setData('remember', e.target.checked)}
                     />
-                    <label className="form-check-label" htmlFor="remember">
-                        تذكرني
-                    </label>
-                </div>
+                    <span className="auth-check-box" aria-hidden="true">
+                        <i className="ri-check-line" />
+                    </span>
+                    تذكّرني على هذا الجهاز
+                </label>
 
-                <div className="d-grid gap-2">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={processing}
-                    >
-                        دخول
-                    </button>
-                </div>
-
-                <div className="d-flex justify-content-between align-items-center mt-3 small">
-                    {canResetPassword && (
-                        <Link href={route('password.request')} className="link-secondary">
-                            نسيت كلمة المرور؟
-                        </Link>
+                <button type="submit" className="auth-submit" disabled={processing}>
+                    {processing ? (
+                        <span className="auth-spinner" aria-hidden="true" />
+                    ) : (
+                        <i className="ri-arrow-left-line" />
                     )}
-                    <Link href={route('register')} className="link-primary">
-                        إنشاء حساب
-                    </Link>
-                </div>
+                    {processing ? 'جارٍ الدخول...' : 'تسجيل الدخول'}
+                </button>
             </form>
+
+            {otpLoginAvailable && (
+                <Link href={route('login.otp')} className="auth-whatsapp">
+                    <span className="auth-whatsapp-icon">
+                        <i className="ri-whatsapp-line" />
+                    </span>
+                    <span className="auth-whatsapp-text">
+                        <strong>الدخول برمز واتساب</strong>
+                        <small>بلا كلمة مرور — رمز يصلك على رقمك</small>
+                    </span>
+                    <i className="ri-arrow-left-s-line" />
+                </Link>
+            )}
+
+            <div className="auth-divider">
+                <span>جديد في الأكاديمية؟</span>
+            </div>
+
+            <Link href={route('register')} className="auth-secondary">
+                <i className="ri-user-add-line" /> أنشئ حساباً مجانياً
+            </Link>
         </GuestLayout>
     );
 }

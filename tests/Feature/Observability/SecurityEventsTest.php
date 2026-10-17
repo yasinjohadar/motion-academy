@@ -174,9 +174,9 @@ class SecurityEventsTest extends TestCase
     public function test_sync_roles_is_audited_even_though_it_fires_no_model_update(): void
     {
         Role::findOrCreate('admin', 'web');
-        Role::findOrCreate('admin-staff', 'web');
+        Role::findOrCreate('student', 'web');
         $user = User::factory()->create();
-        $user->assignRole('admin-staff');
+        $user->assignRole('student');
 
         $user->syncRoles(['admin']);
 

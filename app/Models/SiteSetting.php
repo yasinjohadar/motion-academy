@@ -22,7 +22,22 @@ class SiteSetting extends Model
         'phone',
         'address',
         'footer_text',
+        'seo_title',
+        'seo_description',
+        'seo_keywords',
+        'seo_og_image',
+        'twitter_handle',
+        'google_site_verification',
+        'bing_site_verification',
+        'allow_indexing',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'allow_indexing' => 'boolean',
+        ];
+    }
 
     public static function current(): self
     {
@@ -83,6 +98,14 @@ class SiteSetting extends Model
             'phone' => $this->phone,
             'address' => $this->address,
             'footer_text' => $this->footer_text,
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+            'seo_keywords' => $this->seo_keywords,
+            'seo_og_image' => $this->seo_og_image,
+            'twitter_handle' => $this->twitter_handle,
+            'google_site_verification' => $this->google_site_verification,
+            'bing_site_verification' => $this->bing_site_verification,
+            'allow_indexing' => $this->allow_indexing ?? true,
         ];
     }
 

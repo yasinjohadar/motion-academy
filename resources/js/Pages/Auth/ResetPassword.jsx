@@ -1,3 +1,5 @@
+import AuthField from '@/Components/Auth/AuthField';
+import PasswordStrength from '@/Components/Auth/PasswordStrength';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -16,82 +18,91 @@ export default function ResetPassword({ token, email }) {
         });
     };
 
+    const mismatch = data.password_confirmation !== '' && data.password !== data.password_confirmation;
+
     return (
         <GuestLayout
-            title="إعادة تعيين كلمة المرور"
-            subtitle="أدخل كلمة مرور جديدة لحسابك"
+            title="كلمة مرور جديدة"
+            subtitle="اختر كلمة مرور قوية لم تستخدمها من قبل"
+            icon="ri-lock-password-line"
+            aside={{
+                heading: 'خطوة أخيرة وتعود',
+                text: 'بعد الحفظ يمكنك تسجيل الدخول فوراً بكلمة المرور الجديدة.',
+            }}
         >
             <Head title="إعادة تعيين كلمة المرور" />
 
-            <form onSubmit={submit}>
-                <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                        البريد الإلكتروني
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className={`form-control${errors.email ? ' is-invalid' : ''}`}
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-                    {errors.email && (
-                        <div className="invalid-feedback">{errors.email}</div>
-                    )}
-                </div>
+            <ol className="auth-steps" aria-label="الخطوات">
+                <li className="is-done">
+                    <span>
+                        <i className="ri-check-line" />
+                    </span>{' '}
+                    البريد
+                </li>
+                <li className="is-done">
+                    <span>
+                        <i className="ri-check-line" />
+                    </span>{' '}
+                    الرابط
+                </li>
+                <li className="is-current">
+                    <span>3</span> كلمة مرور جديدة
+                </li>
+            </ol>
 
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                        كلمة المرور الجديدة
-                    </label>
-                    <input
-                        id="password"
+            <form onSubmit={submit} className="auth-form" noValidate>
+                <AuthField
+                    label="البريد الإلكتروني"
+                    icon="ri-mail-line"
+                    type="email"
+                    name="email"
+                    value={data.email}
+                    onChange={(value) => setData('email', value)}
+                    error={errors.email}
+                    autoComplete="username"
+                    dir="ltr"
+                    required
+                />
+
+                <div>
+                    <AuthField
+                        label="كلمة المرور الجديدة"
+                        icon="ri-lock-2-line"
                         type="password"
                         name="password"
                         value={data.password}
-                        className={`form-control${errors.password ? ' is-invalid' : ''}`}
+                        onChange={(value) => setData('password', value)}
+                        error={errors.password}
                         autoComplete="new-password"
+                        placeholder="8 أحرف على الأقل"
                         autoFocus
-                        onChange={(e) => setData('password', e.target.value)}
+                        required
                     />
-                    {errors.password && (
-                        <div className="invalid-feedback">{errors.password}</div>
-                    )}
+                    <PasswordStrength password={data.password} />
                 </div>
 
-                <div className="mb-3">
-                    <label htmlFor="password_confirmation" className="form-label">
-                        تأكيد كلمة المرور
-                    </label>
-                    <input
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className={`form-control${errors.password_confirmation ? ' is-invalid' : ''}`}
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                    />
-                    {errors.password_confirmation && (
-                        <div className="invalid-feedback">
-                            {errors.password_confirmation}
-                        </div>
-                    )}
-                </div>
+                <AuthField
+                    label="تأكيد كلمة المرور"
+                    icon="ri-shield-check-line"
+                    type="password"
+                    name="password_confirmation"
+                    value={data.password_confirmation}
+                    onChange={(value) => setData('password_confirmation', value)}
+                    error={
+                        errors.password_confirmation || (mismatch ? 'كلمتا المرور غير متطابقتين.' : undefined)
+                    }
+                    autoComplete="new-password"
+                    required
+                />
 
-                <div className="d-grid">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={processing}
-                    >
-                        حفظ كلمة المرور
-                    </button>
-                </div>
+                <button type="submit" className="auth-submit" disabled={processing}>
+                    {processing ? (
+                        <span className="auth-spinner" aria-hidden="true" />
+                    ) : (
+                        <i className="ri-save-3-line" />
+                    )}
+                    {processing ? 'جارٍ الحفظ...' : 'حفظ كلمة المرور'}
+                </button>
             </form>
         </GuestLayout>
     );

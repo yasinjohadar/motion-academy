@@ -8,17 +8,26 @@ use App\Http\Controllers\Admin\BlogAiController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogTagController;
+use App\Http\Controllers\Admin\CourseCategoryController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CourseEnrollmentController;
+use App\Http\Controllers\Admin\CourseLessonController;
+use App\Http\Controllers\Admin\CourseSectionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ObservabilityController;
+use App\Http\Controllers\Admin\OtpSettingsController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SitePageController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SmtpSettingController;
 use App\Http\Controllers\Admin\StorageDiskMappingController;
+use App\Http\Controllers\Admin\StudentImpersonationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserPasswordController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppCampaignController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppInstanceController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppMessageController;
@@ -27,7 +36,8 @@ use App\Modules\WhatsApp\Controllers\Admin\WhatsAppSettingsController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppWebhookEventController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])
+// Admins only: a student who opens /admin lands on their own dashboard instead.
+Route::middleware(['auth', 'verified', 'admin.panel'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -87,7 +97,14 @@ Route::middleware(['auth', 'verified'])
                 ->whereNumber('activity')->name('show');
         });
 
-        Route::resource('users', UserController::class)->except(['show']);
+        Route::resource('users', UserController::class);
+        // One-time link that opens a student's account in another browser.
+        Route::post('users/{user}/impersonation-link', [StudentImpersonationController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('users.impersonate');
+        Route::put('users/{user}/password', [UserPasswordController::class, 'update'])
+            ->middleware('throttle:20,1')
+            ->name('users.password');
         Route::resource('roles', RoleController::class)->except(['show']);
 
         Route::resource('smtp-settings', SmtpSettingController::class)->except(['show']);
@@ -195,4 +212,79 @@ Route::middleware(['auth', 'verified'])
             Route::post('ai/generate', [BlogAiController::class, 'generate'])->name('ai.generate');
             Route::post('ai', [BlogAiController::class, 'store'])->name('ai.store');
         });
+
+        Route::prefix('courses')->name('course-')->group(function () {
+            Route::get('categories/trash', [CourseCategoryController::class, 'trash'])
+                ->name('categories.trash');
+            Route::post('categories/reorder', [CourseCategoryController::class, 'reorder'])
+                ->name('categories.reorder');
+            Route::post('categories/{course_category}/restore', [CourseCategoryController::class, 'restore'])
+                ->withTrashed()
+                ->name('categories.restore');
+            Route::delete('categories/{course_category}/force', [CourseCategoryController::class, 'forceDelete'])
+                ->withTrashed()
+                ->name('categories.force-delete');
+            Route::post('categories/{course_category}/toggle-active', [CourseCategoryController::class, 'toggleActive'])
+                ->name('categories.toggle-active');
+            Route::post('categories/{course_category}/toggle-featured', [CourseCategoryController::class, 'toggleFeatured'])
+                ->name('categories.toggle-featured');
+            Route::resource('categories', CourseCategoryController::class)
+                ->except(['show'])
+                ->parameters(['categories' => 'course_category']);
+        });
+
+        Route::get('settings/otp', [OtpSettingsController::class, 'edit'])->name('otp-settings.edit');
+        Route::put('settings/otp', [OtpSettingsController::class, 'update'])->name('otp-settings.update');
+        Route::post('settings/otp/test', [OtpSettingsController::class, 'testSend'])
+            ->middleware('throttle:6,1')
+            ->name('otp-settings.test');
+
+        Route::prefix('enrollments')->name('enrollments.')->group(function () {
+            Route::get('/', [CourseEnrollmentController::class, 'index'])->name('index');
+            Route::get('students', [CourseEnrollmentController::class, 'students'])->name('students');
+            Route::get('courses-for/{user}', [CourseEnrollmentController::class, 'coursesFor'])->name('courses-for');
+            Route::post('/', [CourseEnrollmentController::class, 'store'])->name('store');
+            Route::post('bulk-approve', [CourseEnrollmentController::class, 'bulkApprove'])->name('bulk-approve');
+            Route::post('{enrollment}/approve', [CourseEnrollmentController::class, 'approve'])->name('approve');
+            Route::post('{enrollment}/reject', [CourseEnrollmentController::class, 'reject'])->name('reject');
+            Route::delete('{enrollment}', [CourseEnrollmentController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::get('newsletter/export', [NewsletterSubscriberController::class, 'export'])->name('newsletter.export');
+        Route::post('newsletter/{newsletter_subscriber}/toggle', [NewsletterSubscriberController::class, 'toggle'])->name('newsletter.toggle');
+        Route::resource('newsletter', NewsletterSubscriberController::class)
+            ->only(['index', 'store', 'destroy'])
+            ->parameters(['newsletter' => 'newsletter_subscriber']);
+
+        // Registered after the categories group so `courses/categories/*` is never read as `{course}`.
+        Route::get('courses/trash', [CourseController::class, 'trash'])->name('courses.trash');
+        Route::post('courses/{course}/restore', [CourseController::class, 'restore'])
+            ->withTrashed()
+            ->name('courses.restore');
+        Route::delete('courses/{course}/force', [CourseController::class, 'forceDelete'])
+            ->withTrashed()
+            ->name('courses.force-delete');
+        Route::post('courses/{course}/toggle-featured', [CourseController::class, 'toggleFeatured'])
+            ->name('courses.toggle-featured');
+        Route::post('courses/{course}/toggle-publish', [CourseController::class, 'togglePublish'])
+            ->name('courses.toggle-publish');
+        Route::post('courses/{course}/duplicate', [CourseController::class, 'duplicate'])
+            ->name('courses.duplicate');
+        Route::get('courses/{course}/curriculum', [CourseController::class, 'curriculum'])
+            ->name('courses.curriculum');
+
+        Route::scopeBindings()->prefix('courses/{course}')->name('courses.')->group(function () {
+            Route::post('sections/reorder', [CourseSectionController::class, 'reorder'])->name('sections.reorder');
+            Route::post('sections', [CourseSectionController::class, 'store'])->name('sections.store');
+            Route::put('sections/{section}', [CourseSectionController::class, 'update'])->name('sections.update');
+            Route::delete('sections/{section}', [CourseSectionController::class, 'destroy'])->name('sections.destroy');
+
+            Route::post('sections/{section}/lessons/reorder', [CourseLessonController::class, 'reorder'])
+                ->name('lessons.reorder');
+            Route::post('sections/{section}/lessons', [CourseLessonController::class, 'store'])->name('lessons.store');
+            Route::put('lessons/{lesson}', [CourseLessonController::class, 'update'])->name('lessons.update');
+            Route::delete('lessons/{lesson}', [CourseLessonController::class, 'destroy'])->name('lessons.destroy');
+        });
+
+        Route::resource('courses', CourseController::class)->except(['show']);
     });

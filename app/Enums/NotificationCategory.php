@@ -7,6 +7,7 @@ enum NotificationCategory: string
     case Backups = 'backups';
     case WhatsApp = 'whatsapp';
     case Blog = 'blog';
+    case Courses = 'courses';
     case Users = 'users';
     case System = 'system';
 
@@ -16,6 +17,7 @@ enum NotificationCategory: string
             self::Backups => 'النسخ الاحتياطي',
             self::WhatsApp => 'واتساب',
             self::Blog => 'المدونة',
+            self::Courses => 'الدورات والانضمام',
             self::Users => 'المستخدمون والصلاحيات',
             self::System => 'النظام',
         };
@@ -30,6 +32,7 @@ enum NotificationCategory: string
             self::Backups => 'ri-database-2-line',
             self::WhatsApp => 'ri-whatsapp-line',
             self::Blog => 'ri-article-line',
+            self::Courses => 'ri-graduation-cap-line',
             self::Users => 'ri-group-line',
             self::System => 'ri-settings-4-line',
         };
@@ -41,6 +44,7 @@ enum NotificationCategory: string
             self::Backups => 'admin-badge-info',
             self::WhatsApp => 'admin-badge-success',
             self::Blog => 'admin-badge-warning',
+            self::Courses => 'admin-badge-success',
             self::Users => 'admin-badge-info',
             self::System => 'admin-badge-muted',
         };

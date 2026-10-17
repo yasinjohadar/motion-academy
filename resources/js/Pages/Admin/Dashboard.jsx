@@ -6,12 +6,108 @@ import { Link, usePage } from '@inertiajs/react';
 
 const shortcuts = [
     {
+        title: 'دورة جديدة',
+        desc: 'إنشاء دورة ومنهجها',
+        icon: 'ri-video-add-line',
+        color: 'green',
+        href: 'admin.courses.create',
+        permission: 'admin.courses.create',
+    },
+    {
+        title: 'الدورات',
+        desc: 'إدارة الدورات والمناهج',
+        icon: 'ri-play-list-2-line',
+        color: 'cyan',
+        href: 'admin.courses.index',
+        permission: 'admin.courses.list',
+    },
+    {
+        title: 'طلبات الانضمام',
+        desc: 'مراجعة وقبول الطلاب',
+        icon: 'ri-user-follow-line',
+        color: 'teal',
+        href: 'admin.enrollments.index',
+        permission: 'admin.enrollments.list',
+    },
+    {
+        title: 'تصنيفات الدورات',
+        desc: 'المجالات وترتيبها',
+        icon: 'ri-folder-3-line',
+        color: 'indigo',
+        href: 'admin.course-categories.index',
+        permission: 'admin.course-categories.list',
+    },
+    {
+        title: 'مقال جديد',
+        desc: 'الكتابة في المدونة',
+        icon: 'ri-quill-pen-line',
+        color: 'orange',
+        href: 'admin.blog-posts.create',
+        permission: 'admin.blog-posts.create',
+    },
+    {
+        title: 'مقالات المدونة',
+        desc: 'إدارة المقالات',
+        icon: 'ri-article-line',
+        color: 'pink',
+        href: 'admin.blog-posts.index',
+        permission: 'admin.blog-posts.list',
+    },
+    {
+        title: 'القائمة البريدية',
+        desc: 'المشتركون والتصدير',
+        icon: 'ri-mail-send-line',
+        color: 'gold',
+        href: 'admin.newsletter.index',
+        permission: 'admin.newsletter-subscribers.list',
+    },
+    {
+        title: 'مكتبة الوسائط',
+        desc: 'الصور والملفات',
+        icon: 'ri-image-2-line',
+        color: 'red',
+        href: 'admin.media.index',
+        permission: 'admin.media.list',
+    },
+    {
+        title: 'إعدادات الموقع',
+        desc: 'الاسم والشعار والتواصل',
+        icon: 'ri-settings-4-line',
+        color: 'brown',
+        href: 'admin.site-settings.edit',
+        permission: 'admin.site-settings.list',
+    },
+    {
+        title: 'رموز التحقق OTP',
+        desc: 'الدخول والاستعادة عبر واتساب',
+        icon: 'ri-shield-keyhole-line',
+        color: 'teal',
+        href: 'admin.otp-settings.edit',
+        permission: 'admin.otp-settings.list',
+    },
+    {
+        title: 'زيارة الموقع',
+        desc: 'الواجهة العامة',
+        icon: 'ri-global-line',
+        color: 'yellow',
+        // The public site is Blade, not Inertia: a plain link, opened in a new tab.
+        url: '/',
+        permission: null,
+    },
+    {
         title: 'المراقبة والسجلات',
         desc: 'نشاط النظام',
         icon: 'ri-radar-line',
         color: 'blue',
         href: 'admin.observability.index',
-        permission: 'admin.observability.activity',
+        // The page opens with any one observability permission.
+        permission: [
+            'admin.observability.activity',
+            'admin.observability.security',
+            'admin.observability.logs',
+            'admin.observability.jobs',
+            'admin.observability.database',
+        ],
     },
     {
         title: 'المستخدمون',
@@ -94,51 +190,64 @@ export default function Dashboard({
     lastLoginAt,
 }) {
     const { auth } = usePage().props;
-    const { can } = useCan();
+    const { can, canAny } = useCan();
+    const allowed = (permission) =>
+        !permission || (Array.isArray(permission) ? canAny(permission) : can(permission));
 
-    const visibleShortcuts = shortcuts.filter((s) => !s.permission || can(s.permission));
+    const visibleShortcuts = shortcuts.filter((s) => allowed(s.permission));
 
     return (
         <AdminUiPage
             title={`مرحباً بك، ${auth.user.name}!`}
-            subtitle={
-                lastLoginAt
-                    ? `آخر تسجيل دخول: ${lastLoginAt}`
-                    : 'نظرة عامة على لوحة التحكم'
-            }
+            subtitle={lastLoginAt ? `آخر تسجيل دخول: ${lastLoginAt}` : 'نظرة عامة على لوحة التحكم'}
         >
             <div className="row g-3 mb-4">
                 {widgets.map((widget, index) => (
                     <div className="col-xl-3 col-lg-6 col-md-6" key={widget.key}>
-                        <Link
-                            href={route(widget.route)}
-                            className="dashboard-stat-link"
-                            style={{ '--card-delay': `${index * 0.1}s` }}
-                        >
-                            <div className={`dashboard-stat-card dashboard-stat-${widget.theme}`}>
-                                <div className="stat-card-shine" />
-                                <div className="stat-card-mesh" />
-                                <div className="stat-card-bubble stat-card-bubble-1" />
-                                <div className="stat-card-bubble stat-card-bubble-2" />
-                                <div className="stat-card-bubble stat-card-bubble-3" />
-                                <div className="stat-card-glow" />
-                                <div className="stat-card-body">
-                                    <div className="stat-card-content">
-                                        <span className="stat-label">{widget.title}</span>
-                                        <span className="stat-value" dir="ltr">
-                                            {Number(widget.value).toLocaleString('en-US')}
-                                        </span>
-                                        <span className="stat-subtext">{widget.subtext}</span>
-                                    </div>
-                                    <div className="stat-icon-wrap">
-                                        <span className="stat-icon-ring" />
-                                        <span className="stat-icon-circle">
-                                            <i className={widget.icon} />
-                                        </span>
+                        {(() => {
+                            // Numbers show for everyone on the dashboard; the card links only
+                            // when the viewer may open its page.
+                            const card = (
+                                <div className={`dashboard-stat-card dashboard-stat-${widget.theme}`}>
+                                    <div className="stat-card-shine" />
+                                    <div className="stat-card-mesh" />
+                                    <div className="stat-card-bubble stat-card-bubble-1" />
+                                    <div className="stat-card-bubble stat-card-bubble-2" />
+                                    <div className="stat-card-bubble stat-card-bubble-3" />
+                                    <div className="stat-card-glow" />
+                                    <div className="stat-card-body">
+                                        <div className="stat-card-content">
+                                            <span className="stat-label">{widget.title}</span>
+                                            <span className="stat-value" dir="ltr">
+                                                {Number(widget.value).toLocaleString('en-US')}
+                                            </span>
+                                            <span className="stat-subtext">{widget.subtext}</span>
+                                        </div>
+                                        <div className="stat-icon-wrap">
+                                            <span className="stat-icon-ring" />
+                                            <span className="stat-icon-circle">
+                                                <i className={widget.icon} />
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
+                            );
+                            const style = { '--card-delay': `${index * 0.1}s` };
+
+                            return widget.route && canAny(widget.permissions ?? []) ? (
+                                <Link
+                                    href={route(widget.route)}
+                                    className="dashboard-stat-link"
+                                    style={style}
+                                >
+                                    {card}
+                                </Link>
+                            ) : (
+                                <div className="dashboard-stat-link" style={style}>
+                                    {card}
+                                </div>
+                            );
+                        })()}
                     </div>
                 ))}
             </div>
@@ -152,32 +261,45 @@ export default function Dashboard({
                         <h5 className="dashboard-section-title mb-0">اختصارات سريعة</h5>
                     </div>
                     <div className="row g-3 shortcuts-grid">
-                        {visibleShortcuts.map((shortcut, index) => (
-                            <div
-                                className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
-                                key={shortcut.title}
-                            >
-                                <Link
-                                    href={route(shortcut.href)}
-                                    className={`shortcut-card shortcut-theme-${shortcut.color}`}
-                                    style={{ '--shortcut-delay': `${index * 0.05}s` }}
+                        {visibleShortcuts.map((shortcut, index) => {
+                            const Tag = shortcut.url ? 'a' : Link;
+                            const linkProps = shortcut.url
+                                ? { href: shortcut.url, target: '_blank', rel: 'noopener' }
+                                : { href: route(shortcut.href) };
+
+                            return (
+                                <div
+                                    className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
+                                    key={shortcut.title}
                                 >
-                                    <span className="shortcut-shine" />
-                                    <span className="shortcut-accent" />
-                                    <span className="shortcut-icon-wrap">
-                                        <span className="shortcut-icon-ring" />
-                                        <span className="shortcut-icon">
-                                            <i className={shortcut.icon} />
+                                    <Tag
+                                        {...linkProps}
+                                        className={`shortcut-card shortcut-theme-${shortcut.color}`}
+                                        style={{ '--shortcut-delay': `${index * 0.05}s` }}
+                                    >
+                                        <span className="shortcut-shine" />
+                                        <span className="shortcut-accent" />
+                                        <span className="shortcut-icon-wrap">
+                                            <span className="shortcut-icon-ring" />
+                                            <span className="shortcut-icon">
+                                                <i className={shortcut.icon} />
+                                            </span>
                                         </span>
-                                    </span>
-                                    <span className="shortcut-title">{shortcut.title}</span>
-                                    <span className="shortcut-desc">{shortcut.desc}</span>
-                                    <span className="shortcut-arrow">
-                                        <i className="ri-arrow-left-s-line" />
-                                    </span>
-                                </Link>
-                            </div>
-                        ))}
+                                        <span className="shortcut-title">{shortcut.title}</span>
+                                        <span className="shortcut-desc">{shortcut.desc}</span>
+                                        <span className="shortcut-arrow">
+                                            <i
+                                                className={
+                                                    shortcut.url
+                                                        ? 'ri-external-link-line'
+                                                        : 'ri-arrow-left-s-line'
+                                                }
+                                            />
+                                        </span>
+                                    </Tag>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -229,9 +351,7 @@ export default function Dashboard({
                                 <h6 className="card-title mb-0">فحوصات النظام</h6>
                                 <span
                                     className={`admin-badge ${
-                                        health.score === 100
-                                            ? 'admin-badge-success'
-                                            : 'admin-badge-warning'
+                                        health.score === 100 ? 'admin-badge-success' : 'admin-badge-warning'
                                     }`}
                                 >
                                     {health.score}%
@@ -243,18 +363,10 @@ export default function Dashboard({
                                         <span
                                             key={check.label}
                                             className={`admin-badge ${
-                                                check.passed
-                                                    ? 'admin-badge-success'
-                                                    : 'admin-badge-danger'
+                                                check.passed ? 'admin-badge-success' : 'admin-badge-danger'
                                             }`}
                                         >
-                                            <i
-                                                className={
-                                                    check.passed
-                                                        ? 'ri-check-line'
-                                                        : 'ri-close-line'
-                                                }
-                                            />{' '}
+                                            <i className={check.passed ? 'ri-check-line' : 'ri-close-line'} />{' '}
                                             {check.label}
                                         </span>
                                     ))}
@@ -315,9 +427,7 @@ export default function Dashboard({
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span
-                                                        className={`admin-badge ${eventTone(row.event)}`}
-                                                    >
+                                                    <span className={`admin-badge ${eventTone(row.event)}`}>
                                                         {eventLabel(row.event)}
                                                     </span>
                                                 </td>

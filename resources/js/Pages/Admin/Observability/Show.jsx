@@ -1,5 +1,6 @@
 import { eventLabel, eventTone, logNameLabel } from '@/Components/Admin/ActivityTable';
 import AdminUiPage, { AdminPanel } from '@/Components/Admin/AdminUiPage';
+import useCan from '@/hooks/useCan';
 import { Link } from '@inertiajs/react';
 
 function ChangesTable({ changes }) {
@@ -38,6 +39,7 @@ function ChangesTable({ changes }) {
 }
 
 export default function Show({ item, batch = [] }) {
+    const { can } = useCan();
     const isSecurity = item.log_name === 'security';
 
     return (
@@ -47,8 +49,9 @@ export default function Show({ item, batch = [] }) {
             flash={null}
             actions={
                 <Link
+                    // Back to the security log only for those who may open it.
                     href={
-                        isSecurity
+                        isSecurity && can('admin.observability.security')
                             ? route('admin.observability.security')
                             : route('admin.observability.activity')
                     }

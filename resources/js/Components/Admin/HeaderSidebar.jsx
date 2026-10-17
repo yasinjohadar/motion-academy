@@ -1,4 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
+import useCan from '@/hooks/useCan';
 import { useState } from 'react';
 
 /**
@@ -25,6 +26,7 @@ const TABS = [
 
 export default function HeaderSidebar() {
     const { notifications } = usePage().props;
+    const { can } = useCan();
     const [tab, setTab] = useState('notifications');
 
     const items = notifications?.items ?? [];
@@ -35,11 +37,7 @@ export default function HeaderSidebar() {
             return;
         }
 
-        router.post(
-            route('admin.notifications.read-all'),
-            {},
-            { preserveScroll: true, preserveState: true },
-        );
+        router.post(route('admin.notifications.read-all'), {}, { preserveScroll: true, preserveState: true });
     };
 
     const openNotification = (event, item) => {
@@ -83,9 +81,7 @@ export default function HeaderSidebar() {
                         مركز التنبيهات
                     </h5>
                     <p className="hs-panel__subtitle">
-                        {unreadCount > 0
-                            ? `${unreadCount} غير مقروء`
-                            : 'كل شيء مقروء'}
+                        {unreadCount > 0 ? `${unreadCount} غير مقروء` : 'كل شيء مقروء'}
                     </p>
                 </div>
                 <button
@@ -118,8 +114,8 @@ export default function HeaderSidebar() {
             </ul>
 
             <div className="hs-panel__body">
-                {tab === 'notifications' && (
-                    items.length === 0 ? (
+                {tab === 'notifications' &&
+                    (items.length === 0 ? (
                         <EmptyState
                             icon="ri-notification-off-line"
                             title="لا توجد إشعارات"
@@ -156,15 +152,21 @@ export default function HeaderSidebar() {
                                 </li>
                             ))}
                         </ul>
-                    )
-                )}
+                    ))}
 
                 {tab === 'chat' && (
                     <EmptyState
                         icon="ri-chat-3-line"
                         title="لا توجد محادثات هنا بعد"
                         hint="محادثات واتساب تُدار من شاشتها المخصّصة."
-                        action={{ href: route('admin.whatsapp-messages.index'), label: 'فتح محادثات واتساب' }}
+                        action={
+                            can('admin.whatsapp-messages.list')
+                                ? {
+                                      href: route('admin.whatsapp-messages.index'),
+                                      label: 'فتح محادثات واتساب',
+                                  }
+                                : null
+                        }
                     />
                 )}
 

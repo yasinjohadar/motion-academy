@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            CourseCategorySeeder::class,
+            CourseSeeder::class,
         ]);
 
         $admin = User::query()->firstOrCreate(
@@ -33,8 +35,12 @@ class DatabaseSeeder extends Seeder
         $admin->syncPermissions(Permission::all());
         $admin->syncRoles(['admin']);
 
+        // After the admin exists: the demo articles are attributed to them.
+        $this->call(BlogSeeder::class);
+
         if (User::query()->count() < 10) {
-            User::factory(50)->create();
+            // Demo learners: every account is an admin or a student.
+            User::factory(50)->create()->each->assignRole('student');
         }
     }
 }

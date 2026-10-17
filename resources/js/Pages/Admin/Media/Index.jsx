@@ -12,10 +12,7 @@ export default function Index({ media, filters = {}, flash }) {
     const [selectedId, setSelectedId] = useState(items[0]?.id || null);
     const [dragOver, setDragOver] = useState(false);
 
-    const selected = useMemo(
-        () => items.find((item) => item.id === selectedId) || null,
-        [items, selectedId],
-    );
+    const selected = useMemo(() => items.find((item) => item.id === selectedId) || null, [items, selectedId]);
 
     const metaForm = useForm({
         title: selected?.title || '',
@@ -60,14 +57,14 @@ export default function Index({ media, filters = {}, flash }) {
 
     const saveMeta = (e) => {
         e.preventDefault();
-        if (!selected || !can('admin.media.edit')) {
+        if (!selected?.can?.update) {
             return;
         }
         metaForm.put(route('admin.media.update', selected.id), { preserveScroll: true });
     };
 
     const removeSelected = () => {
-        if (!selected || !can('admin.media.delete')) {
+        if (!selected?.can?.delete) {
             return;
         }
         if (!window.confirm(`حذف «${selected.filename}»؟`)) {
@@ -157,21 +154,23 @@ export default function Index({ media, filters = {}, flash }) {
                             </button>
                         </form>
 
-                        <div
-                            className={`media-dropzone${dragOver ? ' is-dragover' : ''}`}
-                            onDragOver={(e) => {
-                                e.preventDefault();
-                                setDragOver(true);
-                            }}
-                            onDragLeave={() => setDragOver(false)}
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                setDragOver(false);
-                                uploadFiles(e.dataTransfer.files);
-                            }}
-                        >
-                            اسحب الصور وأفلتها هنا للرفع والمعالجة التلقائية
-                        </div>
+                        {can('admin.media.create') && (
+                            <div
+                                className={`media-dropzone${dragOver ? ' is-dragover' : ''}`}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setDragOver(true);
+                                }}
+                                onDragLeave={() => setDragOver(false)}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setDragOver(false);
+                                    uploadFiles(e.dataTransfer.files);
+                                }}
+                            >
+                                اسحب الصور وأفلتها هنا للرفع والمعالجة التلقائية
+                            </div>
+                        )}
 
                         <div className="media-grid mt-3">
                             {items.length === 0 && (
@@ -199,7 +198,9 @@ export default function Index({ media, filters = {}, flash }) {
                                         className={`admin-btn admin-btn-sm ${link.active ? 'admin-btn-primary' : 'admin-btn-ghost'}`}
                                         disabled={!link.url}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
-                                        onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
+                                        onClick={() =>
+                                            link.url && router.get(link.url, {}, { preserveState: true })
+                                        }
                                     />
                                 ))}
                             </div>
@@ -218,8 +219,8 @@ export default function Index({ media, filters = {}, flash }) {
                                 <div className="small text-muted mb-3">
                                     <div>{selected.filename}</div>
                                     <div>
-                                        {selected.width || '—'}×{selected.height || '—'} · {selected.human_size} ·{' '}
-                                        {selected.mime}
+                                        {selected.width || '—'}×{selected.height || '—'} ·{' '}
+                                        {selected.human_size} · {selected.mime}
                                     </div>
                                     <div dir="ltr" className="text-break">
                                         {selected.url}
@@ -233,7 +234,7 @@ export default function Index({ media, filters = {}, flash }) {
                                             className="form-control"
                                             value={metaForm.data.title}
                                             onChange={(e) => metaForm.setData('title', e.target.value)}
-                                            disabled={!can('admin.media.edit')}
+                                            disabled={!selected?.can?.update}
                                         />
                                     </div>
                                     <div>
@@ -242,7 +243,7 @@ export default function Index({ media, filters = {}, flash }) {
                                             className="form-control"
                                             value={metaForm.data.alt}
                                             onChange={(e) => metaForm.setData('alt', e.target.value)}
-                                            disabled={!can('admin.media.edit')}
+                                            disabled={!selected?.can?.update}
                                         />
                                     </div>
                                     <div>
@@ -251,7 +252,7 @@ export default function Index({ media, filters = {}, flash }) {
                                             className="form-control"
                                             value={metaForm.data.caption}
                                             onChange={(e) => metaForm.setData('caption', e.target.value)}
-                                            disabled={!can('admin.media.edit')}
+                                            disabled={!selected?.can?.update}
                                         />
                                     </div>
                                     <div>
@@ -261,12 +262,12 @@ export default function Index({ media, filters = {}, flash }) {
                                             rows={3}
                                             value={metaForm.data.description}
                                             onChange={(e) => metaForm.setData('description', e.target.value)}
-                                            disabled={!can('admin.media.edit')}
+                                            disabled={!selected?.can?.update}
                                         />
                                     </div>
 
                                     <div className="admin-actions">
-                                        {can('admin.media.edit') && (
+                                        {selected?.can?.update && (
                                             <button
                                                 type="submit"
                                                 className="admin-btn admin-btn-primary"
@@ -275,10 +276,14 @@ export default function Index({ media, filters = {}, flash }) {
                                                 حفظ
                                             </button>
                                         )}
-                                        <button type="button" className="admin-btn admin-btn-ghost" onClick={copyUrl}>
+                                        <button
+                                            type="button"
+                                            className="admin-btn admin-btn-ghost"
+                                            onClick={copyUrl}
+                                        >
                                             نسخ الرابط
                                         </button>
-                                        {can('admin.media.delete') && (
+                                        {selected?.can?.delete && (
                                             <button
                                                 type="button"
                                                 className="admin-btn admin-btn-danger"

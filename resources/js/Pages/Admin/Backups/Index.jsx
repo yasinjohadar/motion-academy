@@ -38,10 +38,7 @@ export default function Index({ backups, flash }) {
             flash={flash}
             actions={
                 can('admin.backups.create') && (
-                    <Link
-                        href={route('admin.backups.create')}
-                        className="admin-btn admin-btn-primary"
-                    >
+                    <Link href={route('admin.backups.create')} className="admin-btn admin-btn-primary">
                         <i className="ri-add-circle-line" />
                         نسخة جديدة
                     </Link>
@@ -50,11 +47,7 @@ export default function Index({ backups, flash }) {
         >
             <DeleteConfirmModal
                 show={Boolean(itemToDelete)}
-                message={
-                    itemToDelete
-                        ? `هل أنت متأكد من حذف النسخة «${itemToDelete.name}»؟`
-                        : ''
-                }
+                message={itemToDelete ? `هل أنت متأكد من حذف النسخة «${itemToDelete.name}»؟` : ''}
                 processing={deleting}
                 onConfirm={() => {
                     if (!itemToDelete || deleting) return;
@@ -88,9 +81,7 @@ export default function Index({ backups, flash }) {
                             </thead>
                             <tbody>
                                 {rows.length === 0 && (
-                                    <TableEmptyRow colSpan={8}>
-                                        لا توجد نسخ احتياطية بعد
-                                    </TableEmptyRow>
+                                    <TableEmptyRow colSpan={8}>لا توجد نسخ احتياطية بعد</TableEmptyRow>
                                 )}
                                 {rows.map((backup, index) => (
                                     <tr key={backup.id}>
@@ -112,22 +103,17 @@ export default function Index({ backups, flash }) {
                                             <div className="d-flex flex-wrap gap-2">
                                                 {can('admin.backups.show') && (
                                                     <Link
-                                                        href={route(
-                                                            'admin.backups.show',
-                                                            backup.id,
-                                                        )}
+                                                        href={route('admin.backups.show', backup.id)}
                                                         className="admin-btn admin-btn-sm admin-btn-ghost"
                                                     >
                                                         تفاصيل
                                                     </Link>
                                                 )}
-                                                {can('admin.backups.delete') && (
+                                                {backup.can?.delete && (
                                                     <button
                                                         type="button"
                                                         className="admin-btn admin-btn-sm admin-btn-danger"
-                                                        onClick={() =>
-                                                            setItemToDelete(backup)
-                                                        }
+                                                        onClick={() => setItemToDelete(backup)}
                                                     >
                                                         حذف
                                                     </button>

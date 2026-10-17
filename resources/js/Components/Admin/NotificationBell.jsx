@@ -136,11 +136,7 @@ export default function NotificationBell() {
         }
 
         setLive([]);
-        router.post(
-            route('admin.notifications.read-all'),
-            {},
-            { preserveScroll: true, preserveState: true },
-        );
+        router.post(route('admin.notifications.read-all'), {}, { preserveScroll: true, preserveState: true });
     };
 
     const openNotification = (e, item) => {
@@ -167,6 +163,8 @@ export default function NotificationBell() {
             router.visit(item.action_url);
         }
     };
+
+    const isLive = realtimeEnabled && socketConnected;
 
     return (
         <div className="header-element notifications-dropdown main-header-notification">
@@ -199,69 +197,87 @@ export default function NotificationBell() {
                     </>
                 )}
             </a>
-            <div className="main-header-dropdown dropdown-menu dropdown-menu-end main-header-message">
-                <div className="menu-header-content bg-primary text-fixed-white">
-                    <div className="d-flex align-items-center justify-content-between">
-                        <h6 className="mb-0 fs-15 fw-semibold text-fixed-white">الإشعارات</h6>
-                        {unreadCount > 0 && (
-                            <span
-                                role="button"
-                                onClick={markAllRead}
-                                className="badge rounded-pill bg-warning pt-1 text-fixed-black"
-                            >
-                                تحديد الكل كمقروء
-                            </span>
-                        )}
+
+            <div className="dropdown-menu dropdown-menu-end nb-menu">
+                <div className="nb-head">
+                    <div className="nb-head-top">
+                        <div>
+                            <h6 className="nb-title">الإشعارات</h6>
+                            <p className="nb-subtitle">
+                                {unreadCount > 0 ? (
+                                    <>
+                                        لديك <strong>{unreadCount}</strong>{' '}
+                                        {unreadCount === 1 ? 'إشعار جديد' : 'إشعارات جديدة'}
+                                    </>
+                                ) : (
+                                    'كل شيء مقروء — أنت على اطلاع'
+                                )}
+                            </p>
+                        </div>
+                        <span
+                            className={`nb-live${isLive ? ' is-live' : ''}`}
+                            title={isLive ? 'تصل الإشعارات لحظياً' : 'تُحدَّث القائمة دورياً'}
+                        >
+                            <span className="nb-live-dot" />
+                            {isLive ? 'مباشر' : 'تحديث دوري'}
+                        </span>
                     </div>
-                    <p className="dropdown-title-text subtext mb-0 text-fixed-white op-6 pb-0 fs-12">
-                        لديك {unreadCount} إشعارات جديدة
-                    </p>
+                    {unreadCount > 0 && (
+                        <button type="button" className="nb-read-all" onClick={markAllRead}>
+                            <i className="ri-check-double-line" /> تحديد الكل كمقروء
+                        </button>
+                    )}
                 </div>
-                <div>
-                    <hr className="dropdown-divider" />
-                </div>
-                <ul className="list-unstyled mb-0" id="header-notification-scroll">
+
+                <ul className="nb-list" id="header-notification-scroll">
                     {items.length === 0 && (
-                        <li className="dropdown-item text-center py-3">
-                            <p className="text-muted mb-0">لا توجد إشعارات جديدة</p>
+                        <li className="nb-empty">
+                            <span className="nb-empty-icon">
+                                <i className="ri-notification-off-line" />
+                            </span>
+                            <strong>لا توجد إشعارات</strong>
+                            <span>سنبلغك هنا بكل جديد في الموقع.</span>
                         </li>
                     )}
                     {items.map((item) => (
-                        <li
-                            key={item.id}
-                            className={`dropdown-item${item.is_read ? '' : ' bg-light-subtle'}`}
-                        >
+                        <li key={item.id}>
                             <a
                                 href="javascript:void(0);"
-                                className="d-flex align-items-start gap-2 text-decoration-none"
+                                className={`nb-item is-${item.level || 'info'}${item.is_read ? '' : ' is-unread'}`}
                                 onClick={(e) => openNotification(e, item)}
                             >
-                                <span className="avatar avatar-sm bg-primary-transparent flex-shrink-0">
-                                    <i className={item.icon} />
+                                <span className="nb-item-icon">
+                                    <i className={item.icon || 'ri-notification-3-line'} />
                                 </span>
-                                <span className="flex-grow-1 overflow-hidden">
-                                    <span className="d-block fw-semibold fs-13 text-truncate">
-                                        {item.title}
-                                    </span>
-                                    <span className="d-block text-muted fs-12 text-truncate">
-                                        {item.message}
-                                    </span>
-                                    <span className="d-block text-muted op-7 fs-11">
-                                        {item.created_at_human}
+                                <span className="nb-item-body">
+                                    <span className="nb-item-title">{item.title}</span>
+                                    {item.message && <span className="nb-item-text">{item.message}</span>}
+                                    <span className="nb-item-meta">
+                                        {item.category_label && (
+                                            <span className="nb-chip">{item.category_label}</span>
+                                        )}
+                                        <span>
+                                            <i className="ri-time-line" /> {item.created_at_human}
+                                        </span>
                                     </span>
                                 </span>
-                                {!item.is_read && (
-                                    <span className="badge bg-success-transparent flex-shrink-0">
-                                        جديد
-                                    </span>
-                                )}
+                                {!item.is_read && <span className="nb-item-dot" aria-label="غير مقروء" />}
                             </a>
                         </li>
                     ))}
                 </ul>
-                <div className="text-center dropdown-footer">
-                    <Link href={route('admin.notifications.index')} className="text-primary fs-13">
-                        عرض الكل
+
+                <div className="nb-foot">
+                    <Link href={route('admin.notifications.index')} className="nb-foot-main">
+                        عرض كل الإشعارات <i className="ri-arrow-left-line" />
+                    </Link>
+                    <Link
+                        href={route('admin.notifications.preferences')}
+                        className="nb-foot-icon"
+                        title="تفضيلات الإشعارات"
+                        aria-label="تفضيلات الإشعارات"
+                    >
+                        <i className="ri-settings-3-line" />
                     </Link>
                 </div>
             </div>
