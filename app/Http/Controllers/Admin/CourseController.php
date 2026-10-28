@@ -71,12 +71,16 @@ class CourseController extends Controller implements HasMiddleware
         [$sortColumn, $sortDirection] = self::SORTS[$filters['sort']];
 
         $courses = $this->filteredQuery($filters)
-            ->with(['category:id,name', 'instructor:id,name'])
+            ->with(['category:id,name', 'instructor:id,name', 'landing:id,course_id,is_published'])
             ->orderBy($sortColumn, $sortDirection)
             ->orderByDesc('id')
             ->paginate(12)
             ->withQueryString()
-            ->through(fn (Course $course) => $course->toListArray());
+            ->through(fn (Course $course) => [
+                ...$course->toListArray(),
+                // null: no landing page yet; otherwise whether it is published.
+                'landing_published' => $course->landing?->is_published,
+            ]);
 
         return Inertia::render('Admin/Courses/Index', [
             'courses' => $courses,

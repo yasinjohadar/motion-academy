@@ -30,6 +30,7 @@ class PolicyCoverageTest extends TestCase
         'AppNotification' => 'own notifications, scoped by owner in NotificationCenter',
         'NotificationPreference' => 'own preferences, never listed for other users',
         'CourseLessonAttachment' => 'child rows of a lesson, governed by CoursePolicy through the lesson form',
+        'CourseLanding' => 'one-to-one with its course, governed by CoursePolicy through the landing editor',
         'LessonProgress' => 'own learning progress, written and read only by LearningProgress for the signed-in student',
         'BackupLog' => 'read-only child rows rendered inside the backup screen',
         'MediaVariant' => 'child rows of Media, governed by MediaPolicy',

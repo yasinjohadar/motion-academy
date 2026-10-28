@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Services\Frontend\HomeSections;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SiteSettingUpdateRequest extends FormRequest
@@ -43,6 +44,8 @@ class SiteSettingUpdateRequest extends FormRequest
             'social_links.*.icon' => ['required_with:social_links', 'string', 'max:80'],
             'social_links.*.sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'social_links.*.is_active' => ['nullable', 'boolean'],
+            'home_sections' => ['sometimes', 'array:'.implode(',', array_keys(HomeSections::SECTIONS))],
+            'home_sections.*' => ['boolean'],
         ];
     }
 

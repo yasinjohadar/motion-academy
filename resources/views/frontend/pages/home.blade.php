@@ -8,13 +8,16 @@
 <!-- Main Body -->
     <div id="toast-container"></div>
     <main class="home-main">
-        @include('frontend.partials.home-hero')
+        @if ($homeSections->shows('hero'))
+            @include('frontend.partials.home-hero')
 
-        <div class="home-hero-bridge" aria-hidden="true"></div>
+            <div class="home-hero-bridge" aria-hidden="true"></div>
+        @endif
 
 
+        @if ($homeSections->shows('categories'))
         <!-- Featured Categories -->
-        <section class="categories-section home-zone home-zone--base section-fade-up">
+        <section class="categories-section {{ $homeSections->zoneClasses('categories') }} section-fade-up">
             <div class="container">
                 <div class="categories-header">
                     <div class="categories-header-text">
@@ -47,9 +50,11 @@
                 </div>
             </div>
         </section>
+        @endif
 
+        @if ($homeSections->shows('courses'))
         <!-- Popular Courses -->
-        <section class="courses-section home-zone home-zone--alt section-fade-up">
+        <section class="courses-section {{ $homeSections->zoneClasses('courses') }} section-fade-up">
             <div class="container">
                 <div class="courses-header">
                     <div class="courses-header-text">
@@ -75,222 +80,22 @@
                 </div>
             </div>
         </section>
+        @endif
 
 
 
 
-        <!-- Team Slider Section -->
-        <section class="team-section home-zone home-zone--base section-fade-up">
-            <div class="container">
-                <div class="team-header text-center">
-                    <span class="team-eyebrow">شركاء النجاح</span>
-                    <h2 class="team-title">فريق الخبراء</h2>
-                    <p class="team-subtitle mx-auto">مجموعة من أفضل المدربين في الوطن العربي، يجمعهم شغف نقل خبراتهم العملية.</p>
-                </div>
+        @if ($homeSections->shows('team') && $teamMembers->isNotEmpty())
+            @include('frontend.partials.home-team')
+        @endif
 
-                <div class="team-swiper-wrap">
-                    <button class="team-swiper-btn team-swiper-prev" aria-label="السابق">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+        @if ($homeSections->shows('testimonials') && $testimonials->isNotEmpty())
+            @include('frontend.partials.home-testimonials')
+        @endif
 
-                    <div class="swiper team-swiper">
-                        <div class="swiper-wrapper">
-
-                            <div class="swiper-slide">
-                                <article class="team-card" style="--team-color: #02ad8f;">
-                                    <div class="team-card-avatar">
-                                        <span class="team-card-avatar-inner"><i class="fas fa-user-tie"></i></span>
-                                    </div>
-                                    <h3 class="team-card-name">م. أحمد سعيد</h3>
-                                    <p class="team-card-role en-text">Senior Front-end Engineer</p>
-                                    <div class="team-card-rating en-text" aria-label="تقييم 4.9 من 5">
-                                        <span class="team-rating-stars">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                        </span>
-                                        <span class="team-rating-value">4.9</span>
-                                    </div>
-                                    <p class="team-card-bio">خبير في بناء وتطوير واجهات الويب الحديثة بأحدث التقنيات.</p>
-                                    <div class="team-card-social">
-                                        <a href="#" class="team-social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                                        <a href="#" class="team-social-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                                    </div>
-                                </article>
-                            </div>
-
-                            <div class="swiper-slide">
-                                <article class="team-card" style="--team-color: #33a4da;">
-                                    <div class="team-card-avatar">
-                                        <span class="team-card-avatar-inner"><i class="fas fa-paint-brush"></i></span>
-                                    </div>
-                                    <h3 class="team-card-name">سارة محمد</h3>
-                                    <p class="team-card-role en-text">UX/UI Designer</p>
-                                    <div class="team-card-rating en-text" aria-label="تقييم 4.8 من 5">
-                                        <span class="team-rating-stars">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                        </span>
-                                        <span class="team-rating-value">4.8</span>
-                                    </div>
-                                    <p class="team-card-bio">متخصصة في تصميم تجربة المستخدم وواجهات الجوال الحديثة.</p>
-                                    <div class="team-card-social">
-                                        <a href="#" class="team-social-btn" aria-label="Behance"><i class="fab fa-behance"></i></a>
-                                        <a href="#" class="team-social-btn" aria-label="Dribbble"><i class="fab fa-dribbble"></i></a>
-                                    </div>
-                                </article>
-                            </div>
-
-                            <div class="swiper-slide">
-                                <article class="team-card" style="--team-color: #1a83c1;">
-                                    <div class="team-card-avatar">
-                                        <span class="team-card-avatar-inner"><i class="fas fa-robot"></i></span>
-                                    </div>
-                                    <h3 class="team-card-name">عمر مصطفى</h3>
-                                    <p class="team-card-role en-text">Machine Learning Engineer</p>
-                                    <div class="team-card-rating en-text" aria-label="تقييم 4.9 من 5">
-                                        <span class="team-rating-stars">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                        </span>
-                                        <span class="team-rating-value">4.9</span>
-                                    </div>
-                                    <p class="team-card-bio">شغوف بعلوم البيانات والذكاء الاصطناعي وبناء نماذج توليدية متقدمة.</p>
-                                    <div class="team-card-social">
-                                        <a href="#" class="team-social-btn" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                                        <a href="#" class="team-social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                                    </div>
-                                </article>
-                            </div>
-
-                            <div class="swiper-slide">
-                                <article class="team-card" style="--team-color: #45bec4;">
-                                    <div class="team-card-avatar">
-                                        <span class="team-card-avatar-inner"><i class="fas fa-chart-pie"></i></span>
-                                    </div>
-                                    <h3 class="team-card-name">طارق زياد</h3>
-                                    <p class="team-card-role en-text">Digital Marketing Expert</p>
-                                    <div class="team-card-rating en-text" aria-label="تقييم 4.5 من 5">
-                                        <span class="team-rating-stars">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
-                                        </span>
-                                        <span class="team-rating-value">4.5</span>
-                                    </div>
-                                    <p class="team-card-bio">خبير في التسويق الرقمي وإدارة الحملات الإعلانية لتحقيق أعلى عائد.</p>
-                                    <div class="team-card-social">
-                                        <a href="#" class="team-social-btn" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                                        <a href="#" class="team-social-btn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                                    </div>
-                                </article>
-                            </div>
-
-                            <div class="swiper-slide">
-                                <article class="team-card" style="--team-color: #1a83c1;">
-                                    <div class="team-card-avatar">
-                                        <span class="team-card-avatar-inner"><i class="fas fa-mobile-alt"></i></span>
-                                    </div>
-                                    <h3 class="team-card-name">م. خالد أحمد</h3>
-                                    <p class="team-card-role en-text">Flutter / Mobile Developer</p>
-                                    <div class="team-card-rating en-text" aria-label="تقييم 5.0 من 5">
-                                        <span class="team-rating-stars">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                        </span>
-                                        <span class="team-rating-value">5.0</span>
-                                    </div>
-                                    <p class="team-card-bio">متخصص في تطوير تطبيقات الجوال بـ Flutter وDart للـ iOS والـ Android.</p>
-                                    <div class="team-card-social">
-                                        <a href="#" class="team-social-btn" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                                        <a href="#" class="team-social-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                                    </div>
-                                </article>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <button class="team-swiper-btn team-swiper-next" aria-label="التالي">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                </div>
-
-                <div class="swiper-pagination team-swiper-pagination"></div>
-
-                <div class="text-center team-footer-cta">
-                    <a href="{{ route('who-we-are') }}" class="btn team-view-all">
-                        تعرف على كامل الفريق <i class="fas fa-arrow-left ms-2"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Testimonials -->
-        <section class="testimonials-section home-zone home-zone--alt section-fade-up">
-            <div class="container">
-                <div class="testimonials-header text-center">
-                    <span class="testimonials-eyebrow">قصص نجاح</span>
-                    <h2 class="testimonials-title">آراء المتعلمين</h2>
-                    <p class="testimonials-subtitle mx-auto">تجارب حقيقية من متعلمين غيّروا مساراتهم المهنية بفضل محتوى عملي ومحدّث</p>
-                </div>
-
-                <div class="row g-4 testimonials-grid">
-                    <div class="col-md-6 col-lg-4">
-                        <blockquote class="testimonial-card" style="--testimonial-color: #02ad8f;">
-                            <span class="testimonial-quote-icon" aria-hidden="true"><i class="fas fa-quote-right"></i></span>
-                            <div class="testimonial-avatar">
-                                <span class="testimonial-avatar-inner"><i class="fas fa-user"></i></span>
-                            </div>
-                            <p class="testimonial-text">بفضل الكورسات هنا، استطعت تغيير مساري المهني والعمل كمطور واجهات أمامية في شركة عالمية بوقت قياسي.</p>
-                            <div class="testimonial-rating en-text" aria-label="تقييم 5 من 5">
-                                <span class="testimonial-stars">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                </span>
-                            </div>
-                            <footer class="testimonial-author">
-                                <cite class="testimonial-name">أحمد محمود</cite>
-                                <span class="testimonial-role en-text">Front-end Developer</span>
-                            </footer>
-                        </blockquote>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4">
-                        <blockquote class="testimonial-card" style="--testimonial-color: #33a4da;">
-                            <span class="testimonial-quote-icon" aria-hidden="true"><i class="fas fa-quote-right"></i></span>
-                            <div class="testimonial-avatar">
-                                <span class="testimonial-avatar-inner"><i class="fas fa-user-graduate"></i></span>
-                            </div>
-                            <p class="testimonial-text">منصة رائعة، المحتوى مشروح بطريقة مبسطة وعملية. الكورسات يتم تحديثها باستمرار لتطابق متطلبات السوق.</p>
-                            <div class="testimonial-rating en-text" aria-label="تقييم 4.5 من 5">
-                                <span class="testimonial-stars">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </span>
-                            </div>
-                            <footer class="testimonial-author">
-                                <cite class="testimonial-name">سارة خليل</cite>
-                                <span class="testimonial-role en-text">UI/UX Designer</span>
-                            </footer>
-                        </blockquote>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4">
-                        <blockquote class="testimonial-card" style="--testimonial-color: #1a83c1;">
-                            <span class="testimonial-quote-icon" aria-hidden="true"><i class="fas fa-quote-right"></i></span>
-                            <div class="testimonial-avatar">
-                                <span class="testimonial-avatar-inner"><i class="fas fa-laptop-code"></i></span>
-                            </div>
-                            <p class="testimonial-text">المشاريع العملية والدعم المستمر من المدربين ساعدوني على بناء portfolio قوي والحصول على وظيفة خلال شهرين فقط.</p>
-                            <div class="testimonial-rating en-text" aria-label="تقييم 5 من 5">
-                                <span class="testimonial-stars">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                                </span>
-                            </div>
-                            <footer class="testimonial-author">
-                                <cite class="testimonial-name">محمد العلي</cite>
-                                <span class="testimonial-role en-text">Data Analyst</span>
-                            </footer>
-                        </blockquote>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        @if ($homeSections->shows('newsletter'))
         <!-- Newsletter -->
-        <section class="newsletter-section home-zone home-zone--base section-fade-up">
+        <section class="newsletter-section {{ $homeSections->zoneClasses('newsletter') }} section-fade-up">
             <div class="container">
                 <div class="newsletter-box">
                     <div class="row g-4 g-lg-5 align-items-center">
@@ -363,9 +168,11 @@
                 </div>
             </div>
         </section>
+        @endif
 
+        @if ($homeSections->shows('blog'))
         <!-- Latest Blog Section -->
-        <section class="blog-section home-zone home-zone--alt home-zone--last section-fade-up">
+        <section class="blog-section {{ $homeSections->zoneClasses('blog') }} section-fade-up">
             <div class="container">
                 <div class="blog-header">
                     <div class="blog-header-text">
@@ -413,6 +220,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
     </main>
 
@@ -425,69 +233,123 @@
 
 @push('scripts')
 <script>
-        // Init Hero Swiper
-        const heroSwiper = new Swiper('.hero-swiper', {
-            effect: 'fade',
-            fadeEffect: { crossFade: true },
-            speed: 900,
-            loop: true,
-            autoplay: {
-                delay: 6000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true
-            },
-            pagination: {
-                el: '.hero-pagination',
-                clickable: true,
-                renderBullet: (index, className) =>
-                    `<span class="${className}"><span class="hero-bullet-inner"></span><span class="hero-bullet-label">${['الأكاديمية', 'الموشن', 'الدورات', 'ابدأ مجاناً'][index]}</span></span>`
-            },
-            navigation: {
-                nextEl: '.hero-next',
-                prevEl: '.hero-prev'
-            },
-            on: {
-                autoplayTimeLeft(s, time, progress) {
-                    const fill = document.querySelector('.hero-progress-fill');
-                    if (fill) fill.style.width = `${(1 - progress) * 100}%`;
+        // Init Hero Swiper — behaviour comes from the admin panel (data-hero-settings)
+        const heroEl = document.querySelector('.hero-swiper');
+        if (heroEl) {
+            const hero = JSON.parse(heroEl.dataset.heroSettings || '{}');
+            const heroSlides = heroEl.querySelectorAll('.hero-slide');
+            const heroLabels = Array.from(heroSlides, (slide) => slide.dataset.bulletLabel || '');
+            const heroCycles = heroSlides.length > 1;
+            const heroEffects = {
+                fade: { effect: 'fade', fadeEffect: { crossFade: true } },
+                slide: { effect: 'slide' },
+                creative: {
+                    effect: 'creative',
+                    creativeEffect: {
+                        prev: { translate: ['-20%', 0, -1], opacity: 0 },
+                        next: { translate: ['100%', 0, 0] },
+                    },
                 },
-                slideChangeTransitionStart() {
-                    document.querySelectorAll('.hero-slide .hero-content > *').forEach(el => {
-                        el.style.animation = 'none';
-                        el.offsetHeight;
-                        el.style.animation = '';
-                    });
-                }
-            }
-        });
+            };
 
-        // Init Team Swiper
-        const teamSwiper = new Swiper('.team-swiper', {
-            slidesPerView: 1,
-            spaceBetween: 24,
-            loop: true,
-            autoplay: { delay: 4500, disableOnInteraction: false },
-            pagination: { el: '.team-swiper-pagination', clickable: true },
-            navigation: { nextEl: '.team-swiper-next', prevEl: '.team-swiper-prev' },
-            breakpoints: {
-                576:  { slidesPerView: 2 },
-                992:  { slidesPerView: 3 },
-                1200: { slidesPerView: 4 }
-            }
-        });
+            new Swiper(heroEl, {
+                ...(heroEffects[hero.effect] || heroEffects.fade),
+                speed: hero.speed || 900,
+                loop: heroCycles && hero.loop !== false,
+                allowTouchMove: heroCycles,
+                autoplay: heroCycles && hero.autoplay !== false
+                    ? {
+                        delay: hero.autoplay_delay || 6000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: hero.pause_on_hover !== false
+                    }
+                    : false,
+                pagination: {
+                    el: '.hero-pagination',
+                    clickable: true,
+                    renderBullet: (index, className) => {
+                        const label = document.createElement('span');
+                        label.className = 'hero-bullet-label';
+                        label.textContent = heroLabels[index] || '';
+
+                        return `<span class="${className}"><span class="hero-bullet-inner"></span>${label.outerHTML}</span>`;
+                    }
+                },
+                navigation: {
+                    nextEl: '.hero-next',
+                    prevEl: '.hero-prev'
+                },
+                on: {
+                    autoplayTimeLeft(s, time, progress) {
+                        const fill = document.querySelector('.hero-progress-fill');
+                        if (fill) fill.style.width = `${(1 - progress) * 100}%`;
+                    },
+                    slideChangeTransitionStart() {
+                        document.querySelectorAll('.hero-slide .hero-content > *').forEach(el => {
+                            el.style.animation = 'none';
+                            el.offsetHeight;
+                            el.style.animation = '';
+                        });
+                    }
+                }
+            });
+        }
+
+        // Init Team Swiper (only when the admin picks the slider layout)
+        const teamEl = document.querySelector('.team-swiper');
+        if (teamEl) {
+            const columns = Number(teamEl.dataset.columns) || 4;
+            new Swiper(teamEl, {
+                slidesPerView: 1,
+                spaceBetween: 24,
+                loop: teamEl.querySelectorAll('.swiper-slide').length > columns,
+                autoplay: teamEl.dataset.autoplay === 'true'
+                    ? { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true }
+                    : false,
+                pagination: { el: '.team-swiper-pagination', clickable: true },
+                navigation: { nextEl: '.team-swiper-next', prevEl: '.team-swiper-prev' },
+                breakpoints: {
+                    576: { slidesPerView: Math.min(2, columns) },
+                    992: { slidesPerView: Math.min(3, columns) },
+                    1200: { slidesPerView: columns }
+                }
+            });
+        }
+
+        // Init Testimonials Swiper (only when the admin picks the slider layout)
+        const testimonialsEl = document.querySelector('.testimonials-swiper');
+        if (testimonialsEl) {
+            const columns = Number(testimonialsEl.dataset.columns) || 3;
+            new Swiper(testimonialsEl, {
+                slidesPerView: 1,
+                spaceBetween: 24,
+                loop: testimonialsEl.querySelectorAll('.swiper-slide').length > columns,
+                autoplay: testimonialsEl.dataset.autoplay === 'true'
+                    ? { delay: 5500, disableOnInteraction: false, pauseOnMouseEnter: true }
+                    : false,
+                pagination: { el: '.testimonials-swiper-pagination', clickable: true },
+                navigation: { nextEl: '.testimonials-swiper-next', prevEl: '.testimonials-swiper-prev' },
+                breakpoints: {
+                    768: { slidesPerView: Math.min(2, columns) },
+                    992: { slidesPerView: columns }
+                }
+            });
+        }
 
         // Init Blog Swiper
-        const blogSwiper = new Swiper('.blog-swiper', {
-            slidesPerView: 1,
-            spaceBetween: 24,
-            loop: true,
-            autoplay: { delay: 5000, disableOnInteraction: false },
-            pagination: { el: '.blog-swiper-pagination', clickable: true },
-            navigation: { nextEl: '.blog-swiper-next', prevEl: '.blog-swiper-prev' },
-            breakpoints: {
-                768:  { slidesPerView: 2 },
-                992:  { slidesPerView: 3 }
-            }
-        });
+        if (document.querySelector('.blog-swiper')) {
+            new Swiper('.blog-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 24,
+                loop: true,
+                autoplay: { delay: 5000, disableOnInteraction: false },
+                pagination: { el: '.blog-swiper-pagination', clickable: true },
+                navigation: { nextEl: '.blog-swiper-next', prevEl: '.blog-swiper-prev' },
+                breakpoints: {
+                    768:  { slidesPerView: 2 },
+                    992:  { slidesPerView: 3 }
+                }
+            });
+        }
     </script>
 @endpush

@@ -11,9 +11,11 @@ use App\Http\Controllers\Admin\BlogTagController;
 use App\Http\Controllers\Admin\CourseCategoryController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CourseEnrollmentController;
+use App\Http\Controllers\Admin\CourseLandingController;
 use App\Http\Controllers\Admin\CourseLessonController;
 use App\Http\Controllers\Admin\CourseSectionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\NotificationController;
@@ -26,6 +28,8 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SmtpSettingController;
 use App\Http\Controllers\Admin\StorageDiskMappingController;
 use App\Http\Controllers\Admin\StudentImpersonationController;
+use App\Http\Controllers\Admin\TeamMemberController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserPasswordController;
 use App\Modules\WhatsApp\Controllers\Admin\WhatsAppCampaignController;
@@ -156,6 +160,26 @@ Route::middleware(['auth', 'verified', 'admin.panel'])
         Route::post('site-pages/{site_page}/toggle-publish', [SitePageController::class, 'togglePublish'])
             ->name('site-pages.toggle-publish');
 
+        Route::put('hero-slides/settings', [HeroSlideController::class, 'updateSettings'])
+            ->name('hero-slides.settings');
+        Route::resource('hero-slides', HeroSlideController::class)->except(['show']);
+        Route::post('hero-slides/{hero_slide}/toggle-active', [HeroSlideController::class, 'toggleActive'])
+            ->name('hero-slides.toggle-active');
+
+        Route::put('testimonials/settings', [TestimonialController::class, 'updateSettings'])
+            ->name('testimonials.settings');
+        Route::resource('testimonials', TestimonialController::class)->except(['show']);
+        Route::post('testimonials/{testimonial}/toggle-active', [TestimonialController::class, 'toggleActive'])
+            ->name('testimonials.toggle-active');
+        Route::post('testimonials/{testimonial}/toggle-featured', [TestimonialController::class, 'toggleFeatured'])
+            ->name('testimonials.toggle-featured');
+
+        Route::put('team-members/settings', [TeamMemberController::class, 'updateSettings'])
+            ->name('team-members.settings');
+        Route::resource('team-members', TeamMemberController::class)->except(['show']);
+        Route::post('team-members/{team_member}/toggle-active', [TeamMemberController::class, 'toggleActive'])
+            ->name('team-members.toggle-active');
+
         Route::post('app-storage/test-draft', [AppStorageController::class, 'testDraft'])
             ->name('app-storage.test-draft');
         Route::post('app-storage/{app_storage}/test', [AppStorageController::class, 'test'])
@@ -272,6 +296,10 @@ Route::middleware(['auth', 'verified', 'admin.panel'])
             ->name('courses.duplicate');
         Route::get('courses/{course}/curriculum', [CourseController::class, 'curriculum'])
             ->name('courses.curriculum');
+        Route::get('courses/{course}/landing', [CourseLandingController::class, 'edit'])
+            ->name('courses.landing.edit');
+        Route::put('courses/{course}/landing', [CourseLandingController::class, 'update'])
+            ->name('courses.landing.update');
 
         Route::scopeBindings()->prefix('courses/{course}')->name('courses.')->group(function () {
             Route::post('sections/reorder', [CourseSectionController::class, 'reorder'])->name('sections.reorder');

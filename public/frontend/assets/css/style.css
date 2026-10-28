@@ -669,6 +669,63 @@ html[data-theme="dark"] .testimonial-card:hover {
   letter-spacing: 0.02em;
 }
 
+/* Admin-uploaded avatar photo fills the ring */
+.testimonial-avatar-inner img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.testimonial-course {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--testimonial-color, var(--accent-color));
+  background: color-mix(in srgb, var(--testimonial-color, var(--accent-color)) 10%, transparent);
+  transition: background 0.3s ease;
+}
+
+.testimonial-course:hover {
+  background: color-mix(in srgb, var(--testimonial-color, var(--accent-color)) 18%, transparent);
+}
+
+/* Slider layout: room above the cards for their hover lift */
+.testimonials-swiper {
+  flex: 1;
+  overflow: hidden;
+  padding: 12px 4px 16px;
+  min-width: 0;
+}
+
+.testimonials-swiper-pagination {
+  position: static !important;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100% !important;
+  margin-top: 1.25rem;
+}
+
+.testimonials-swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: rgba(2, 173, 143, 0.25);
+  opacity: 1;
+}
+
+.testimonials-swiper-pagination .swiper-pagination-bullet-active {
+  width: 28px;
+  border-radius: 6px;
+  background: var(--accent-color);
+}
+
 @media (max-width: 767px) {
   .testimonials-header {
     margin-bottom: 2rem;

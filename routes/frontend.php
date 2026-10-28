@@ -3,6 +3,7 @@
 use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\Frontend\CategoryController;
 use App\Http\Controllers\Frontend\CourseController;
+use App\Http\Controllers\Frontend\CourseLandingController;
 use App\Http\Controllers\Frontend\EnrollmentController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\LessonController;
@@ -35,6 +36,8 @@ Route::get('/courses', [CourseController::class, 'index'])->name('courses');
 Route::get('/search/suggest', SearchController::class)->name('search.suggest');
 Route::get('/courses/search', [CourseController::class, 'search'])->name('courses.search');
 Route::get('/courses/{slug}', [CourseController::class, 'show'])->name('courses.show');
+// Standalone advertising page for a course (no site header or footer).
+Route::get('/l/{slug}', [CourseLandingController::class, 'show'])->name('courses.landing');
 
 // Students: ask to join a course, withdraw the request, see "my courses".
 Route::middleware('auth')->group(function () {

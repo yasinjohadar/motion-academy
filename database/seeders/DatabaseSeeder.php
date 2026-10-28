@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             CourseCategorySeeder::class,
             CourseSeeder::class,
+            HeroSlideSeeder::class,
+            TestimonialSeeder::class,
+            TeamMemberSeeder::class,
         ]);
 
         $admin = User::query()->firstOrCreate(

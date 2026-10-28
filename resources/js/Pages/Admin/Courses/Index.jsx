@@ -319,6 +319,24 @@ export default function Index({ courses, filters, categories, instructors, statu
                                                         >
                                                             <i className="ri-list-check-3" />
                                                         </Link>
+                                                        <Link
+                                                            href={route('admin.courses.landing.edit', course.id)}
+                                                            className="admin-action-btn admin-action-add"
+                                                            style={
+                                                                course.landing_published && isPublished
+                                                                    ? { background: '#059669', borderColor: '#059669', color: '#fff' }
+                                                                    : undefined
+                                                            }
+                                                            title={
+                                                                course.landing_published === null
+                                                                    ? 'صفحة الهبوط — لم تُنشأ بعد'
+                                                                    : course.landing_published && isPublished
+                                                                      ? 'صفحة الهبوط — منشورة ويراها الزوار'
+                                                                      : 'صفحة الهبوط — غير منشورة'
+                                                            }
+                                                        >
+                                                            <i className="ri-megaphone-line" />
+                                                        </Link>
                                                         <button
                                                             type="button"
                                                             className={`admin-action-btn ${isPublished ? 'admin-action-on' : 'admin-action-off'}`}

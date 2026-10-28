@@ -23,6 +23,13 @@ export default function Edit({ course, flash, ...options }) {
                         <i className="ri-list-check-3" />
                         المنهج
                     </Link>
+                    <Link
+                        href={route('admin.courses.landing.edit', course.id)}
+                        className="admin-btn admin-btn-primary"
+                    >
+                        <i className="ri-megaphone-line" />
+                        صفحة الهبوط
+                    </Link>
                     <Link href={route('admin.courses.index')} className="admin-btn admin-btn-ghost">
                         <i className="ri-arrow-right-line" />
                         العودة للقائمة

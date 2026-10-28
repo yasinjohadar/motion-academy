@@ -607,6 +607,31 @@ html[data-theme="dark"] .ma-phone-screen { background: #0f2a4a; }
   background: var(--brand-gradient) !important;
 }
 
+/* ---------- Custom image visual (admin-uploaded) ---------- */
+.ma-hero-image {
+  margin: 0 auto;
+  max-width: 540px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(15, 42, 74, 0.22), 0 0 0 1px rgba(69, 190, 196, 0.25);
+  animation: ma-image-float 9s ease-in-out infinite;
+}
+
+@keyframes ma-image-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.ma-hero-image img {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+}
+
+/* ---------- Slide without a visual: centred copy ---------- */
+.ma-hero-solo .ma-hero-stats { justify-content: center; }
+
 /* ---------- Entrance: copy and visual rise in on each slide change ---------- */
 .ma-hero .swiper-slide-active .hero-content > * {
   animation: ma-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;

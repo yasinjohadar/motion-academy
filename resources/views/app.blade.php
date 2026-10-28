@@ -19,6 +19,8 @@
         <link id="style" href="{{ asset('assets/libs/bootstrap/css/bootstrap.rtl.min.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/css/styles.min.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet">
+        {{-- Same Font Awesome build as the public site, so icon fields preview the real icon. --}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
         <link href="{{ asset('assets/libs/node-waves/waves.min.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/libs/simplebar/simplebar.min.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">

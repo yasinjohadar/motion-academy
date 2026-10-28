@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SiteSettingUpdateRequest;
 use App\Models\SiteSetting;
 use App\Models\SocialLink;
+use App\Services\Frontend\HomeSections;
 use App\Services\Site\SiteSettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class SiteSettingController extends Controller implements HasMiddleware
 {
     public function __construct(
         private SiteSettingsService $settingsService,
+        private HomeSections $homeSections,
     ) {}
 
     public static function middleware(): array
@@ -42,6 +44,7 @@ class SiteSettingController extends Controller implements HasMiddleware
             'setting' => $setting->toAdminArray(),
             'socialLinks' => $socialLinks,
             'iconOptions' => config('site.social_icons', []),
+            'homeSections' => $this->homeSections->toAdminArray(),
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
@@ -60,6 +63,8 @@ class SiteSettingController extends Controller implements HasMiddleware
             $request->file('logo'),
             $request->file('favicon'),
         );
+
+        $this->homeSections->save($data['home_sections'] ?? []);
 
         return redirect()
             ->route('admin.site-settings.edit')

@@ -5,7 +5,7 @@ import SocialLinksEditor from '@/Components/Admin/SocialLinksEditor';
 import useCan from '@/hooks/useCan';
 import { useForm } from '@inertiajs/react';
 
-export default function Edit({ setting, socialLinks, iconOptions, flash }) {
+export default function Edit({ setting, socialLinks, iconOptions, homeSections = [], flash }) {
     const { can } = useCan();
     const { data, setData, post, processing, errors } = useForm({
         site_name: setting.site_name || '',
@@ -33,6 +33,7 @@ export default function Edit({ setting, socialLinks, iconOptions, flash }) {
         bing_site_verification: setting.bing_site_verification || '',
         allow_indexing: setting.allow_indexing !== false,
         social_links: socialLinks || [],
+        home_sections: Object.fromEntries(homeSections.map((section) => [section.key, section.visible])),
         _method: 'put',
     });
 
@@ -47,7 +48,7 @@ export default function Edit({ setting, socialLinks, iconOptions, flash }) {
     return (
         <AdminUiPage
             title="إعدادات الموقع العامة"
-            subtitle="الاسم، الشعار، رقم الواتساب الأساسي، ووسائل التواصل"
+            subtitle="الاسم، الشعار، رقم الواتساب الأساسي، وسائل التواصل، وأقسام الصفحة الرئيسية"
             flash={flash}
         >
             <form onSubmit={submit}>
@@ -338,6 +339,36 @@ export default function Edit({ setting, socialLinks, iconOptions, flash }) {
                             </div>
                         </div>
                     </div>
+                </AdminPanel>
+
+                <AdminPanel title="أقسام الصفحة الرئيسية" icon="ri-layout-row-line" className="mb-3">
+                    <p className="text-muted small mb-3">
+                        أوقف أي قسم لإخفائه من الصفحة الرئيسية دون حذف محتواه.
+                    </p>
+                    <div className="row g-2">
+                        {homeSections.map((section) => (
+                            <div className="col-sm-6 col-lg-4" key={section.key}>
+                                <label className="form-check form-switch mb-0">
+                                    <input
+                                        type="checkbox"
+                                        role="switch"
+                                        className="form-check-input"
+                                        checked={Boolean(data.home_sections[section.key])}
+                                        onChange={(e) =>
+                                            setData('home_sections', {
+                                                ...data.home_sections,
+                                                [section.key]: e.target.checked,
+                                            })
+                                        }
+                                    />
+                                    <span className="form-check-label">{section.label}</span>
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    {errors.home_sections && (
+                        <div className="invalid-feedback d-block">{errors.home_sections}</div>
+                    )}
                 </AdminPanel>
 
                 <AdminPanel title="وسائل التواصل" icon="ri-share-line" className="mb-3">

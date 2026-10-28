@@ -20,6 +20,9 @@ export default function Sidebar() {
     const isOtpSettings = route().current('admin.otp-settings.*');
     const isSiteSettings = route().current('admin.site-settings.*');
     const isSitePages = route().current('admin.site-pages.*');
+    const isHeroSlides = route().current('admin.hero-slides.*');
+    const isTestimonials = route().current('admin.testimonials.*');
+    const isTeamMembers = route().current('admin.team-members.*');
     const isAppStorage = route().current('admin.app-storage.*');
     const isDiskMappings = route().current('admin.storage-disk-mappings.*');
     const isBackups = route().current('admin.backups.*');
@@ -32,6 +35,9 @@ export default function Sidebar() {
         isAiProviders ||
         isSiteSettings ||
         isSitePages ||
+        isHeroSlides ||
+        isTestimonials ||
+        isTeamMembers ||
         isAppStorage ||
         isDiskMappings ||
         isBackups ||
@@ -243,6 +249,39 @@ export default function Sidebar() {
                                         >
                                             <i className="ri-pages-line side-menu__icon" />
                                             صفحات الموقع
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.hero-slides.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.hero-slides.index')}
+                                            className={`side-menu__item${isHeroSlides ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-slideshow-line side-menu__icon" />
+                                            سلايدر الرئيسية
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.testimonials.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.testimonials.index')}
+                                            className={`side-menu__item${isTestimonials ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-chat-quote-line side-menu__icon" />
+                                            آراء المتعلمين
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.team-members.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.team-members.index')}
+                                            className={`side-menu__item${isTeamMembers ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-team-line side-menu__icon" />
+                                            فريق الخبراء
                                         </Link>
                                     </li>
                                 )}
