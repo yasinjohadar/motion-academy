@@ -71,7 +71,12 @@ class CourseController extends Controller implements HasMiddleware
         [$sortColumn, $sortDirection] = self::SORTS[$filters['sort']];
 
         $courses = $this->filteredQuery($filters)
-            ->with(['category:id,name', 'instructor:id,name', 'landing:id,course_id,is_published'])
+            ->with([
+                // Trashed too, so a course in a deleted category can say why it is hidden.
+                'category' => fn ($query) => $query->withTrashed()->select('id', 'name', 'is_active', 'deleted_at'),
+                'instructor:id,name',
+                'landing:id,course_id,is_published',
+            ])
             ->orderBy($sortColumn, $sortDirection)
             ->orderByDesc('id')
             ->paginate(12)
@@ -80,6 +85,7 @@ class CourseController extends Controller implements HasMiddleware
                 ...$course->toListArray(),
                 // null: no landing page yet; otherwise whether it is published.
                 'landing_published' => $course->landing?->is_published,
+                'hidden_reason' => $course->publicHiddenReason(),
             ]);
 
         return Inertia::render('Admin/Courses/Index', [

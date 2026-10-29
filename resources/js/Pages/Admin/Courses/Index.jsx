@@ -297,6 +297,14 @@ export default function Index({ courses, filters, categories, instructors, statu
                                             <span className={`admin-badge ${course.status_badge}`}>
                                                 {course.status_label}
                                             </span>
+                                            {course.hidden_reason && (
+                                                <div
+                                                    className="small fw-semibold mt-1"
+                                                    style={{ color: '#b45309', maxWidth: 180 }}
+                                                >
+                                                    <i className="ri-eye-off-line" /> {course.hidden_reason}
+                                                </div>
+                                            )}
                                         </td>
                                         <td>
                                             <div className="admin-action-group">

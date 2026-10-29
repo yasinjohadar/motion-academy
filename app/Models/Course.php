@@ -166,6 +166,33 @@ class Course extends Model
     }
 
     /**
+     * Why a published course is missing from the public site, or null when it shows.
+     *
+     * Mirrors CourseCatalog::visible() (published, publish date reached, category
+     * active and not deleted), so the admin list can say what the site will do.
+     * Expects `category` loaded withTrashed().
+     */
+    public function publicHiddenReason(): ?string
+    {
+        if ($this->status !== CourseStatus::Published) {
+            return null;
+        }
+
+        if ($this->published_at?->isFuture()) {
+            return 'مجدولة: تظهر في '.$this->published_at->format('Y-m-d H:i');
+        }
+
+        $category = $this->category;
+
+        return match (true) {
+            $category === null => 'بلا تصنيف — لا تظهر في الموقع',
+            $category->trashed() => "لا تظهر: التصنيف «{$category->name}» محذوف",
+            ! $category->is_active => "لا تظهر: التصنيف «{$category->name}» غير مفعّل",
+            default => null,
+        };
+    }
+
+    /**
      * Whether the course has reached max_students (approved enrollments only).
      */
     public function isFull(): bool
