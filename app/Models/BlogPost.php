@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 /**
  * Datetime casts are invisible to static analysis without these.
@@ -158,20 +157,12 @@ class BlogPost extends Model
 
     public function featuredImageUrl(): ?string
     {
-        if (! filled($this->featured_image)) {
-            return null;
-        }
+        return app(AppStorageManager::class)->publicUrl('blog', $this->featured_image);
+    }
 
-        if (Str::startsWith($this->featured_image, ['http://', 'https://'])) {
-            return $this->featured_image;
-        }
-
-        try {
-            return app(AppStorageManager::class)->url('blog', $this->featured_image)
-                ?? asset('storage/'.$this->featured_image);
-        } catch (\Throwable) {
-            return asset('storage/'.$this->featured_image);
-        }
+    public function hasUploadedFeaturedImage(): bool
+    {
+        return AppStorageManager::isStoredPath($this->featured_image);
     }
 
     /**

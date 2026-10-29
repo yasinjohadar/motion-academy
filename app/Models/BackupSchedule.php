@@ -118,14 +118,8 @@ class BackupSchedule extends Model
                 'full' => 'كاملة',
                 default => $this->backup_type,
             },
-            'storage_config_id' => $this->storage_config_id,
-            'storage_config' => $this->storageConfig
-                ? [
-                    'id' => $this->storageConfig->id,
-                    'name' => $this->storageConfig->name,
-                    'driver_label' => config("storage.drivers.{$this->storageConfig->driver}", $this->storageConfig->driver),
-                ]
-                : null,
+            'storage_config_id' => $this->storage_config_id ?? 'local',
+            'storage_config' => Backup::destinationFor($this->storageConfig),
             'frequency' => $this->frequency,
             'frequency_label' => match ($this->frequency) {
                 'weekly' => 'أسبوعي',

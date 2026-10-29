@@ -33,7 +33,7 @@ export default function Edit({ config, drivers, flash }) {
 
     return (
         <AdminUiPage
-            title="تعديل إعداد التخزين"
+            title="تعديل حساب التخزين"
             subtitle={config.name}
             flash={flash}
             actions={
@@ -42,7 +42,19 @@ export default function Edit({ config, drivers, flash }) {
                 </Link>
             }
         >
-            <AdminPanel title="بيانات الإعداد" icon="ri-cloud-line">
+            <AdminPanel title="بيانات الحساب" icon="ri-cloud-line">
+                {config.is_current && (
+                    <div className="alert alert-success small">
+                        <i className="ri-checkbox-circle-line" /> هذا هو التخزين المستخدم حالياً لملفات الموقع، لذلك
+                        لا يمكن إيقافه أو تغيير نوعه قبل نقل الملفات إلى تخزين آخر.
+                    </div>
+                )}
+                {config.config_error && (
+                    <div className="alert alert-danger small">
+                        <i className="ri-error-warning-line" /> تعذّر فك تشفير الإعدادات المحفوظة (ربما تغيّر مفتاح
+                        التطبيق). أعد إدخال المفاتيح ثم احفظ.
+                    </div>
+                )}
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -68,6 +80,7 @@ export default function Edit({ config, drivers, flash }) {
                             <select
                                 className={`form-select${errors.driver ? ' is-invalid' : ''}`}
                                 value={data.driver}
+                                disabled={config.is_current}
                                 onChange={(e) => changeDriver(e.target.value)}
                             >
                                 {Object.entries(drivers).map(([value, label]) => (
@@ -85,6 +98,7 @@ export default function Edit({ config, drivers, flash }) {
                             onChange={(next) => setData('config', next)}
                             editing
                             hasSecretAccessKey={config.has_secret_access_key}
+                            accessKeyHint={config.access_key_hint}
                         />
 
                         <div className="col-md-6">
@@ -116,6 +130,7 @@ export default function Edit({ config, drivers, flash }) {
                                     type="checkbox"
                                     className="form-check-input"
                                     checked={data.is_active}
+                                    disabled={config.is_current}
                                     onChange={(e) => setData('is_active', e.target.checked)}
                                 />
                                 <label className="form-check-label" htmlFor="is_active">

@@ -24,9 +24,9 @@ export default function Sidebar() {
     const isTestimonials = route().current('admin.testimonials.*');
     const isTeamMembers = route().current('admin.team-members.*');
     const isAppStorage = route().current('admin.app-storage.*');
-    const isDiskMappings = route().current('admin.storage-disk-mappings.*');
     const isBackups = route().current('admin.backups.*');
     const isBackupSchedules = route().current('admin.backup-schedules.*');
+    const isSiteContent = isSitePages || isHeroSlides || isTestimonials || isTeamMembers;
     const isSettings =
         isNotifications ||
         isObservability ||
@@ -34,12 +34,7 @@ export default function Sidebar() {
         isOtpSettings ||
         isAiProviders ||
         isSiteSettings ||
-        isSitePages ||
-        isHeroSlides ||
-        isTestimonials ||
-        isTeamMembers ||
         isAppStorage ||
-        isDiskMappings ||
         isBackups ||
         isBackupSchedules;
     const isProfile = route().current('admin.profile.edit');
@@ -61,6 +56,7 @@ export default function Sidebar() {
 
     const [whatsAppOpen, setWhatsAppOpen] = useState(isWhatsApp);
     const [settingsOpen, setSettingsOpen] = useState(isSettings);
+    const [siteContentOpen, setSiteContentOpen] = useState(isSiteContent);
     const [blogOpen, setBlogOpen] = useState(isBlog);
     const [coursesOpen, setCoursesOpen] = useState(isCourses);
 
@@ -75,6 +71,12 @@ export default function Sidebar() {
             setSettingsOpen(true);
         }
     }, [isSettings]);
+
+    useEffect(() => {
+        if (isSiteContent) {
+            setSiteContentOpen(true);
+        }
+    }, [isSiteContent]);
 
     useEffect(() => {
         if (isBlog) {
@@ -172,198 +174,6 @@ export default function Sidebar() {
                                 </Link>
                             </li>
                         )}
-                        {/* Always shown: it holds the signed-in admin's own notifications. */}
-                        <li
-                            className={`slide has-sub${settingsOpen ? ' open' : ''}${isSettings ? ' active' : ''}`}
-                        >
-                            <a
-                                href="#settings-menu"
-                                className={`side-menu__item${isSettings ? ' active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setSettingsOpen((open) => !open);
-                                }}
-                            >
-                                <i className="ri-settings-4-line side-menu__icon" />
-                                <span className="side-menu__label">الإعدادات</span>
-                                {unreadCount > 0 && !settingsOpen && (
-                                    <span className="badge bg-danger rounded-pill ms-auto">
-                                        {unreadCount > 99 ? '99+' : unreadCount}
-                                    </span>
-                                )}
-                                <i className="ri-arrow-left-s-line side-menu__angle" />
-                            </a>
-                            <ul
-                                className="slide-menu child1"
-                                style={{ display: settingsOpen ? 'block' : 'none' }}
-                            >
-                                {/* No can() gate — these are the signed-in user's own notifications. */}
-                                <li className="slide">
-                                    <Link
-                                        href={route('admin.notifications.index')}
-                                        className={`side-menu__item${isNotifications ? ' active' : ''}`}
-                                    >
-                                        <i className="ri-notification-3-line side-menu__icon" />
-                                        الإشعارات
-                                        {unreadCount > 0 && (
-                                            <span className="badge bg-danger rounded-pill ms-auto">
-                                                {unreadCount > 99 ? '99+' : unreadCount}
-                                            </span>
-                                        )}
-                                    </Link>
-                                </li>
-                                {canAny([
-                                    'admin.observability.activity',
-                                    'admin.observability.security',
-                                    'admin.observability.logs',
-                                    'admin.observability.jobs',
-                                    'admin.observability.database',
-                                ]) && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.observability.index')}
-                                            className={`side-menu__item${isObservability ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-radar-line side-menu__icon" />
-                                            المراقبة والسجلات
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.site-settings.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.site-settings.edit')}
-                                            className={`side-menu__item${isSiteSettings ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-global-line side-menu__icon" />
-                                            إعدادات الموقع
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.site-pages.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.site-pages.index')}
-                                            className={`side-menu__item${isSitePages ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-pages-line side-menu__icon" />
-                                            صفحات الموقع
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.hero-slides.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.hero-slides.index')}
-                                            className={`side-menu__item${isHeroSlides ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-slideshow-line side-menu__icon" />
-                                            سلايدر الرئيسية
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.testimonials.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.testimonials.index')}
-                                            className={`side-menu__item${isTestimonials ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-chat-quote-line side-menu__icon" />
-                                            آراء المتعلمين
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.team-members.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.team-members.index')}
-                                            className={`side-menu__item${isTeamMembers ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-team-line side-menu__icon" />
-                                            فريق الخبراء
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.smtp-settings.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.smtp-settings.index')}
-                                            className={`side-menu__item${isSmtp ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-mail-settings-line side-menu__icon" />
-                                            إعدادات SMTP
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.otp-settings.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.otp-settings.edit')}
-                                            className={`side-menu__item${isOtpSettings ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-shield-keyhole-line side-menu__icon" />
-                                            رموز التحقق OTP
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.ai-providers.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.ai-providers.index')}
-                                            className={`side-menu__item${isAiProviders ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-robot-2-line side-menu__icon" />
-                                            مزودو الذكاء الاصطناعي
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.app-storage.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.app-storage.index')}
-                                            className={`side-menu__item${isAppStorage ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-cloud-line side-menu__icon" />
-                                            التخزين السحابي
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.storage-disk-mappings.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.storage-disk-mappings.index')}
-                                            className={`side-menu__item${isDiskMappings ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-hard-drive-2-line side-menu__icon" />
-                                            ربط الأقراص
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.backups.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.backups.index')}
-                                            className={`side-menu__item${isBackups ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-database-2-line side-menu__icon" />
-                                            النسخ الاحتياطية
-                                        </Link>
-                                    </li>
-                                )}
-                                {can('admin.backup-schedules.list') && (
-                                    <li className="slide">
-                                        <Link
-                                            href={route('admin.backup-schedules.index')}
-                                            className={`side-menu__item${isBackupSchedules ? ' active' : ''}`}
-                                        >
-                                            <i className="ri-calendar-check-line side-menu__icon" />
-                                            جدولة النسخ
-                                        </Link>
-                                    </li>
-                                )}
-                            </ul>
-                        </li>
                         {(can('admin.courses.list') ||
                             can('admin.course-categories.list') ||
                             can('admin.enrollments.list')) && (
@@ -494,6 +304,77 @@ export default function Sidebar() {
                                 </ul>
                             </li>
                         )}
+                        {(can('admin.site-pages.list') ||
+                            can('admin.hero-slides.list') ||
+                            can('admin.testimonials.list') ||
+                            can('admin.team-members.list')) && (
+                            <li
+                                className={`slide has-sub${siteContentOpen ? ' open' : ''}${isSiteContent ? ' active' : ''}`}
+                            >
+                                <a
+                                    href="#site-content-menu"
+                                    className={`side-menu__item${isSiteContent ? ' active' : ''}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setSiteContentOpen((open) => !open);
+                                    }}
+                                >
+                                    <i className="ri-layout-masonry-line side-menu__icon" />
+                                    <span className="side-menu__label">محتوى الموقع</span>
+                                    <i className="ri-arrow-left-s-line side-menu__angle" />
+                                </a>
+                                <ul
+                                    className="slide-menu child1"
+                                    style={{ display: siteContentOpen ? 'block' : 'none' }}
+                                >
+                                    {can('admin.site-pages.list') && (
+                                        <li className="slide">
+                                            <Link
+                                                href={route('admin.site-pages.index')}
+                                                className={`side-menu__item${isSitePages ? ' active' : ''}`}
+                                            >
+                                                <i className="ri-pages-line side-menu__icon" />
+                                                صفحات الموقع
+                                            </Link>
+                                        </li>
+                                    )}
+                                    {can('admin.hero-slides.list') && (
+                                        <li className="slide">
+                                            <Link
+                                                href={route('admin.hero-slides.index')}
+                                                className={`side-menu__item${isHeroSlides ? ' active' : ''}`}
+                                            >
+                                                <i className="ri-slideshow-line side-menu__icon" />
+                                                سلايدر الصفحة الرئيسية
+                                            </Link>
+                                        </li>
+                                    )}
+                                    {can('admin.testimonials.list') && (
+                                        <li className="slide">
+                                            <Link
+                                                href={route('admin.testimonials.index')}
+                                                className={`side-menu__item${isTestimonials ? ' active' : ''}`}
+                                            >
+                                                <i className="ri-chat-quote-line side-menu__icon" />
+                                                آراء المتعلمين
+                                            </Link>
+                                        </li>
+                                    )}
+                                    {can('admin.team-members.list') && (
+                                        <li className="slide">
+                                            <Link
+                                                href={route('admin.team-members.index')}
+                                                className={`side-menu__item${isTeamMembers ? ' active' : ''}`}
+                                            >
+                                                <i className="ri-team-line side-menu__icon" />
+                                                فريق الخبراء
+                                            </Link>
+                                        </li>
+                                    )}
+                                </ul>
+                            </li>
+                        )}
                         {(can('admin.whatsapp-settings.list') ||
                             can('admin.whatsapp-instances.list') ||
                             can('admin.whatsapp-send.create') ||
@@ -577,6 +458,143 @@ export default function Sidebar() {
                                 </ul>
                             </li>
                         )}
+                        {/* Always shown: it holds the signed-in admin's own notifications. */}
+                        <li
+                            className={`slide has-sub${settingsOpen ? ' open' : ''}${isSettings ? ' active' : ''}`}
+                        >
+                            <a
+                                href="#settings-menu"
+                                className={`side-menu__item${isSettings ? ' active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSettingsOpen((open) => !open);
+                                }}
+                            >
+                                <i className="ri-settings-4-line side-menu__icon" />
+                                <span className="side-menu__label">الإعدادات</span>
+                                {unreadCount > 0 && !settingsOpen && (
+                                    <span className="badge bg-danger rounded-pill ms-auto">
+                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                    </span>
+                                )}
+                                <i className="ri-arrow-left-s-line side-menu__angle" />
+                            </a>
+                            <ul
+                                className="slide-menu child1"
+                                style={{ display: settingsOpen ? 'block' : 'none' }}
+                            >
+                                {can('admin.site-settings.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.site-settings.edit')}
+                                            className={`side-menu__item${isSiteSettings ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-global-line side-menu__icon" />
+                                            إعدادات الموقع
+                                        </Link>
+                                    </li>
+                                )}
+                                {/* No can() gate — these are the signed-in user's own notifications. */}
+                                <li className="slide">
+                                    <Link
+                                        href={route('admin.notifications.index')}
+                                        className={`side-menu__item${isNotifications ? ' active' : ''}`}
+                                    >
+                                        <i className="ri-notification-3-line side-menu__icon" />
+                                        الإشعارات
+                                        {unreadCount > 0 && (
+                                            <span className="badge bg-danger rounded-pill ms-auto">
+                                                {unreadCount > 99 ? '99+' : unreadCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </li>
+                                {can('admin.smtp-settings.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.smtp-settings.index')}
+                                            className={`side-menu__item${isSmtp ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-mail-settings-line side-menu__icon" />
+                                            إعدادات SMTP
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.otp-settings.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.otp-settings.edit')}
+                                            className={`side-menu__item${isOtpSettings ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-shield-keyhole-line side-menu__icon" />
+                                            رموز التحقق OTP
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.ai-providers.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.ai-providers.index')}
+                                            className={`side-menu__item${isAiProviders ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-robot-2-line side-menu__icon" />
+                                            مزودو الذكاء الاصطناعي
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.app-storage.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.app-storage.index')}
+                                            className={`side-menu__item${isAppStorage ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-cloud-line side-menu__icon" />
+                                            التخزين
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.backups.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.backups.index')}
+                                            className={`side-menu__item${isBackups ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-database-2-line side-menu__icon" />
+                                            النسخ الاحتياطية
+                                        </Link>
+                                    </li>
+                                )}
+                                {can('admin.backup-schedules.list') && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.backup-schedules.index')}
+                                            className={`side-menu__item${isBackupSchedules ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-calendar-check-line side-menu__icon" />
+                                            جدولة النسخ
+                                        </Link>
+                                    </li>
+                                )}
+                                {canAny([
+                                    'admin.observability.activity',
+                                    'admin.observability.security',
+                                    'admin.observability.logs',
+                                    'admin.observability.jobs',
+                                    'admin.observability.database',
+                                ]) && (
+                                    <li className="slide">
+                                        <Link
+                                            href={route('admin.observability.index')}
+                                            className={`side-menu__item${isObservability ? ' active' : ''}`}
+                                        >
+                                            <i className="ri-radar-line side-menu__icon" />
+                                            المراقبة والسجلات
+                                        </Link>
+                                    </li>
+                                )}
+                            </ul>
+                        </li>
                         <li className={`slide${isProfile ? ' active' : ''}`}>
                             <Link
                                 href={route('admin.profile.edit')}

@@ -7,7 +7,6 @@ use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\CourseLesson;
 use App\Models\CourseSection;
-use App\Models\StorageDiskMapping;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -46,8 +45,7 @@ class CourseTest extends TestCase
         Role::findOrCreate('student', 'web');
 
         // Uploads must hit the faked disks, not the real local storage the migrations map.
-        StorageDiskMapping::query()->whereIn('disk_name', [Course::IMAGE_DISK, Course::VIDEO_DISK])->delete();
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
         Storage::fake('local');
     }
 
@@ -267,10 +265,10 @@ class CourseTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $course = Course::query()->firstOrFail();
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertExists($course->thumbnail);
+        Storage::disk('public')->assertExists($course->thumbnail);
         // Uploaded videos are private: they never land on the public fallback disk.
         Storage::disk('local')->assertExists($course->intro_video);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertMissing($course->intro_video);
+        Storage::disk('public')->assertMissing($course->intro_video);
     }
 
     public function test_new_course_cannot_be_created_as_published(): void
@@ -377,7 +375,7 @@ class CourseTest extends TestCase
 
     public function test_force_delete_keeps_files_shared_with_a_duplicate(): void
     {
-        $disk = Storage::disk(config('storage.fallback_disk', 'public'));
+        $disk = Storage::disk('public');
         $disk->put('thumbnails/shared.jpg', 'img');
         $original = Course::factory()->create(['thumbnail' => 'thumbnails/shared.jpg']);
         Course::factory()->create(['thumbnail' => 'thumbnails/shared.jpg']);

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Jobs\CreateBackupJob;
-use App\Models\AppStorageConfig;
 use App\Models\Backup;
 use App\Models\BackupSchedule;
 use App\Models\User;
@@ -13,6 +12,7 @@ use App\Services\Backup\DatabaseBackupEngine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -42,6 +42,9 @@ class BackupSystemTest extends TestCase
 
         $role = Role::findOrCreate('admin', 'web');
         $role->syncPermissions(Permission::all());
+
+        Storage::fake('local');
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -52,22 +55,16 @@ class BackupSystemTest extends TestCase
         return $user;
     }
 
-    protected function localStorage(): AppStorageConfig
-    {
-        return AppStorageConfig::query()->where('driver', 'local')->firstOrFail();
-    }
-
     public function test_admin_can_create_database_backup_to_local_storage(): void
     {
         $admin = $this->adminUser();
-        $storage = $this->localStorage();
 
         // Sync queue runs the job immediately in testing
         $this->actingAs($admin)
             ->post(route('admin.backups.store'), [
                 'name' => 'Test DB Backup',
                 'backup_type' => 'database',
-                'storage_config_id' => $storage->id,
+                'storage_config_id' => 'local',
                 'retention_days' => 7,
             ])
             ->assertRedirect();
@@ -77,19 +74,23 @@ class BackupSystemTest extends TestCase
         $this->assertSame('completed', $backup->status);
         $this->assertNotNull($backup->storage_path);
         $this->assertGreaterThan(0, $backup->file_size);
+
+        // Local backups live in the private folder, never under the public /storage link.
+        $this->assertNull($backup->storage_config_id);
+        Storage::disk('local')->assertExists($backup->storage_path);
+        Storage::disk('public')->assertMissing($backup->storage_path);
     }
 
     public function test_admin_can_download_completed_backup(): void
     {
         $admin = $this->adminUser();
-        $storage = $this->localStorage();
 
         $backup = Backup::query()->create([
             'name' => 'DL',
             'type' => 'manual',
             'backup_type' => 'database',
             'storage_driver' => 'local',
-            'storage_config_id' => $storage->id,
+            'storage_config_id' => null,
             'status' => 'pending',
             'retention_days' => 7,
             'created_by' => $admin->id,
@@ -106,14 +107,13 @@ class BackupSystemTest extends TestCase
     public function test_restore_requires_confirmation(): void
     {
         $admin = $this->adminUser();
-        $storage = $this->localStorage();
 
         $backup = Backup::query()->create([
             'name' => 'Restore Me',
             'type' => 'manual',
             'backup_type' => 'database',
             'storage_driver' => 'local',
-            'storage_config_id' => $storage->id,
+            'storage_config_id' => null,
             'status' => 'pending',
             'retention_days' => 7,
         ]);
@@ -129,14 +129,13 @@ class BackupSystemTest extends TestCase
 
     public function test_restore_service_replays_database_backup(): void
     {
-        $storage = $this->localStorage();
 
         $backup = Backup::query()->create([
             'name' => 'Restore Service',
             'type' => 'manual',
             'backup_type' => 'database',
             'storage_driver' => 'local',
-            'storage_config_id' => $storage->id,
+            'storage_config_id' => null,
             'status' => 'pending',
             'retention_days' => 7,
         ]);
@@ -183,13 +182,12 @@ class BackupSystemTest extends TestCase
     public function test_admin_can_create_backup_schedule(): void
     {
         $admin = $this->adminUser();
-        $storage = $this->localStorage();
 
         $this->actingAs($admin)
             ->post(route('admin.backup-schedules.store'), [
                 'name' => 'Daily DB',
                 'backup_type' => 'database',
-                'storage_config_id' => $storage->id,
+                'storage_config_id' => 'local',
                 'frequency' => 'daily',
                 'time' => '03:30',
                 'retention_days' => 14,
@@ -200,6 +198,7 @@ class BackupSystemTest extends TestCase
         $this->assertDatabaseHas('backup_schedules', [
             'name' => 'Daily DB',
             'frequency' => 'daily',
+            'storage_config_id' => null,
         ]);
 
         $schedule = BackupSchedule::query()->first();
@@ -211,12 +210,11 @@ class BackupSystemTest extends TestCase
         Queue::fake();
 
         $admin = $this->adminUser();
-        $storage = $this->localStorage();
 
         $this->actingAs($admin)
             ->post(route('admin.backups.store'), [
                 'backup_type' => 'database',
-                'storage_config_id' => $storage->id,
+                'storage_config_id' => 'local',
             ])
             ->assertRedirect();
 

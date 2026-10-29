@@ -25,12 +25,10 @@ class DashboardController extends Controller implements HasMiddleware
     {
         $user = $request->user();
 
+        // The dashboard is the stat tiles and the shortcuts only; activity, checks and
+        // today's summary live on the observability screens.
         return Inertia::render('Admin/Dashboard', [
             'widgets' => $this->stats->overview(),
-            'health' => $this->stats->systemHealth(),
-            'todaySummary' => $this->stats->todaySummary($user),
-            'activityChart' => $this->stats->activityChart(),
-            'recentActivity' => $this->stats->recentActivity(),
             'lastLoginAt' => optional($this->stats->lastLoginAt($user))?->diffForHumans(),
         ]);
     }

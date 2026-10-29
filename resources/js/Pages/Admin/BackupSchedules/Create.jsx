@@ -86,7 +86,7 @@ export function ScheduleFields({ data, setData, errors, storages }) {
                 <select
                     className={`form-select${errors.storage_config_id ? ' is-invalid' : ''}`}
                     value={data.storage_config_id}
-                    onChange={(e) => setData('storage_config_id', Number(e.target.value) || '')}
+                    onChange={(e) => setData('storage_config_id', e.target.value)}
                 >
                     {storages.map((storage) => (
                         <option key={storage.id} value={storage.id}>

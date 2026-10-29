@@ -7,6 +7,7 @@ use App\Models\CourseLesson;
 use App\Models\CourseLessonAttachment;
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Stores and removes course/lesson files.
@@ -16,11 +17,19 @@ use Illuminate\Http\UploadedFile;
  */
 trait ManagesCourseFiles
 {
-    protected function storeCourseFile(string $disk, UploadedFile $file, string $directory): ?string
+    /**
+     * @throws ValidationException when the upload fails — never a silent null that
+     *                             would clear the column and delete the old file
+     */
+    protected function storeCourseFile(string $disk, UploadedFile $file, string $directory, string $field = 'file'): string
     {
         $path = app(AppStorageManager::class)->storeUploadedFile($disk, $file, $directory);
 
-        return $path !== false ? $path : null;
+        if ($path === false) {
+            throw ValidationException::withMessages([$field => 'تعذّر رفع الملف. لم يتم تغيير الملف الحالي.']);
+        }
+
+        return $path;
     }
 
     protected function deleteCourseFileIfUnused(string $disk, ?string $path): void

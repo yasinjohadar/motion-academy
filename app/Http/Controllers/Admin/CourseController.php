@@ -318,9 +318,12 @@ class CourseController extends Controller implements HasMiddleware
             [Course::IMAGE_DISK, $course->thumbnail],
             [Course::VIDEO_DISK, $course->intro_video_source === VideoSource::Upload ? $course->intro_video : null],
         ];
-        foreach ($course->lessons()->get() as $lesson) {
+        foreach ($course->lessons()->with('attachments')->get() as $lesson) {
             $files[] = [Course::VIDEO_DISK, $lesson->hasStoredVideo() ? $lesson->video : null];
             $files[] = [Course::VIDEO_DISK, $lesson->hasStoredAttachment() ? $lesson->attachment : null];
+            foreach ($lesson->attachments as $attachment) {
+                $files[] = [Course::VIDEO_DISK, $attachment->path];
+            }
         }
 
         $course->forceDelete();
@@ -372,7 +375,7 @@ class CourseController extends Controller implements HasMiddleware
         $media = [];
 
         if ($request->hasFile('thumbnail')) {
-            $media['thumbnail'] = $this->storeCourseFile(Course::IMAGE_DISK, $request->file('thumbnail'), 'thumbnails');
+            $media['thumbnail'] = $this->storeCourseFile(Course::IMAGE_DISK, $request->file('thumbnail'), 'thumbnails', 'thumbnail');
         } elseif (filled($request->input('thumbnail_url'))) {
             $media['thumbnail'] = (string) $request->input('thumbnail_url');
         } elseif ($request->boolean('remove_thumbnail')) {
@@ -383,7 +386,7 @@ class CourseController extends Controller implements HasMiddleware
 
         if ($source === VideoSource::Upload) {
             if ($request->hasFile('intro_video_file')) {
-                $media['intro_video'] = $this->storeCourseFile(Course::VIDEO_DISK, $request->file('intro_video_file'), 'intro');
+                $media['intro_video'] = $this->storeCourseFile(Course::VIDEO_DISK, $request->file('intro_video_file'), 'intro', 'intro_video_file');
             }
             $media['intro_video_source'] = $source;
         } elseif ($source !== null) {

@@ -1,4 +1,4 @@
-export const emptyDriverConfig = (driver = 'local') => {
+export const emptyDriverConfig = (driver = 's3') => {
     switch (driver) {
         case 's3':
             return {
@@ -9,6 +9,7 @@ export const emptyDriverConfig = (driver = 'local') => {
                 url: '',
                 endpoint: '',
                 use_path_style: false,
+                public_acl: false,
             };
         case 'cloudflare_r2':
             return {
@@ -27,10 +28,10 @@ export const emptyDriverConfig = (driver = 'local') => {
                 endpoint: '',
                 url: '',
                 use_path_style: true,
+                public_acl: false,
             };
-        case 'local':
         default:
-            return { path: 'public' };
+            return {};
     }
 };
 
@@ -41,28 +42,11 @@ export default function StorageDriverFields({
     onChange,
     editing = false,
     hasSecretAccessKey = false,
+    accessKeyHint = null,
 }) {
     const setField = (key, value) => {
         onChange({ ...config, [key]: value });
     };
-
-    if (driver === 'local') {
-        return (
-            <div className="col-md-6">
-                <label className="form-label">المسار داخل storage/app</label>
-                <input
-                    type="text"
-                    className={`form-control${errors['config.path'] ? ' is-invalid' : ''}`}
-                    value={config.path || 'public'}
-                    onChange={(e) => setField('path', e.target.value)}
-                    placeholder="public"
-                />
-                {errors['config.path'] && (
-                    <div className="invalid-feedback">{errors['config.path']}</div>
-                )}
-            </div>
-        );
-    }
 
     return (
         <>
@@ -88,7 +72,7 @@ export default function StorageDriverFields({
                     className={`form-control${errors['config.access_key_id'] ? ' is-invalid' : ''}`}
                     value={config.access_key_id || ''}
                     onChange={(e) => setField('access_key_id', e.target.value)}
-                    placeholder={editing ? 'اتركه كما هو أو أدخل مفتاحاً جديداً' : ''}
+                    placeholder={editing ? `المحفوظ: ${accessKeyHint || '—'} — اتركه فارغاً للإبقاء عليه` : ''}
                     autoComplete="off"
                 />
                 {errors['config.access_key_id'] && (
@@ -178,26 +162,35 @@ export default function StorageDriverFields({
 
             {(driver === 's3' || driver === 'idrive_e2') && (
                 <div className="col-md-6">
-                    <label className="form-label">URL عام (اختياري)</label>
+                    <label className="form-label">الرابط العام للحاوية (اختياري)</label>
                     <input
                         type="url"
                         className={`form-control${errors['config.url'] ? ' is-invalid' : ''}`}
                         value={config.url || ''}
                         onChange={(e) => setField('url', e.target.value)}
+                        placeholder="https://bucket.s3.amazonaws.com"
+                        dir="ltr"
                     />
+                    {errors['config.url'] && <div className="invalid-feedback">{errors['config.url']}</div>}
+                    <div className="form-text">اتركه فارغاً لاستخدام رابط الحاوية الافتراضي.</div>
                 </div>
             )}
 
             {driver === 'cloudflare_r2' && (
                 <div className="col-md-6">
-                    <label className="form-label">Public URL (اختياري)</label>
+                    <label className="form-label">الرابط العام للحاوية (مطلوب)</label>
                     <input
                         type="url"
                         className={`form-control${errors['config.public_url'] ? ' is-invalid' : ''}`}
                         value={config.public_url || ''}
                         onChange={(e) => setField('public_url', e.target.value)}
-                        placeholder="https://cdn.example.com"
+                        placeholder="https://pub-xxxx.r2.dev أو https://cdn.example.com"
+                        dir="ltr"
                     />
+                    {errors['config.public_url'] && (
+                        <div className="invalid-feedback">{errors['config.public_url']}</div>
+                    )}
+                    <div className="form-text">فعّل الوصول العام للحاوية في Cloudflare (r2.dev أو نطاق مخصص).</div>
                 </div>
             )}
 
@@ -217,6 +210,32 @@ export default function StorageDriverFields({
                     </div>
                 </div>
             )}
+
+            {(driver === 's3' || driver === 'idrive_e2') && (
+                <div className="col-md-6 d-flex align-items-end">
+                    <div className="form-check mb-2">
+                        <input
+                            id="public_acl"
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={Boolean(config.public_acl)}
+                            onChange={(e) => setField('public_acl', e.target.checked)}
+                        />
+                        <label className="form-check-label" htmlFor="public_acl">
+                            جعل الملفات العامة public-read عبر ACL
+                        </label>
+                    </div>
+                </div>
+            )}
+
+            <div className="col-12">
+                <div className="alert alert-info small mb-0">
+                    <i className="ri-information-line" /> تُخزَّن الصور في المجلد <code dir="ltr">public/</code>{' '}
+                    والفيديوهات الخاصة في <code dir="ltr">private/</code> داخل الحاوية. اجعل القراءة العامة على{' '}
+                    <code dir="ltr">public/*</code> فقط (سياسة الحاوية)، أو فعّل خيار ACL إن كانت الحاوية تدعمه.
+                    زر «اختبار» يتحقق من ذلك فعلياً.
+                </div>
+            </div>
         </>
     );
 }

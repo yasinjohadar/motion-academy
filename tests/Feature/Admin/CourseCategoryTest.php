@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\CourseCategory;
-use App\Models\StorageDiskMapping;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -36,8 +35,7 @@ class CourseCategoryTest extends TestCase
 
         // The migration maps the "courses" disk to the real local storage; drop it so
         // uploads fall through to the faked fallback disk.
-        StorageDiskMapping::query()->where('disk_name', CourseCategory::STORAGE_DISK)->delete();
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -154,7 +152,7 @@ class CourseCategoryTest extends TestCase
         $category = CourseCategory::query()->firstOrFail();
         $this->assertNotNull($category->image);
         $this->assertTrue($category->hasUploadedImage());
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertExists($category->image);
+        Storage::disk('public')->assertExists($category->image);
     }
 
     public function test_admin_can_pick_image_from_library_and_remove_it(): void
@@ -302,7 +300,7 @@ class CourseCategoryTest extends TestCase
 
     public function test_force_delete_removes_record_and_uploaded_image(): void
     {
-        $disk = Storage::disk(config('storage.fallback_disk', 'public'));
+        $disk = Storage::disk('public');
         $disk->put('categories/cover.jpg', 'image');
         $category = CourseCategory::factory()->create(['image' => 'categories/cover.jpg']);
         $orphan = CourseCategory::factory()->childOf($category)->create();

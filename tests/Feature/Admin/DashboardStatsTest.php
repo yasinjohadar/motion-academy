@@ -180,10 +180,12 @@ class DashboardStatsTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('Admin/Dashboard')
                 ->has('widgets', 4)
-                ->has('todaySummary', 4)
-                ->has('activityChart', 14)
-                ->has('health.checks')
-                ->has('recentActivity')
+                ->has('lastLoginAt')
+                // Trimmed on purpose: the page is the tiles and the shortcuts only.
+                ->missing('todaySummary')
+                ->missing('activityChart')
+                ->missing('health')
+                ->missing('recentActivity')
             );
     }
 

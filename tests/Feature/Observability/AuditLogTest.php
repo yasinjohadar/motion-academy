@@ -3,10 +3,10 @@
 namespace Tests\Feature\Observability;
 
 use App\Models\AppNotification;
+use App\Models\AppStorageConfig;
 use App\Models\Concerns\AuditsChanges;
 use App\Models\Media;
 use App\Models\SmtpSetting;
-use App\Models\StorageDiskMapping;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -134,11 +134,12 @@ class AuditLogTest extends TestCase
 
     public function test_migrations_do_not_write_activity_rows(): void
     {
-        // The storage/blog/media/backup migrations seed audited StorageDiskMapping rows
-        // before activity_log exists; they must run inside activity()->withoutLogs().
+        // Migrations that touch audited models (e.g. the storage conversion updating
+        // an AppStorageConfig) run before activity_log exists on a fresh install;
+        // they must run inside activity()->withoutLogs().
         $this->assertSame(
             0,
-            DB::table('activity_log')->where('subject_type', StorageDiskMapping::class)->count()
+            DB::table('activity_log')->where('subject_type', AppStorageConfig::class)->count()
         );
     }
 }

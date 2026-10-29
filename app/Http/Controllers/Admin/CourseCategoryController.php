@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\AuthorizesPanelResource;
+use App\Http\Controllers\Concerns\ResolvesImageField;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Course\CourseCategoryReorderRequest;
 use App\Http\Requests\Admin\Course\CourseCategoryStoreRequest;
@@ -19,7 +20,7 @@ use Inertia\Response;
 
 class CourseCategoryController extends Controller implements HasMiddleware
 {
-    use AuthorizesPanelResource;
+    use AuthorizesPanelResource, ResolvesImageField;
 
     public function __construct(private readonly AppStorageManager $storageManager) {}
 
@@ -112,7 +113,7 @@ class CourseCategoryController extends Controller implements HasMiddleware
     public function store(CourseCategoryStoreRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $image = $this->resolveImage($request);
+        $image = $this->resolveImageField($request, 'image', CourseCategory::STORAGE_DISK, 'categories');
         unset($data['image'], $data['image_url'], $data['remove_image']);
 
         $slug = CourseCategory::slugify((string) (filled($data['slug'] ?? null) ? $data['slug'] : $data['name']));
@@ -147,7 +148,10 @@ class CourseCategoryController extends Controller implements HasMiddleware
     public function update(CourseCategoryUpdateRequest $request, CourseCategory $course_category): RedirectResponse
     {
         $data = $request->validated();
-        $image = $this->resolveImage($request, $course_category);
+        $image = $this->resolveImageField(
+            $request, 'image', CourseCategory::STORAGE_DISK, 'categories',
+            $course_category->hasUploadedImage() ? $course_category->image : null,
+        );
         unset($data['image'], $data['image_url'], $data['remove_image']);
 
         $slugInput = filled($data['slug'] ?? null) ? (string) $data['slug'] : (string) $course_category->slug;
@@ -279,39 +283,6 @@ class CourseCategoryController extends Controller implements HasMiddleware
         }
 
         return back()->with('success', 'تم حذف التصنيف نهائياً.');
-    }
-
-    /**
-     * Decide the image column value from the request.
-     *
-     * Returns the new value (a stored path, a library URL, or null to clear it),
-     * or false when the existing image should be left untouched.
-     */
-    private function resolveImage(Request $request, ?CourseCategory $category = null): string|false|null
-    {
-        $replacesExisting = $request->hasFile('image')
-            || filled($request->input('image_url'))
-            || $request->boolean('remove_image');
-
-        if ($category && $replacesExisting && $category->hasUploadedImage()) {
-            $this->storageManager->delete(CourseCategory::STORAGE_DISK, $category->image);
-        }
-
-        if ($request->hasFile('image')) {
-            $path = $this->storageManager->storeUploadedFile(CourseCategory::STORAGE_DISK, $request->file('image'), 'categories');
-
-            return $path !== false ? $path : null;
-        }
-
-        if (filled($request->input('image_url'))) {
-            return (string) $request->input('image_url');
-        }
-
-        if ($request->boolean('remove_image')) {
-            return null;
-        }
-
-        return false;
     }
 
     /**

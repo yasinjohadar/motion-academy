@@ -26,8 +26,8 @@ export default function Create({ drivers, flash }) {
 
     return (
         <AdminUiPage
-            title="إعداد تخزين جديد"
-            subtitle="أضف Amazon S3 أو R2 أو IDrive e2 أو تخزيناً محلياً"
+            title="حساب تخزين سحابي جديد"
+            subtitle="أضف حساب Amazon S3 أو Cloudflare R2 أو IDrive e2"
             flash={flash}
             actions={
                 <Link href={route('admin.app-storage.index')} className="admin-btn admin-btn-ghost">

@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\AppStorageConfig;
-use App\Models\StorageDiskMapping;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -31,22 +29,6 @@ return new class extends Migration
 
             $table->index(['parent_id', 'is_active', 'order']);
         });
-
-        if (Schema::hasTable('storage_disk_mappings') && Schema::hasTable('app_storage_configs')) {
-            // StorageDiskMapping is audited; suppress logging for the seed row like the blog migration does.
-            activity()->withoutLogs(function (): void {
-                $local = AppStorageConfig::query()->where('driver', 'local')->orderBy('id')->first();
-                if ($local && ! StorageDiskMapping::query()->where('disk_name', 'courses')->exists()) {
-                    StorageDiskMapping::query()->create([
-                        'disk_name' => 'courses',
-                        'label' => 'صور الدورات',
-                        'primary_storage_id' => $local->id,
-                        'fallback_storage_ids' => [],
-                        'is_active' => true,
-                    ]);
-                }
-            });
-        }
     }
 
     public function down(): void

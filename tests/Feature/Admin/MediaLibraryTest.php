@@ -32,7 +32,7 @@ class MediaLibraryTest extends TestCase
         $role = Role::findOrCreate('admin', 'web');
         $role->syncPermissions(Permission::all());
 
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User

@@ -42,7 +42,7 @@ class Course extends Model
 
     use SoftDeletes;
 
-    /** Logical disk for the thumbnail and the uploaded intro video. */
+    /** Logical disk for the thumbnail (public images). */
     public const IMAGE_DISK = 'courses';
 
     /** Private logical disk for uploaded lesson videos, attachments and intro videos. */
@@ -318,7 +318,7 @@ class Course extends Model
 
     public static function isStoredPath(?string $value): bool
     {
-        return filled($value) && ! Str::startsWith((string) $value, ['http://', 'https://']);
+        return AppStorageManager::isStoredPath($value);
     }
 
     public function thumbnailUrl(): ?string
@@ -339,19 +339,7 @@ class Course extends Model
 
     public static function publicUrl(?string $value): ?string
     {
-        if (! filled($value)) {
-            return null;
-        }
-
-        if (! static::isStoredPath($value)) {
-            return $value;
-        }
-
-        try {
-            return app(AppStorageManager::class)->url(self::IMAGE_DISK, $value) ?? asset('storage/'.$value);
-        } catch (\Throwable) {
-            return asset('storage/'.$value);
-        }
+        return app(AppStorageManager::class)->publicUrl(self::IMAGE_DISK, $value);
     }
 
     /**

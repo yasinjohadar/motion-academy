@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\AuthorizesPanelResource;
+use App\Http\Controllers\Concerns\ResolvesImageField;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Blog\BlogPostStoreRequest;
 use App\Http\Requests\Admin\Blog\BlogPostUpdateRequest;
@@ -21,7 +22,7 @@ use Inertia\Response;
 
 class BlogPostController extends Controller implements HasMiddleware
 {
-    use AuthorizesPanelResource;
+    use AuthorizesPanelResource, ResolvesImageField;
 
     public function __construct(private readonly AppStorageManager $storageManager) {}
 
@@ -90,20 +91,15 @@ class BlogPostController extends Controller implements HasMiddleware
     {
         $data = $request->validated();
         $tagIds = array_values(array_unique(array_map('intval', $data['tag_ids'] ?? [])));
-        $featuredImageUrl = $data['featured_image_url'] ?? null;
         unset($data['tag_ids'], $data['featured_image'], $data['featured_image_url']);
 
         $slug = filled($data['slug'] ?? null)
             ? BlogCategory::slugify((string) $data['slug'])
             : BlogCategory::slugify((string) $data['title']);
 
-        if ($request->hasFile('featured_image')) {
-            $path = $this->storageManager->storeUploadedFile('blog', $request->file('featured_image'), 'posts');
-            if ($path !== false) {
-                $data['featured_image'] = $path;
-            }
-        } elseif (filled($featuredImageUrl)) {
-            $data['featured_image'] = $featuredImageUrl;
+        $image = $this->resolveImageField($request, 'featured_image', 'blog', 'posts');
+        if ($image !== false) {
+            $data['featured_image'] = $image;
         }
 
         $post = BlogPost::query()->create([
@@ -150,7 +146,6 @@ class BlogPostController extends Controller implements HasMiddleware
 
         $data = $request->validated();
         $tagIds = array_values(array_unique(array_map('intval', $data['tag_ids'] ?? [])));
-        $featuredImageUrl = $data['featured_image_url'] ?? null;
         unset($data['tag_ids'], $data['featured_image'], $data['featured_image_url']);
 
         $oldCategoryId = $blog_post->blog_category_id;
@@ -160,20 +155,12 @@ class BlogPostController extends Controller implements HasMiddleware
             ? (string) $data['slug']
             : (string) $blog_post->slug;
 
-        if ($request->hasFile('featured_image')) {
-            if (filled($blog_post->featured_image) && ! str_starts_with((string) $blog_post->featured_image, 'http')) {
-                $this->storageManager->delete('blog', $blog_post->featured_image);
-            }
-
-            $path = $this->storageManager->storeUploadedFile('blog', $request->file('featured_image'), 'posts');
-            if ($path !== false) {
-                $data['featured_image'] = $path;
-            }
-        } elseif (filled($featuredImageUrl)) {
-            if (filled($blog_post->featured_image) && ! str_starts_with((string) $blog_post->featured_image, 'http')) {
-                $this->storageManager->delete('blog', $blog_post->featured_image);
-            }
-            $data['featured_image'] = $featuredImageUrl;
+        $image = $this->resolveImageField(
+            $request, 'featured_image', 'blog', 'posts',
+            $blog_post->hasUploadedFeaturedImage() ? $blog_post->featured_image : null,
+        );
+        if ($image !== false) {
+            $data['featured_image'] = $image;
         }
 
         $blog_post->update([
@@ -210,9 +197,8 @@ class BlogPostController extends Controller implements HasMiddleware
         $categoryId = $blog_post->blog_category_id;
         $tagIds = $blog_post->tags()->pluck('blog_tags.id')->map(fn ($id) => (int) $id)->all();
 
-        if (filled($blog_post->featured_image) && ! str_starts_with((string) $blog_post->featured_image, 'http')) {
-            $this->storageManager->delete('blog', $blog_post->featured_image);
-        }
+        // delete() ignores values that are URLs rather than uploaded files.
+        $this->storageManager->delete('blog', $blog_post->featured_image);
 
         $blog_post->tags()->detach();
         $blog_post->delete();
@@ -270,9 +256,7 @@ class BlogPostController extends Controller implements HasMiddleware
             return back()->with('error', 'لا توجد صورة لحذفها.');
         }
 
-        if (! str_starts_with((string) $blog_post->featured_image, 'http')) {
-            $this->storageManager->delete('blog', $blog_post->featured_image);
-        }
+        $this->storageManager->delete('blog', $blog_post->featured_image);
         $blog_post->update([
             'featured_image' => null,
             'featured_image_alt' => null,

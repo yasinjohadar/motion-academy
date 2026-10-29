@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\AppStorageConfig;
-use App\Models\StorageDiskMapping;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -127,23 +125,6 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['blog_post_id', 'blog_tag_id']);
         });
-
-        if (Schema::hasTable('app_storage_configs') && Schema::hasTable('storage_disk_mappings')) {
-            // StorageDiskMapping is audited; this migration predates the activity_log
-            // table on a fresh install, so suppress logging for the seed row.
-            activity()->withoutLogs(function (): void {
-                $local = AppStorageConfig::query()->where('driver', 'local')->orderBy('id')->first();
-                if ($local && ! StorageDiskMapping::query()->where('disk_name', 'blog')->exists()) {
-                    StorageDiskMapping::query()->create([
-                        'disk_name' => 'blog',
-                        'label' => 'صور المدونة',
-                        'primary_storage_id' => $local->id,
-                        'fallback_storage_ids' => [],
-                        'is_active' => true,
-                    ]);
-                }
-            });
-        }
     }
 
     public function down(): void
@@ -152,9 +133,5 @@ return new class extends Migration
         Schema::dropIfExists('blog_posts');
         Schema::dropIfExists('blog_tags');
         Schema::dropIfExists('blog_categories');
-
-        if (Schema::hasTable('storage_disk_mappings')) {
-            StorageDiskMapping::query()->where('disk_name', 'blog')->delete();
-        }
     }
 };

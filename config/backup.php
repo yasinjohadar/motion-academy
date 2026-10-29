@@ -12,6 +12,14 @@ return [
     'files_source' => storage_path('app/public'),
 
     /*
+    | Private uploads (lesson videos and attachments). Top-level folders listed in
+    | `private_files_exclude` are never archived or wiped on restore — `backups`
+    | is where this server keeps the archives themselves.
+    */
+    'private_files_source' => storage_path('app/private'),
+    'private_files_exclude' => ['backups'],
+
+    /*
     | When true, backup/restore jobs use the queue connection.
     | Set BACKUP_DISPATCH_SYNC=true to run immediately without queue:work.
     */

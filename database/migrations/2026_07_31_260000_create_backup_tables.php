@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\AppStorageConfig;
-use App\Models\StorageDiskMapping;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -73,22 +71,6 @@ return new class extends Migration
 
             $table->index(['backup_id', 'created_at']);
         });
-
-        // StorageDiskMapping is audited; this migration predates the activity_log
-        // table on a fresh install, so suppress logging for the seed row.
-        activity()->withoutLogs(function (): void {
-            $local = AppStorageConfig::query()->where('driver', 'local')->orderBy('id')->first();
-
-            if ($local && ! StorageDiskMapping::query()->where('disk_name', 'backups')->exists()) {
-                StorageDiskMapping::query()->create([
-                    'disk_name' => 'backups',
-                    'label' => 'أرشيف النسخ الاحتياطية',
-                    'primary_storage_id' => $local->id,
-                    'fallback_storage_ids' => [],
-                    'is_active' => true,
-                ]);
-            }
-        });
     }
 
     public function down(): void
@@ -100,7 +82,5 @@ return new class extends Migration
         Schema::table('app_storage_configs', function (Blueprint $table) {
             $table->dropColumn('max_backups');
         });
-
-        StorageDiskMapping::query()->where('disk_name', 'backups')->delete();
     }
 };

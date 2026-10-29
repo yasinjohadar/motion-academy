@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Concerns;
 
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 /**
  * The image field convention of the content forms: `{field}` is an uploaded
  * file, `{field}_url` a URL picked from the media library, and
- * `remove_{field}` clears it. A replaced or removed upload is deleted.
+ * `remove_{field}` clears it. A replaced or removed upload is deleted — but only
+ * once its replacement is safely stored.
  */
 trait ResolvesImageField
 {
@@ -17,6 +19,8 @@ trait ResolvesImageField
      * clear it), or false when the current value should be left untouched.
      *
      * @param  string|null  $currentUpload  the current value when it is an uploaded path, else null
+     *
+     * @throws ValidationException when the upload fails (the current image is kept)
      */
     protected function resolveImageField(
         Request $request,
@@ -27,28 +31,24 @@ trait ResolvesImageField
     ): string|false|null {
         $storage = app(AppStorageManager::class);
 
-        $replacesExisting = $request->hasFile($field)
-            || filled($request->input("{$field}_url"))
-            || $request->boolean("remove_{$field}");
+        if ($request->hasFile($field)) {
+            $next = $storage->storeUploadedFile($disk, $request->file($field), $directory);
 
-        if ($currentUpload !== null && $replacesExisting) {
+            if ($next === false) {
+                throw ValidationException::withMessages([$field => 'تعذّر رفع الصورة. لم يتم تغيير الصورة الحالية.']);
+            }
+        } elseif (filled($request->input("{$field}_url"))) {
+            $next = (string) $request->input("{$field}_url");
+        } elseif ($request->boolean("remove_{$field}")) {
+            $next = null;
+        } else {
+            return false;
+        }
+
+        if ($currentUpload !== null && $currentUpload !== $next) {
             $storage->delete($disk, $currentUpload);
         }
 
-        if ($request->hasFile($field)) {
-            $path = $storage->storeUploadedFile($disk, $request->file($field), $directory);
-
-            return $path !== false ? $path : null;
-        }
-
-        if (filled($request->input("{$field}_url"))) {
-            return (string) $request->input("{$field}_url");
-        }
-
-        if ($request->boolean("remove_{$field}")) {
-            return null;
-        }
-
-        return false;
+        return $next;
     }
 }

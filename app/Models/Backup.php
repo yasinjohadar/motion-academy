@@ -61,6 +61,49 @@ class Backup extends Model
         ];
     }
 
+    /**
+     * Where a backup can be kept: this server's private folder, or any active
+     * cloud account. The id "local" stands for this server.
+     *
+     * @return array<int, array{id: int|string, name: string, driver: string, driver_label: string}>
+     */
+    public static function destinationOptions(): array
+    {
+        return [
+            self::localDestination(),
+            ...AppStorageConfig::query()
+                ->where('is_active', true)
+                ->orderByDesc('priority')
+                ->orderBy('name')
+                ->get()
+                ->map(fn (AppStorageConfig $config) => self::destinationFor($config))
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array{id: int|string, name: string, driver: string, driver_label: string}
+     */
+    public static function destinationFor(?AppStorageConfig $config): array
+    {
+        return $config
+            ? [
+                'id' => $config->id,
+                'name' => $config->name,
+                'driver' => $config->driver,
+                'driver_label' => config("storage.drivers.{$config->driver}", $config->driver),
+            ]
+            : self::localDestination();
+    }
+
+    /**
+     * @return array{id: string, name: string, driver: string, driver_label: string}
+     */
+    private static function localDestination(): array
+    {
+        return ['id' => 'local', 'name' => 'السيرفر المحلي', 'driver' => 'local', 'driver_label' => 'مجلد خاص'];
+    }
+
     /** @return BelongsTo<AppStorageConfig, $this> */
     public function storageConfig(): BelongsTo
     {
@@ -113,15 +156,8 @@ class Backup extends Model
                 default => $this->backup_type,
             },
             'storage_driver' => $this->storage_driver,
-            'storage_config_id' => $this->storage_config_id,
-            'storage_config' => $this->storageConfig
-                ? [
-                    'id' => $this->storageConfig->id,
-                    'name' => $this->storageConfig->name,
-                    'driver' => $this->storageConfig->driver,
-                    'driver_label' => config("storage.drivers.{$this->storageConfig->driver}", $this->storageConfig->driver),
-                ]
-                : null,
+            'storage_config_id' => $this->storage_config_id ?? 'local',
+            'storage_config' => self::destinationFor($this->storageConfig),
             'storage_path' => $this->storage_path,
             'file_path' => $this->file_path,
             'file_size' => $this->file_size,

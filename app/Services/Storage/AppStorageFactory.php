@@ -8,37 +8,41 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
+/**
+ * Builds Laravel disks for cloud accounts (S3, Cloudflare R2, IDrive e2).
+ *
+ * A zone ("public" / "private") puts the files under that prefix of the bucket,
+ * so one bucket policy can make public/* readable while private/* stays
+ * private. Without a zone (backups) the disk works at the bucket root.
+ */
 class AppStorageFactory
 {
-    public static function create(AppStorageConfig $config): Filesystem
+    public static function create(AppStorageConfig $config, ?string $zone = null): Filesystem
     {
-        $driverConfig = $config->getDecryptedConfig();
-        $diskName = 'app_storage_'.$config->id.'_'.md5(json_encode($driverConfig));
-
-        $diskConfig = self::buildDiskConfig($config->driver, $driverConfig);
-
-        if ($config->cdn_url) {
-            $diskConfig['url'] = rtrim($config->cdn_url, '/');
-        }
-
-        Config::set("filesystems.disks.{$diskName}", $diskConfig);
-
-        return Storage::disk($diskName);
+        return self::createFromArray(
+            $config->driver,
+            $config->getDecryptedConfig(),
+            $config->cdn_url,
+            $zone,
+            'app_storage_'.$config->id,
+        );
     }
 
     /**
-     * Build a runtime disk from raw driver + config (for connection tests).
-     *
      * @param  array<string, mixed>  $driverConfig
      */
-    public static function createFromArray(string $driver, array $driverConfig, ?string $cdnUrl = null): Filesystem
-    {
-        $diskName = 'test_storage_'.md5(json_encode([$driver, $driverConfig]));
-        $diskConfig = self::buildDiskConfig($driver, $driverConfig);
+    public static function createFromArray(
+        string $driver,
+        array $driverConfig,
+        ?string $cdnUrl = null,
+        ?string $zone = null,
+        string $prefix = 'test_storage',
+    ): Filesystem {
+        $diskConfig = self::buildDiskConfig($driver, $driverConfig, $zone, $cdnUrl);
 
-        if ($cdnUrl) {
-            $diskConfig['url'] = rtrim($cdnUrl, '/');
-        }
+        // Everything that shapes the disk is in the name: Storage::disk() caches by
+        // name, so a changed driver, URL or zone must never reuse an old instance.
+        $diskName = $prefix.'_'.md5(json_encode([$driver, $driverConfig, $cdnUrl, $zone]));
 
         Config::set("filesystems.disks.{$diskName}", $diskConfig);
 
@@ -49,31 +53,39 @@ class AppStorageFactory
      * @param  array<string, mixed>  $config
      * @return array<string, mixed>
      */
-    public static function buildDiskConfig(string $driver, array $config): array
+    public static function buildDiskConfig(string $driver, array $config, ?string $zone = null, ?string $cdnUrl = null): array
     {
-        return match ($driver) {
-            'local' => self::getLocalConfig($config),
+        $disk = match ($driver) {
             's3' => self::getS3Config($config),
             'cloudflare_r2' => self::getCloudflareR2Config($config),
             'idrive_e2' => self::getIdriveE2Config($config),
             default => throw new InvalidArgumentException("نوع التخزين غير مدعوم: {$driver}"),
         };
-    }
 
-    /**
-     * @param  array<string, mixed>  $config
-     * @return array<string, mixed>
-     */
-    private static function getLocalConfig(array $config): array
-    {
-        return [
-            'driver' => 'local',
-            'root' => storage_path('app/'.($config['path'] ?? 'public')),
-            // Relative so previews work regardless of APP_URL / port (e.g. 127.0.0.1:8500).
-            'url' => '/storage',
-            'visibility' => 'public',
-            'throw' => true,
-        ];
+        if ($zone === null) {
+            return $disk;
+        }
+
+        // Accounts already holding files at the bucket root (before zones existed)
+        // keep that layout instead of being silently split into public/ and private/.
+        if (! filter_var($config['legacy_root'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+            $disk['root'] = (string) config("storage.cloud_prefixes.{$zone}", $zone);
+        }
+
+        if ($zone === 'public') {
+            // The S3 adapter appends the root prefix itself (public/…).
+            $publicUrl = $cdnUrl ?: ($disk['url'] ?? null);
+            $disk['url'] = $publicUrl ? rtrim($publicUrl, '/') : null;
+
+            if (filter_var($config['public_acl'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                $disk['visibility'] = 'public';
+            }
+        } else {
+            // Private files are only ever handed out as presigned URLs.
+            $disk['url'] = null;
+        }
+
+        return $disk;
     }
 
     /**
@@ -88,7 +100,7 @@ class AppStorageFactory
             'secret' => $config['secret_access_key'] ?? '',
             'region' => $config['region'] ?? 'us-east-1',
             'bucket' => $config['bucket'] ?? '',
-            'url' => $config['url'] ?? null,
+            'url' => $config['public_url'] ?? ($config['url'] ?? null),
             'endpoint' => $config['endpoint'] ?? null,
             'use_path_style_endpoint' => filter_var($config['use_path_style'] ?? false, FILTER_VALIDATE_BOOLEAN),
             'throw' => true,
@@ -109,7 +121,9 @@ class AppStorageFactory
             'secret' => $config['secret_access_key'] ?? '',
             'region' => 'auto',
             'bucket' => $config['bucket'] ?? '',
-            'url' => $config['public_url'] ?? ($config['url'] ?? null),
+            // R2 objects are only publicly reachable through the bucket's public
+            // domain (r2.dev or a custom one); the API endpoint never serves them.
+            'url' => $config['public_url'] ?? null,
             'endpoint' => "https://{$accountId}.r2.cloudflarestorage.com",
             'use_path_style_endpoint' => true,
             'throw' => true,
@@ -128,7 +142,7 @@ class AppStorageFactory
             'secret' => $config['secret_access_key'] ?? '',
             'region' => $config['region'] ?? 'us-east-1',
             'bucket' => $config['bucket'] ?? '',
-            'url' => $config['url'] ?? null,
+            'url' => $config['public_url'] ?? ($config['url'] ?? null),
             'endpoint' => $config['endpoint'] ?? '',
             'use_path_style_endpoint' => filter_var($config['use_path_style'] ?? true, FILTER_VALIDATE_BOOLEAN),
             'throw' => true,

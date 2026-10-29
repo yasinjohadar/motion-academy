@@ -32,7 +32,7 @@ class HeroSlideTest extends TestCase
         }
 
         Role::findOrCreate('admin', 'web')->syncPermissions(Permission::all());
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -121,7 +121,7 @@ class HeroSlideTest extends TestCase
     public function test_admin_can_upload_a_slide_image_and_it_is_replaced_by_a_library_url(): void
     {
         $admin = $this->adminUser();
-        $disk = Storage::disk(config('storage.fallback_disk', 'public'));
+        $disk = Storage::disk('public');
 
         $this->actingAs($admin)->post(route('admin.hero-slides.store'), $this->validPayload([
             'visual' => HeroSlideVisual::Image->value,

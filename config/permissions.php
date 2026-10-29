@@ -70,10 +70,7 @@ return [
                         'admin.app-storage.edit-any' => 'تعديل إعدادات تخزين أنشأها آخرون',
                         'admin.app-storage.delete-any' => 'حذف إعدادات تخزين أنشأها آخرون',
                         'admin.app-storage.test' => 'اختبار اتصال التخزين',
-                        'admin.storage-disk-mappings.list' => 'عرض ربط الأقراص',
-                        'admin.storage-disk-mappings.create' => 'إنشاء ربط قرص',
-                        'admin.storage-disk-mappings.edit' => 'تعديل ربط الأقراص',
-                        'admin.storage-disk-mappings.delete' => 'حذف ربط قرص',
+                        'admin.app-storage.switch' => 'تبديل مكان تخزين الملفات ونقلها',
                     ],
                 ],
                 'backups' => [

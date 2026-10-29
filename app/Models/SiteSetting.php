@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Models\Concerns\AuditsChanges;
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class SiteSetting extends Model
 {
@@ -68,15 +67,7 @@ class SiteSetting extends Model
 
     private function resolvePublicPath(?string $path): ?string
     {
-        if (! filled($path)) {
-            return null;
-        }
-
-        if (Str::startsWith($path, ['http://', 'https://', '/'])) {
-            return $path;
-        }
-
-        return app(AppStorageManager::class)->url('site', $path);
+        return app(AppStorageManager::class)->publicUrl('site', $path);
     }
 
     /**

@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Off: Laravel's own serve route lives under /storage, the same prefix as
+            // the public symlink. Private files go out only via the signed files.private route.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

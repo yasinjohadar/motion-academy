@@ -51,12 +51,15 @@ class CourseSectionController extends Controller implements HasMiddleware
     {
         $this->authorize('update', $course);
 
-        $lessons = $section->lessons()->get();
+        $lessons = $section->lessons()->with('attachments')->get();
         $section->delete();
 
         foreach ($lessons as $lesson) {
             $this->deleteCourseFileIfUnused(Course::VIDEO_DISK, $lesson->hasStoredVideo() ? $lesson->video : null);
             $this->deleteCourseFileIfUnused(Course::VIDEO_DISK, $lesson->hasStoredAttachment() ? $lesson->attachment : null);
+            foreach ($lesson->attachments as $attachment) {
+                $this->deleteCourseFileIfUnused(Course::VIDEO_DISK, $attachment->path);
+            }
         }
 
         return back()->with('success', 'تم حذف القسم ودروسه.');

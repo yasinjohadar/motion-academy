@@ -7,7 +7,6 @@ use App\Models\Course;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
 use App\Models\SmtpSetting;
-use App\Models\StorageDiskMapping;
 use App\Models\User;
 use App\Modules\WhatsApp\Models\EvolutionInstance;
 
@@ -52,10 +51,6 @@ return [
                 // `config` مستبعد كاملاً — يحوي secret_access_key و password و token و client_secret.
                 'log_name' => 'settings',
                 'fields' => ['name', 'driver', 'is_active', 'priority', 'cdn_url', 'max_backups'],
-            ],
-            StorageDiskMapping::class => [
-                'log_name' => 'settings',
-                'fields' => ['disk_name', 'label', 'primary_storage_id', 'fallback_storage_ids', 'is_active'],
             ],
             SiteSetting::class => [
                 'log_name' => 'content',

@@ -132,25 +132,12 @@ class CourseCategory extends Model
 
     public function hasUploadedImage(): bool
     {
-        return filled($this->image) && ! Str::startsWith((string) $this->image, ['http://', 'https://']);
+        return AppStorageManager::isStoredPath($this->image);
     }
 
     public function imageUrl(): ?string
     {
-        if (! filled($this->image)) {
-            return null;
-        }
-
-        if (! $this->hasUploadedImage()) {
-            return $this->image;
-        }
-
-        try {
-            return app(AppStorageManager::class)->url(self::STORAGE_DISK, $this->image)
-                ?? asset('storage/'.$this->image);
-        } catch (\Throwable) {
-            return asset('storage/'.$this->image);
-        }
+        return app(AppStorageManager::class)->publicUrl(self::STORAGE_DISK, $this->image);
     }
 
     /**

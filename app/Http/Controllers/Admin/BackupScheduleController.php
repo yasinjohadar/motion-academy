@@ -6,7 +6,7 @@ use App\Http\Controllers\Concerns\AuthorizesPanelResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BackupScheduleStoreRequest;
 use App\Http\Requests\Admin\BackupScheduleUpdateRequest;
-use App\Models\AppStorageConfig;
+use App\Models\Backup;
 use App\Models\BackupSchedule;
 use App\Services\Backup\BackupScheduleService;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +67,7 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
         $schedule = BackupSchedule::query()->create([
             ...$data,
+            'storage_config_id' => $request->storageConfigId(),
             'retention_days' => (int) ($data['retention_days'] ?? 30),
             'is_active' => (bool) ($data['is_active'] ?? true),
             'created_by' => $request->user()?->id,
@@ -106,6 +107,7 @@ class BackupScheduleController extends Controller implements HasMiddleware
 
         $backup_schedule->fill([
             ...$data,
+            'storage_config_id' => $request->storageConfigId(),
             'retention_days' => (int) ($data['retention_days'] ?? 30),
             'is_active' => (bool) ($data['is_active'] ?? true),
         ]);
@@ -160,17 +162,6 @@ class BackupScheduleController extends Controller implements HasMiddleware
      */
     private function storageOptions(): array
     {
-        return AppStorageConfig::query()
-            ->where('is_active', true)
-            ->orderByDesc('priority')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (AppStorageConfig $config) => [
-                'id' => $config->id,
-                'name' => $config->name,
-                'driver' => $config->driver,
-                'driver_label' => config("storage.drivers.{$config->driver}", $config->driver),
-            ])
-            ->all();
+        return Backup::destinationOptions();
     }
 }

@@ -113,7 +113,7 @@ class BackupController extends Controller implements HasMiddleware
     public function store(BackupStoreRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $storage = AppStorageConfig::query()->findOrFail($data['storage_config_id']);
+        $storage = ($id = $request->storageConfigId()) ? AppStorageConfig::query()->findOrFail($id) : null;
 
         $backup = Backup::query()->create([
             'name' => filled($data['name'] ?? null)
@@ -121,8 +121,8 @@ class BackupController extends Controller implements HasMiddleware
                 : 'backup_'.now()->format('Y-m-d_H-i-s'),
             'type' => 'manual',
             'backup_type' => $data['backup_type'],
-            'storage_driver' => $storage->driver,
-            'storage_config_id' => $storage->id,
+            'storage_driver' => $storage?->driver ?? 'local',
+            'storage_config_id' => $storage?->id,
             'compression_type' => 'zip',
             'status' => 'pending',
             'progress' => 0,
@@ -275,17 +275,6 @@ class BackupController extends Controller implements HasMiddleware
      */
     private function storageOptions(): array
     {
-        return AppStorageConfig::query()
-            ->where('is_active', true)
-            ->orderByDesc('priority')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (AppStorageConfig $config) => [
-                'id' => $config->id,
-                'name' => $config->name,
-                'driver' => $config->driver,
-                'driver_label' => config("storage.drivers.{$config->driver}", $config->driver),
-            ])
-            ->all();
+        return Backup::destinationOptions();
     }
 }

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\Channels\AppDatabaseChannel;
 use App\Services\Ai\AiProviderConfigApplier;
 use App\Services\Smtp\SmtpConfigApplier;
+use App\Services\Storage\AppStorageManager;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
         // framework's notification payload. ChannelManager::createDatabaseDriver()
         // resolves DatabaseChannel through the container, so this binding is enough.
         $this->app->bind(DatabaseChannel::class, AppDatabaseChannel::class);
+
+        // One storage lookup per request (or per queued job), not one per file URL.
+        $this->app->scoped(AppStorageManager::class);
     }
 
     /**

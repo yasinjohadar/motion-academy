@@ -8,7 +8,6 @@ use App\Models\Course;
 use App\Models\CourseLesson;
 use App\Models\CourseLessonAttachment;
 use App\Models\CourseSection;
-use App\Models\StorageDiskMapping;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -31,9 +30,8 @@ class CourseCurriculumTest extends TestCase
         }
         Role::findOrCreate('admin', 'web')->syncPermissions(Permission::all());
 
-        StorageDiskMapping::query()->where('disk_name', Course::VIDEO_DISK)->delete();
         Storage::fake('local');
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -191,8 +189,8 @@ class CourseCurriculumTest extends TestCase
         $file = $lesson->attachments()->sole();
         $this->assertNotNull($file->path);
         Storage::disk('local')->assertExists($file->path);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertMissing($file->path);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertMissing($lesson->video);
+        Storage::disk('public')->assertMissing($file->path);
+        Storage::disk('public')->assertMissing($lesson->video);
         $this->assertNotNull($lesson->videoUrl());
     }
 

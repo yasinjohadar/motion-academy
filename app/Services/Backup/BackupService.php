@@ -29,15 +29,19 @@ class BackupService
             ? Backup::query()->findOrFail($options['backup_id'])
             : null;
 
-        $storageConfig = AppStorageConfig::query()->findOrFail($options['storage_config_id']);
+        // Null: this server's private folder (storage/app/private/backups).
+        $storageConfig = filled($options['storage_config_id'] ?? null)
+            ? AppStorageConfig::query()->findOrFail($options['storage_config_id'])
+            : null;
+        $driver = $storageConfig?->driver ?? 'local';
 
         if (! $backup) {
             $backup = Backup::query()->create([
                 'name' => $options['name'] ?? 'backup_'.now()->format('Y-m-d_H-i-s'),
                 'type' => $options['type'] ?? 'manual',
                 'backup_type' => $options['backup_type'] ?? 'database',
-                'storage_driver' => $storageConfig->driver,
-                'storage_config_id' => $storageConfig->id,
+                'storage_driver' => $driver,
+                'storage_config_id' => $storageConfig?->id,
                 'compression_type' => 'zip',
                 'status' => 'pending',
                 'retention_days' => (int) ($options['retention_days'] ?? 30),
@@ -53,8 +57,8 @@ class BackupService
             'started_at' => now(),
             'error_message' => null,
             'expires_at' => $backup->calculateExpiresAt(),
-            'storage_driver' => $storageConfig->driver,
-            'storage_config_id' => $storageConfig->id,
+            'storage_driver' => $driver,
+            'storage_config_id' => $storageConfig?->id,
         ]);
 
         $this->log($backup, 'info', 'بدء عملية النسخ الاحتياطي');
@@ -79,7 +83,7 @@ class BackupService
             $remotePath = "backups/{$backup->id}/{$filename}";
 
             if (! $this->storage->putFileOnConfig($storageConfig, $remotePath, $localArchive)) {
-                throw new RuntimeException('فشل رفع ملف النسخة إلى التخزين السحابي.');
+                throw new RuntimeException('فشل حفظ ملف النسخة في وجهة التخزين.');
             }
 
             $size = filesize($localArchive) ?: 0;
@@ -97,11 +101,11 @@ class BackupService
 
             $this->log($backup, 'info', 'اكتملت النسخة الاحتياطية بنجاح');
 
-            if ($storageConfig->driver !== 'local') {
-                File::deleteDirectory($tmpDir);
-            }
+            File::deleteDirectory($tmpDir);
 
-            $this->enforceMaxBackups($storageConfig);
+            if ($storageConfig) {
+                $this->enforceMaxBackups($storageConfig);
+            }
 
             return $backup->fresh(['storageConfig', 'creator']);
         } catch (\Throwable $e) {
@@ -121,12 +125,16 @@ class BackupService
 
     public function download(Backup $backup): StreamedResponse
     {
-        if ($backup->status !== 'completed' || ! $backup->storage_path || ! $backup->storageConfig) {
+        if ($backup->status !== 'completed' || ! $backup->storage_path) {
             throw new RuntimeException('النسخة غير جاهزة للتنزيل.');
         }
 
         $disk = $this->storage->diskForConfig($backup->storageConfig);
         $path = $backup->storage_path;
+
+        if (! $disk->exists($path)) {
+            throw new RuntimeException('ملف النسخة غير موجود في وجهة التخزين.');
+        }
         $name = basename($path);
 
         return response()->streamDownload(function () use ($disk, $path) {
@@ -147,7 +155,7 @@ class BackupService
 
     public function deleteBackup(Backup $backup): void
     {
-        if ($backup->storageConfig && $backup->storage_path) {
+        if ($backup->storage_path) {
             $this->storage->deleteFromConfig($backup->storageConfig, $backup->storage_path);
         }
 
@@ -209,12 +217,8 @@ class BackupService
         $this->setProgress($backup, 25, 'copying_files');
         $this->log($backup, 'info', 'جاري نسخ ملفات التخزين العام');
 
-        $source = (string) config('backup.files_source');
-        $stage = $tmpDir.'/files';
-        if (! is_dir($source)) {
-            mkdir($source, 0755, true);
-        }
-        File::copyDirectory($source, $stage);
+        $stage = $tmpDir.'/staging';
+        $this->stageUploadedFiles($stage);
 
         $this->setProgress($backup, 55, 'compressing');
 
@@ -230,18 +234,43 @@ class BackupService
         $this->compression->extract($dbZip, $sqlExtractDir);
 
         $this->setProgress($backup, 40, 'copying_files');
-        $source = (string) config('backup.files_source');
-        $filesDir = $sqlExtractDir.'/files';
-        if (is_dir($source)) {
-            File::copyDirectory($source, $filesDir);
-        } else {
-            mkdir($filesDir, 0755, true);
-        }
+        $this->stageUploadedFiles($sqlExtractDir);
 
         $this->setProgress($backup, 60, 'compressing');
         $this->log($backup, 'info', 'جاري ضغط النسخة الكاملة');
 
         return $this->compression->zipDirectory($sqlExtractDir, $tmpDir.'/full.zip');
+    }
+
+    /**
+     * Copies this server's uploads into the archive: files/ (public uploads) and
+     * private_files/ (lesson videos and attachments, without the backups folder).
+     */
+    private function stageUploadedFiles(string $stage): void
+    {
+        $public = (string) config('backup.files_source');
+        File::ensureDirectoryExists($stage.'/files');
+        if (is_dir($public)) {
+            File::copyDirectory($public, $stage.'/files');
+        }
+
+        $private = (string) config('backup.private_files_source');
+        $exclude = (array) config('backup.private_files_exclude', []);
+        if (! is_dir($private)) {
+            return;
+        }
+
+        File::ensureDirectoryExists($stage.'/private_files');
+        foreach (File::directories($private) as $dir) {
+            if (! in_array(basename($dir), $exclude, true)) {
+                File::copyDirectory($dir, $stage.'/private_files/'.basename($dir));
+            }
+        }
+        foreach (File::files($private) as $file) {
+            if (! str_starts_with($file->getFilename(), '.')) {
+                File::copy($file->getPathname(), $stage.'/private_files/'.$file->getFilename());
+            }
+        }
     }
 
     private function enforceMaxBackups(AppStorageConfig $config): void

@@ -14,7 +14,7 @@ export default function Create({ storages, queue: pageQueue, flash }) {
     return (
         <AdminUiPage
             title="إنشاء نسخة احتياطية"
-            subtitle="اختر نوع المحتوى ووجهة التخزين السحابي"
+            subtitle="اختر نوع المحتوى ووجهة الحفظ: السيرفر المحلي (مجلد خاص) أو حساب سحابي"
             flash={flash}
             actions={
                 <Link href={route('admin.backups.index')} className="admin-btn admin-btn-ghost">
@@ -73,12 +73,7 @@ export default function Create({ storages, queue: pageQueue, flash }) {
                             <select
                                 className={`form-select${errors.storage_config_id ? ' is-invalid' : ''}`}
                                 value={data.storage_config_id}
-                                onChange={(e) =>
-                                    setData(
-                                        'storage_config_id',
-                                        Number(e.target.value) || '',
-                                    )
-                                }
+                                onChange={(e) => setData('storage_config_id', e.target.value)}
                             >
                                 <option value="">اختر إعداد تخزين...</option>
                                 {storages.map((storage) => (

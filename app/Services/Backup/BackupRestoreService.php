@@ -23,7 +23,7 @@ class BackupRestoreService
         $backup->refresh();
         $backup->loadMissing('storageConfig');
 
-        if ($backup->status !== 'completed' || ! $backup->storage_path || ! $backup->storageConfig) {
+        if ($backup->status !== 'completed' || ! $backup->storage_path) {
             throw new RuntimeException('النسخة غير جاهزة للاسترجاع.');
         }
 
@@ -252,6 +252,37 @@ class BackupRestoreService
         }
 
         File::copyDirectory($source, $dest);
+
+        $this->restorePrivateFiles($extractDir);
+    }
+
+    /**
+     * Archives made since private uploads are included carry a private_files/
+     * folder. Older archives don't, and leave the private folder untouched.
+     */
+    private function restorePrivateFiles(string $extractDir): void
+    {
+        $source = $extractDir.'/private_files';
+        if (! is_dir($source)) {
+            return;
+        }
+
+        $dest = (string) config('backup.private_files_source');
+        $keep = (array) config('backup.private_files_exclude', []);
+        File::ensureDirectoryExists($dest);
+
+        foreach (File::directories($dest) as $dir) {
+            if (! in_array(basename($dir), $keep, true)) {
+                File::deleteDirectory($dir);
+            }
+        }
+        foreach (File::files($dest) as $file) {
+            if (! str_starts_with($file->getFilename(), '.')) {
+                File::delete($file->getPathname());
+            }
+        }
+
+        File::copyDirectory($source, $dest);
     }
 
     private function restoreFull(string $extractDir): void
@@ -267,5 +298,7 @@ class BackupRestoreService
             }
             File::copyDirectory($extractDir.'/files', $dest);
         }
+
+        $this->restorePrivateFiles($extractDir);
     }
 }

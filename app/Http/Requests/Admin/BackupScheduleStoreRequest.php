@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Admin\Concerns\ChoosesBackupDestination;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class BackupScheduleStoreRequest extends FormRequest
 {
+    use ChoosesBackupDestination;
+
     public function authorize(): bool
     {
         return true;
@@ -20,7 +23,7 @@ class BackupScheduleStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'backup_type' => ['required', 'string', Rule::in(['database', 'files', 'full'])],
-            'storage_config_id' => ['required', 'integer', 'exists:app_storage_configs,id'],
+            'storage_config_id' => $this->backupDestinationRules(),
             'frequency' => ['required', 'string', Rule::in(['daily', 'weekly', 'monthly'])],
             'time' => ['required', 'date_format:H:i'],
             'day_of_week' => ['nullable', 'integer', 'min:0', 'max:6', 'required_if:frequency,weekly'],

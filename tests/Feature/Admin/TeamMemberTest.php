@@ -32,7 +32,7 @@ class TeamMemberTest extends TestCase
         }
 
         Role::findOrCreate('admin', 'web')->syncPermissions(Permission::all());
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -125,7 +125,7 @@ class TeamMemberTest extends TestCase
             ['platform' => 'email', 'url' => 'layan@example.com'],
         ], $member->social_links);
         $this->assertSame($admin->id, $member->created_by);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertExists($member->avatar);
+        Storage::disk('public')->assertExists($member->avatar);
     }
 
     public function test_update_can_clear_rating_and_social_links_and_keeps_the_avatar(): void

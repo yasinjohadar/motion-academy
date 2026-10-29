@@ -3,7 +3,6 @@
 namespace App\Models\Concerns;
 
 use App\Services\Storage\AppStorageManager;
-use Illuminate\Support\Str;
 
 /**
  * An `avatar` column holding either an uploaded path on the model's IMAGE_DISK
@@ -13,23 +12,11 @@ trait HasPublicAvatar
 {
     public function hasUploadedAvatar(): bool
     {
-        return filled($this->avatar) && ! Str::startsWith((string) $this->avatar, ['http://', 'https://', '/']);
+        return AppStorageManager::isStoredPath($this->avatar);
     }
 
     public function avatarUrl(): ?string
     {
-        if (! filled($this->avatar)) {
-            return null;
-        }
-
-        if (! $this->hasUploadedAvatar()) {
-            return $this->avatar;
-        }
-
-        try {
-            return app(AppStorageManager::class)->url(self::IMAGE_DISK, $this->avatar) ?? asset('storage/'.$this->avatar);
-        } catch (\Throwable) {
-            return asset('storage/'.$this->avatar);
-        }
+        return app(AppStorageManager::class)->publicUrl(self::IMAGE_DISK, $this->avatar);
     }
 }

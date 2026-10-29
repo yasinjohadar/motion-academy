@@ -33,7 +33,7 @@ class TestimonialTest extends TestCase
         }
 
         Role::findOrCreate('admin', 'web')->syncPermissions(Permission::all());
-        Storage::fake(config('storage.fallback_disk', 'public'));
+        Storage::fake('public');
     }
 
     protected function adminUser(): User
@@ -139,7 +139,7 @@ class TestimonialTest extends TestCase
         $this->assertSame($course->id, $testimonial->course_id);
         $this->assertTrue($testimonial->is_featured);
         $this->assertSame($admin->id, $testimonial->created_by);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertExists($testimonial->avatar);
+        Storage::disk('public')->assertExists($testimonial->avatar);
     }
 
     public function test_removing_the_avatar_deletes_the_uploaded_file(): void
@@ -156,7 +156,7 @@ class TestimonialTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $this->assertNull($testimonial->fresh()->avatar);
-        Storage::disk(config('storage.fallback_disk', 'public'))->assertMissing($path);
+        Storage::disk('public')->assertMissing($path);
     }
 
     public function test_invalid_testimonial_input_is_rejected(): void

@@ -39,6 +39,8 @@ class PolicyCoverageTest extends TestCase
         'WhatsAppWebhookEvent' => 'read-only observability screen, gated by permission',
         'SocialLink' => 'edited inline within site settings',
         'SystemSetting' => 'key/value store written through services only',
+        'StorageMigration' => 'written only by StorageMigrator; shown on the storage screen, gated by admin.app-storage.* permissions',
+        'StorageMigrationFile' => 'child rows of StorageMigration',
         'OtpCode' => 'short-lived credentials read only by OtpService — never listed or edited',
         'User' => 'has UserPolicy',   // present, but listed so the map stays explicit
     ];

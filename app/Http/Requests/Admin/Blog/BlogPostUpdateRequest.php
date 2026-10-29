@@ -34,7 +34,7 @@ class BlogPostUpdateRequest extends FormRequest
             'tag_ids.*' => ['integer', 'exists:blog_tags,id'],
             'status' => ['required', 'string', Rule::in(['draft', 'published', 'scheduled', 'archived'])],
             'featured_image' => ['nullable', 'image', 'max:5120'],
-            'featured_image_url' => ['nullable', 'url', 'max:1000'],
+            'featured_image_url' => ['nullable', 'string', 'max:1000', 'regex:/^(https?:\/\/|\/).+/i'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],

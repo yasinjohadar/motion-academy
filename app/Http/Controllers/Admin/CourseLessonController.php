@@ -139,7 +139,7 @@ class CourseLessonController extends Controller implements HasMiddleware
 
         if ($source === VideoSource::Upload) {
             $attributes['video'] = $request->hasFile('video_file')
-                ? $this->storeCourseFile(Course::VIDEO_DISK, $request->file('video_file'), 'lessons')
+                ? $this->storeCourseFile(Course::VIDEO_DISK, $request->file('video_file'), 'lessons', 'video_file')
                 : ($lesson?->hasStoredVideo() ? $lesson->video : null);
         } else {
             $attributes['video'] = $source !== null ? ($request->input('video') ?: null) : null;
@@ -150,7 +150,7 @@ class CourseLessonController extends Controller implements HasMiddleware
         if ($type !== LessonType::File) {
             $attributes['attachment'] = null;
         } elseif ($request->hasFile('attachment_file')) {
-            $attributes['attachment'] = $this->storeCourseFile(Course::VIDEO_DISK, $request->file('attachment_file'), 'attachments');
+            $attributes['attachment'] = $this->storeCourseFile(Course::VIDEO_DISK, $request->file('attachment_file'), 'attachments', 'attachment_file');
         } elseif (filled($request->input('attachment'))) {
             $attributes['attachment'] = (string) $request->input('attachment');
         } elseif ($request->boolean('remove_attachment')) {
@@ -191,7 +191,7 @@ class CourseLessonController extends Controller implements HasMiddleware
                 if ($model?->path) {
                     $orphans[] = $model->path;
                 }
-                $values['path'] = $this->storeCourseFile(Course::VIDEO_DISK, $upload, 'attachments');
+                $values['path'] = $this->storeCourseFile(Course::VIDEO_DISK, $upload, 'attachments', "attachments.{$index}.file");
                 $values['original_name'] = $upload->getClientOriginalName();
                 $values['size'] = $upload->getSize();
             } elseif (! $isFile) {

@@ -7,7 +7,7 @@ use App\Models\SocialLink;
 use App\Services\Storage\AppStorageManager;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SiteSettingsService
 {
@@ -16,45 +16,22 @@ class SiteSettingsService
     public function update(SiteSetting $setting, array $data, ?UploadedFile $logo = null, ?UploadedFile $favicon = null): SiteSetting
     {
         return DB::transaction(function () use ($setting, $data, $logo, $favicon) {
-            if (! empty($data['remove_logo']) && $setting->logo_path) {
-                $this->deleteStoredPath($setting->logo_path);
-                $setting->logo_path = null;
-            }
+            // Old files are deleted only once the new values are committed: a failed
+            // upload or a rolled-back save must never cost the site its current logo.
+            $obsolete = [];
 
-            if (! empty($data['remove_favicon']) && $setting->favicon_path) {
-                $this->deleteStoredPath($setting->favicon_path);
-                $setting->favicon_path = null;
-            }
+            $setting->logo_path = $this->resolveFile(
+                'logo', $setting->logo_path, $logo, $data['logo_url'] ?? null, ! empty($data['remove_logo']), $obsolete,
+            );
+            $setting->favicon_path = $this->resolveFile(
+                'favicon', $setting->favicon_path, $favicon, $data['favicon_url'] ?? null, ! empty($data['remove_favicon']), $obsolete,
+            );
 
-            if ($logo) {
-                if ($setting->logo_path) {
-                    $this->deleteStoredPath($setting->logo_path);
+            DB::afterCommit(function () use ($obsolete) {
+                foreach ($obsolete as $path) {
+                    $this->storage->delete('site', $path);
                 }
-                $path = $this->storage->storeUploadedFile('site', $logo, 'site');
-                if ($path) {
-                    $setting->logo_path = $path;
-                }
-            } elseif (! empty($data['logo_url'])) {
-                if ($setting->logo_path) {
-                    $this->deleteStoredPath($setting->logo_path);
-                }
-                $setting->logo_path = $data['logo_url'];
-            }
-
-            if ($favicon) {
-                if ($setting->favicon_path) {
-                    $this->deleteStoredPath($setting->favicon_path);
-                }
-                $path = $this->storage->storeUploadedFile('site', $favicon, 'site');
-                if ($path) {
-                    $setting->favicon_path = $path;
-                }
-            } elseif (! empty($data['favicon_url'])) {
-                if ($setting->favicon_path) {
-                    $this->deleteStoredPath($setting->favicon_path);
-                }
-                $setting->favicon_path = $data['favicon_url'];
-            }
+            });
 
             $setting->fill([
                 'site_name' => $data['site_name'],
@@ -132,12 +109,34 @@ class SiteSettingsService
         SocialLink::query()->whereNotIn('id', $keepIds)->delete();
     }
 
-    private function deleteStoredPath(?string $path): void
+    /**
+     * The new value of a file column. Previous files that the new value replaces
+     * are added to $obsolete for deletion after commit.
+     *
+     * @param  array<int, string>  $obsolete
+     */
+    private function resolveFile(string $field, ?string $current, ?UploadedFile $file, ?string $url, bool $remove, array &$obsolete): ?string
     {
-        if (! $path || Str::startsWith($path, ['http://', 'https://'])) {
-            return;
+        if ($file) {
+            $path = $this->storage->storeUploadedFile('site', $file, 'site');
+
+            if ($path === false) {
+                throw ValidationException::withMessages([$field => 'تعذّر رفع الملف. لم يتم تغيير الملف الحالي.']);
+            }
+
+            $next = $path;
+        } elseif (filled($url)) {
+            $next = $url;
+        } elseif ($remove) {
+            $next = null;
+        } else {
+            return $current;
         }
 
-        $this->storage->delete('site', $path);
+        if ($current !== null && $current !== $next) {
+            $obsolete[] = $current;
+        }
+
+        return $next;
     }
 }

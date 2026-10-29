@@ -26,7 +26,6 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SitePageController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SmtpSettingController;
-use App\Http\Controllers\Admin\StorageDiskMappingController;
 use App\Http\Controllers\Admin\StudentImpersonationController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -180,13 +179,13 @@ Route::middleware(['auth', 'verified', 'admin.panel'])
         Route::post('team-members/{team_member}/toggle-active', [TeamMemberController::class, 'toggleActive'])
             ->name('team-members.toggle-active');
 
+        Route::post('app-storage/switch', [AppStorageController::class, 'switch'])
+            ->name('app-storage.switch');
         Route::post('app-storage/test-draft', [AppStorageController::class, 'testDraft'])
             ->name('app-storage.test-draft');
         Route::post('app-storage/{app_storage}/test', [AppStorageController::class, 'test'])
             ->name('app-storage.test');
         Route::resource('app-storage', AppStorageController::class)->except(['show']);
-
-        Route::resource('storage-disk-mappings', StorageDiskMappingController::class)->except(['show']);
 
         Route::get('media/picker', [MediaController::class, 'picker'])->name('media.picker');
         Route::post('media/upload', [MediaController::class, 'upload'])->name('media.upload');
